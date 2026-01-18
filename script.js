@@ -1,21 +1,28 @@
 function toggleLesson(header) {
-    const lesson = header.parentElement;
-    lesson.classList.toggle("open");
+  const lesson = header.parentElement;
+  lesson.classList.toggle("open");
 }
 
- const form = document.querySelector("form");
+const form = document.querySelector("form");
 const status = document.getElementById("form-status");
+const iframe = document.getElementById("hidden_iframe");
+
+let submitted = false;
 
 form.addEventListener("submit", () => {
-  // Show success message
-  status.hidden = false;
-
-  // Move screen reader + keyboard focus to message
-  status.focus();
-
-  // Optional UX improvements
-  form.reset();
+  submitted = true;
 });
 
-const button = form.querySelector("button[type='submit']");
-button.disabled = true;
+iframe.addEventListener("load", () => {
+  if (!submitted) return;
+
+  // Safe: Google has received the data
+  status.hidden = false;
+  status.focus();
+
+  form.reset();
+  submitted = false;
+});
+
+const submitBtn = form.querySelector("input[type='submit']");
+submitBtn.disabled = false;
