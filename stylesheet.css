@@ -122,9 +122,14 @@ h1 {
 }
 
 .site-header {
-  position: relative;   /* IMPORTANT */
-  z-index: 10;
-  padding: 0.8rem 0 1rem;
+  position: relative;
+  z-index: 1000;   /* ⬅️ raise this */
+}
+
+main,
+form {
+  position: relative;
+  /* NO z-index */
 }
 
 .header-bg {
@@ -384,5 +389,14 @@ form {
   /* Show menu */
   .mobile-menu.show {
     display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu {
+    position: fixed;      /* 🔥 KEY CHANGE */
+    top: 64px;
+    right: 16px;
+    z-index: 2000;        /* higher than header bg */
   }
 }
