@@ -1,40 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Lesson Map</title>
-<link rel="stylesheet" href="lesson-map.css">
+  <meta charset="UTF-8">
+  <title>Lesson Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="lesson-map.css">
 </head>
 <body>
 
- 
-
 <main>
-<div class="map-container">
-  <h1>Your Learning Journey 🌟</h1>
+  <div class="map-container">
+    <h1>Your Learning Journey 🌟</h1>
 
-  <div class="map-wrapper">
+    <div class="map-wrapper">
 
-    <!-- SVG CURVED PATH -->
-    <svg class="path-svg" viewBox="0 0 300 1000" preserveAspectRatio="xMidYMin meet">
-      <path d="M150 80 C50 180, 250 280, 150 380
-               C50 480, 250 580, 150 680
-               C50 780, 250 880, 150 980"
-            fill="none" stroke="#ffffff88" stroke-width="6"
-            stroke-linecap="round"/>
-    </svg>
+      <!-- SVG CURVED PATH -->
+      <svg class="path-svg" viewBox="0 0 300 1000" preserveAspectRatio="xMidYMin meet">
+        <path d="M150 80 C50 180, 250 280, 150 380
+                 C50 480, 250 580, 150 680
+                 C50 780, 250 880, 150 980"
+              fill="none"
+              stroke="#ffffff88"
+              stroke-width="6"
+              stroke-linecap="round"/>
+      </svg>
 
-    <!-- LESSON NODES -->
-    <div class="lesson lesson-1">
-      <div class="node">1</div>
+      <!-- LESSON NODES -->
+      <div class="lesson lesson-1"><div class="node">1</div></div>
+      <div class="lesson lesson-2"><div class="node">2</div></div>
+      <div class="lesson lesson-3"><div class="node">3</div></div>
+      <div class="lesson lesson-4"><div class="node">4</div></div>
+      <div class="lesson lesson-5"><div class="node">5</div></div>
+
     </div>
+  </div>
+</main>
 
-    <div class="lesson lesson-2 locked">
-      <div class="node">2</div>
-    </div>
-
-    <div class="lesson lesson-3 locked">
-      <div class="node">3</div>
+<script src="lesson-map.js"></script>
+</body>
+</html>      <div class="node">3</div>
     </div>
 
     <div class="lesson lesson-4 locked">
