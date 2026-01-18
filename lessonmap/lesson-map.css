@@ -1,100 +1,156 @@
-/* ===== RESET ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+*{
+box-sizing: border-box;
+font-family: 'Segoe UI', sans-serif;
 }
+
 
 body {
-  background: linear-gradient(180deg, #0f4c75, #1b6ca8);
-  color: white;
-  display: flex;
-  justify-content: center;
-  overflow-x: hidden;
+margin: 0;
+background: linear-gradient(180deg, #0f4c75, #1b6ca8);
+display: flex;
+justify-content: center;
+overflow-x: hidden;
 }
 
-/* ===== CONTAINER ===== */
 .map-container {
-  width: 100%;
-  max-width: 420px;
-  padding: 24px 16px 60px;
+width: 100%;
+max-width: 420px;
+padding: 20px;
+color: white;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 32px;
-  font-size: 1.8rem;
+text-align: center;
+margin-bottom: 20px;
 }
 
-/* ===== MAP WRAPPER (CRITICAL PART) ===== */
 .map-wrapper {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 3 / 10;   /* 🔥 controls height safely */
-  margin: 0 auto;
+position: relative;
+width: 100%;
+min-height: 120vh;   /* grows with screen */
+max-width: 420px;
+margin: 0 auto;
 }
 
-/* ===== SVG PATH ===== */
+/* SVG Path */
 .path-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+position: absolute;
+width: 100%;
+height: 100%;
+left: 0;
+top: 0;
+overflow: visible;
 }
 
-/* ===== LESSON NODES ===== */
+/* Lesson positioning */
 .lesson {
-  position: absolute;
-  transform: translate(-50%, -50%);
+position: absolute;
+left: 50%;
+transform: translateX(-50%);
 }
 
-/* These percentages MATCH your SVG curve */
-.lesson-1 { top: 8%;  left: 50%; }
-.lesson-2 { top: 24%; left: 30%; }
-.lesson-3 { top: 40%; left: 70%; }
-.lesson-4 { top: 58%; left: 30%; }
-.lesson-5 { top: 76%; left: 70%; }
+.lesson-1 { top: 40px; }
+.lesson-2 { top: 200px; left: 30%; }
+.lesson-3 { top: 360px; left: 70%; }
+.lesson-4 { top: 520px; left: 30%; }
+.lesson-5 { top: 680px; left: 70%; }
 
-/* ===== NODE STYLE ===== */
+/* Node style */
 .node {
-  width: clamp(48px, 8vw, 64px);
-  height: clamp(48px, 8vw, 64px);
-  border-radius: 50%;
-  background: #4caf50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(16px, 3vw, 22px);
-  font-weight: bold;
-  box-shadow: 0 0 18px rgba(0,0,0,0.35);
+width: 64px;
+height: 64px;
+border-radius: 50%;
+background: #4caf50;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 22px;
+font-weight: bold;
+box-shadow: 0 0 18px rgba(0,0,0,0.3);
+cursor: pointer;
 }
 
-/* ===== STATES (optional, safe) ===== */
-.lesson.locked .node {
-  background: #777;
-  opacity: 0.6;
+/* Locked */
+.locked .node {
+background: #777;
+opacity: 0.6;
+cursor: not-allowed;
 }
 
-.lesson.completed .node {
-  background: gold;
-  box-shadow: 0 0 18px gold;
+/* Completed */
+.completed .node {
+background: gold;
+box-shadow: 0 0 18px gold;
 }
 
-.lesson.current .node {
-  animation: pulse 1.5s infinite;
+/* Current */
+.current .node {
+animation: pulse 1.5s infinite;
 }
 
-/* ===== ANIMATION ===== */
+/* Pulse */
 @keyframes pulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.12); }
-  100% { transform: scale(1); }
+0% { transform: scale(1); }
+50% { transform: scale(1.1); }
+100% { transform: scale(1); }
 }
 
-/* ===== LANDSCAPE FIX ===== */
-@media (orientation: landscape) {
-  .map-wrapper {
-    aspect-ratio: 3 / 7;
-  }
+@media (max-width: 600px) {
+.map-wrapper {
+min-height: 140vh;
 }
+
+.node {
+width: 52px;
+height: 52px;
+font-size: 18px;
+}
+}
+
+let completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
+
+const lessons = document.querySelectorAll(".lesson");
+
+lessons.forEach((lesson, index) => {
+const lessonNumber = index + 1;
+
+// reset states
+lesson.classList.remove("locked", "completed", "current");
+
+// ✅ COMPLETED LESSONS
+if (lessonNumber <= completedLessons) {
+lesson.classList.add("completed");
+addChampionBadge(lesson);
+}
+// ▶️ CURRENT (next unlocked)
+else if (lessonNumber === completedLessons + 1) {
+lesson.classList.add("current");
+}
+// 🔒 LOCKED
+else {
+lesson.classList.add("locked");
+}
+
+// CLICK HANDLER
+lesson.addEventListener("click", () => {
+if (lesson.classList.contains("locked")) return;
+
+// ♻️ allow replay of completed lessons  
+window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+
+});
+});
+
+/* 🏆 CHAMPION BADGE FOR COMPLETED LESSONS */
+function addChampionBadge(lesson) {
+// prevent duplicate emoji
+if (lesson.querySelector(".champion")) return;
+
+const badge = document.createElement("span");
+badge.className = "champion";
+badge.textContent = " 🏆";
+badge.style.marginLeft = "6px";
+badge.style.fontSize = "1.2rem";
+
+lesson.appendChild(badge);
+  }
