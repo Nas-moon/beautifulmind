@@ -404,10 +404,6 @@ form {
     right: 16px;
     z-index: 1000;        /* higher than header bg */
   }
-  h1 {
-   position: fixed;
-   z-index: 0;
-  }
 }
 
 .mobile-menu {
