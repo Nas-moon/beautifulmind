@@ -1,101 +1,132 @@
+/* ================================
+   GLOBAL RESET
+================================ */
 * {
   box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
 }
 
-body {
+html, body {
   margin: 0;
-  background: linear-gradient(180deg, #0f4c75, #1b6ca8);
-  display: flex;
-  justify-content: center;
+  padding: 0;
   overflow-x: hidden;
-}
-
-.map-container {
-  width: 100%;
-  max-width: 420px;
-  padding: 20px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  background: linear-gradient(180deg, #0c4a6e, #083344);
   color: white;
 }
 
-h1 {
+/* ================================
+   HEADER
+================================ */
+.title {
   text-align: center;
-  margin-bottom: 20px;
+  font-size: 2rem;
+  font-weight: bold;
+  padding: 24px 12px;
 }
 
-/* 🔑 SVG CONTROLS LAYOUT */
-.map-wrapper {
+/* ================================
+   TIMELINE CONTAINER
+================================ */
+.timeline-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 10;
   max-width: 420px;
   margin: 0 auto;
-  padding-top: 40px;   /* 🔑 reserves space for title */
+  min-height: 180vh;     /* KEY FIX */
+  padding-bottom: 40px;
 }
 
-/* SVG PATH */
-.path-svg {
+/* ================================
+   PATH (CURVED LINE)
+================================ */
+.timeline-path {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
   height: 100%;
+  background: linear-gradient(
+    to bottom,
+    #e5e7eb,
+    #9ca3af,
+    #e5e7eb
+  );
+  border-radius: 10px;
 }
 
-/* LESSON ANCHOR */
-.lesson {
-  position: absolute;
-  transform: translate(-50%, -50%);
-}
-
-/* 🎯 PERCENT-BASED POSITIONS (RESPONSIVE) */
-.lesson-1 { top: 10%; left: 50%; }
-.lesson-2 { top: 24%; left: 32%; }
-.lesson-3 { top: 40%; left: 68%; }
-.lesson-4 { top: 58%; left: 32%; }
-.lesson-5 { top: 76%; left: 68%; }
-
-/* NODE STYLE */
+/* ================================
+   NODES
+================================ */
 .node {
-  width: clamp(48px, 8vw, 64px);
-  height: clamp(48px, 8vw, 64px);
+  position: absolute;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: #4caf50;
+  font-size: 16px;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(16px, 3vw, 22px);
-  font-weight: bold;
-  box-shadow: 0 0 18px rgba(0,0,0,0.3);
-  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease;
 }
 
-/* LOCKED */
-.locked .node {
-  background: #777;
+.node:hover {
+  transform: scale(1.1);
+}
+
+/* ================================
+   NODE STATES
+================================ */
+.node.completed {
+  background: #facc15;
+  color: #1f2937;
+  box-shadow: 0 0 25px rgba(250,204,21,0.8);
+}
+
+.node.active {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.node.locked {
+  background: #6b7280;
+  color: #1f2937;
   opacity: 0.6;
-  cursor: not-allowed;
 }
 
-/* COMPLETED */
-.completed .node {
-  background: gold;
-  box-shadow: 0 0 18px gold;
+/* ================================
+   NODE POSITIONS (PERCENT-BASED)
+================================ */
+.node.step-1 { top: 6%;  left: 52%; }
+.node.step-2 { top: 20%; left: 38%; }
+.node.step-3 { top: 36%; left: 60%; }
+.node.step-4 { top: 52%; left: 40%; }
+.node.step-5 { top: 68%; left: 58%; }
+
+/* ================================
+   TROPHY ICON
+================================ */
+.trophy {
+  position: absolute;
+  font-size: 22px;
+  top: 9%;
+  left: 52%;
+  transform: translateX(-50%);
 }
 
-/* CURRENT */
-.current .node {
-  animation: pulse 1.5s infinite;
-  transform-origin: center;
-}
+/* ================================
+   MOBILE TUNING
+================================ */
+@media (max-width: 600px) {
+  .timeline-container {
+    min-height: 200vh;
+  }
 
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
-  70%  { box-shadow: 0 0 0 14px rgba(255,215,0,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,215,0,0); }
-}
-/* 📱 LANDSCAPE FIX */
-@media (orientation: landscape) {
-  .map-wrapper {
-    aspect-ratio: 3 / 8;
+  .node {
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
   }
 }
