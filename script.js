@@ -26,3 +26,15 @@ iframe.addEventListener("load", () => {
 
 const submitBtn = form.querySelector("input[type='submit']");
 submitBtn.disabled = false;
+
+const burgerBtn = document.getElementById("burgerBtn");
+const mobileMenu = document.getElementById("mobileMenu");
+
+burgerBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  mobileMenu.classList.toggle("show");
+});
+
+document.addEventListener("click", () => {
+  mobileMenu.classList.remove("show");
+});
