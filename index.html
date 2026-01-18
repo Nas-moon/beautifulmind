@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,124 +9,65 @@
       </head>
 
   <body>
-     <header>
+     <header class="site-header">
+       <div class="header-bg"></div>
+       
        <nav class="navi">
           <div class="ice">
-             <svg id="fire" xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 64 64"><title xmlns="">rosette</title><path fill="#a01a5d" d="m46.5 31.2l-2.8-8.3S52.2 10.6 49 8.3s-12.6 9.5-12.6 9.5h-9S18 6.1 14.8 8.3s5.3 14.6 5.3 14.6l-2.8 8.3S3 36.3 4.2 40s15.9-.4 15.9-.4l7.3 5.2s.5 14.9 4.5 14.9s4.5-14.9 4.5-14.9l7.3-5.2s14.7 4.1 15.9.4c1.3-3.7-13.1-8.8-13.1-8.8"/><g fill="#e84d88"><path d="M41.8 9.9c0 10-4.4 18.2-9.9 18.2S22 20 22 9.9s7.2-4.2 9.9-4.2s9.9-5.8 9.9 4.2"/><path d="M13 16.5c9.8 3.1 16.4 9.7 14.7 14.8s-11 6.6-20.8 3.5s-1.9-8-1.1-10.5c.8-2.4-2.6-10.9 7.2-7.8"/><path d="M10.5 45.3c6-8.1 14.5-12.2 18.9-9c4.4 3.1 3.1 12.2-3 20.4c-6 8.1-8.4-.7-10.5-2.2c-2.1-1.6-11.5-1.1-5.4-9.2"/><path d="M37.8 56.5c-6-8.1-7.4-17.2-3-20.4c4.4-3.1 12.9.9 18.9 9s-3.3 7.6-5.4 9.1c-2.1 1.6-4.5 10.4-10.5 2.3"/><path d="M57.1 34.6c-9.8 3.1-19.1 1.5-20.8-3.5c-1.6-5.1 5-11.7 14.7-14.8c9.8-3.1 6.4 5.4 7.2 7.9c.8 2.4 8.7 7.3-1.1 10.4"/></g><ellipse cx="32" cy="32.4" fill="#ffce31" rx="3.8" ry="3.7"/></svg>
-
+             <svg id="fire" xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><title xmlns="">star-fill</title><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#ffda33" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></g></svg>
               <div class="logoname">
          <p>BEAUTIFUL MIND</p>
               </div>
             </div>
             <div class="right">
-     <a href="#"><input type="button" class="instru" value="Instruction"></a>
+     <a href="instru.html"><input type="button" class="instru" value="Instructions"></a>
               <a href="#"><input type="button" class="tracker" value="Tracker"></a>
             </div>
         </nav>
-        <div class="line"></div>
      </header>
 
-     <main>
+     <main class="content">
+
+<div class="starfield">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
        <h1>BEAUTIFUL MIND</h1>
-       <h2><q>LEARNING IS FUN!</q></h2>
+       <h2 class="quote"><q>LEARNING IS FUN!</q></h2>
+       <p class="read">(Read the instructions properly before you proceed)</p>
 <div class="content-layout">
 
        <div class="timeline-container">
     <div class="timeline-background"></div>
 
-    <aside class="timeline">
-
-<h2 id="plan">Lesson Plan</h2>
-
-        <div class="lesson">
-            <div class="lesson-header" onclick="toggleLesson(this)">
-                <span class="arrow">▶</span>
-                <span class="dot"></span>
-                <h3>Lesson 1</h3>
-            </div>
-
-            <div class="lesson-topics">
-                <p>Topic 1: Introduction</p>
-                <p>Topic 2: Core Concepts</p>
-                <p>Topic 3: Practice</p>
-            </div>
-        </div>
-
-        <div class="lesson">
-            <div class="lesson-header" onclick="toggleLesson(this)">
-                <span class="arrow">▶</span>
-                <span class="dot"></span>
-                <h3>Lesson 2</h3>
-            </div>
-
-            <div class="lesson-topics">
-                <p>Topic 1: Theory</p>
-                <p>Topic 2: Examples</p>
-                <p>Topic 3: Quiz</p>
-            </div>
-        </div>
-
-<div class="lesson">
-            <div class="lesson-header" onclick="toggleLesson(this)">
-                <span class="arrow">▶</span>
-                <span class="dot"></span>
-                <h3>Lesson 3</h3>
-            </div>
-
-            <div class="lesson-topics">
-                <p>Topic 1: Theory</p>
-                <p>Topic 2: Examples</p>
-                <p>Topic 3: Quiz</p>
-            </div>
-        </div>
-
-<div class="lesson">
-            <div class="lesson-header" onclick="toggleLesson(this)">
-                <span class="arrow">▶</span>
-                <span class="dot"></span>
-                <h3>Lesson 4</h3>
-            </div>
-
-            <div class="lesson-topics">
-                <p>Topic 1: Theory</p>
-                <p>Topic 2: Examples</p>
-                <p>Topic 3: Quiz</p>
-            </div>
-        </div>
-
-<div class="lesson">
-            <div class="lesson-header" onclick="toggleLesson(this)">
-                <span class="arrow">▶</span>
-                <span class="dot"></span>
-                <h3>Lesson 5</h3>
-            </div>
-
-            <div class="lesson-topics">
-                <p>Topic 1: Theory</p>
-                <p>Topic 2: Examples</p>
-                <p>Topic 3: Quiz</p>
-            </div>
-        </div>
-
-    </aside>
+   
 </div>
 
 <section class="form-section" id="form">
 <h3 id="fill">Fill the details</h3>
         <form
-  action="https://docs.google.com/forms/d/e/1FAIpQLSf4RWqEgaNLDqZOE0mXf-69HEPz8-a-8n3fUjxS5a7-6lX6pw/formResponse"
+  action="https://docs.google.com/forms/d/e/1FAIpQLSdIoq4y40mf2hmr2cK3J2W2svxh8V65Jipt6hOSK-q_D8nV9w/formResponse"
   method="POST"
-  target="hidden_iframe"
->
+  target="hidden_iframe">
+
   <fieldset id="fieldcolor">
         <label for="name">Name (required):</label>
-<input type="text" id="name" name="entry.1995608569" required>
+<input type="text" id="name" name="entry.142485418" placeholder="Mary" class="form-box" required>
+
+<label for="std">Standard of Education (required):</label>
+<input type="text" id="std" name="entry.977842397" placeholder="Eg. 7th standard" class="form-box" required>
 
   <label for="email">Email Address (required):</label>
-<input type="email" id="email" name="entry.1974047936" required>
+<input type="email" id="email" name="entry.64219840" placeholder="abc123@gmail.com" class="form-box" required>
 
-<label for="number">Phone No (required):</label>
-<input type="number" id="number" required>
+<label for="number">Parent mobile number (required):</label>
+<input type="tel" id="number" name="entry.871929848" placeholder="xxxxxxxxxx"  pattern="[0-9]{10}"
+  aria-describedby="phone-help" class="form-box" required>  
+
+<label for="add">Home Address (required):</label>
+<input type="text" id="add" name="entry.1745604996" class="form-box" required>
 
 <input type="submit" id="submit" value="Submit">
   </fieldset>
