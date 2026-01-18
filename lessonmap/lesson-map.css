@@ -23,85 +23,78 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* 🔑 SVG CONTROLS LAYOUT */
 .map-wrapper {
   position: relative;
   width: 100%;
-  min-height: 120vh;   /* grows with screen */
+  aspect-ratio: 3 / 10;
   max-width: 420px;
   margin: 0 auto;
 }
 
-/* SVG Path */
+/* SVG PATH */
 .path-svg {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  left: 0;
-  top: 0;
-  overflow: visible;
 }
 
-/* Lesson positioning */
+/* LESSON ANCHOR */
 .lesson {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 }
 
-.lesson-1 { top: 40px; }
-.lesson-2 { top: 200px; left: 30%; }
-.lesson-3 { top: 360px; left: 70%; }
-.lesson-4 { top: 520px; left: 30%; }
-.lesson-5 { top: 680px; left: 70%; }
+/* 🎯 PERCENT-BASED POSITIONS (RESPONSIVE) */
+.lesson-1 { top: 8%;  left: 50%; }
+.lesson-2 { top: 22%; left: 32%; }
+.lesson-3 { top: 38%; left: 68%; }
+.lesson-4 { top: 55%; left: 32%; }
+.lesson-5 { top: 72%; left: 68%; }
 
-/* Node style */
+/* NODE STYLE */
 .node {
-  width: 64px;
-  height: 64px;
+  width: clamp(48px, 8vw, 64px);
+  height: clamp(48px, 8vw, 64px);
   border-radius: 50%;
   background: #4caf50;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: clamp(16px, 3vw, 22px);
   font-weight: bold;
   box-shadow: 0 0 18px rgba(0,0,0,0.3);
   cursor: pointer;
 }
 
-/* Locked */
+/* LOCKED */
 .locked .node {
   background: #777;
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Completed */
+/* COMPLETED */
 .completed .node {
   background: gold;
   box-shadow: 0 0 18px gold;
 }
 
-/* Current */
+/* CURRENT */
 .current .node {
   animation: pulse 1.5s infinite;
 }
 
-/* Pulse */
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.1); }
   100% { transform: scale(1); }
 }
 
-@media (max-width: 600px) {
+/* 📱 LANDSCAPE FIX */
+@media (orientation: landscape) {
   .map-wrapper {
-    min-height: 140vh;
-  }
-
-  .node {
-    width: 52px;
-    height: 52px;
-    font-size: 18px;
+    aspect-ratio: 3 / 7;
   }
 }
