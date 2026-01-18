@@ -123,7 +123,8 @@ h1 {
 
 .site-header {
   position: relative;
-  z-index: 1000;   /* ⬅️ raise this */
+   /* ⬅️ raise this */
+  padding: 0.8rem 0 1rem ;
 }
 
 main,
@@ -136,7 +137,7 @@ form {
   position: absolute;
   inset: 0;             /* top:0 left:0 right:0 bottom:0 */
   background-color: #1b5583;  /* different from site */
-  z-index: 0;
+  z-index: -1;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
  }
 
@@ -393,11 +394,15 @@ form {
 }
 
 @media (max-width: 768px) {
+  .burger {
+    position: relative;
+    z-index: 1001;
+  }
   .mobile-menu {
     position: fixed;      /* 🔥 KEY CHANGE */
     top: 64px;
     right: 16px;
-    z-index: 2000;        /* higher than header bg */
+    z-index: 1000;        /* higher than header bg */
   }
 }
 
