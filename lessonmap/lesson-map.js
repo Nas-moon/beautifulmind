@@ -27,7 +27,7 @@ lessons.forEach((lesson, index) => {
     if (lesson.classList.contains("locked")) return;
 
     // ♻️ allow replay of completed lessons
-    window.location.href = `lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+    window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
   });
 });
 
