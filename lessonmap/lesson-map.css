@@ -1,4 +1,4 @@
-*{
+* {
 box-sizing: border-box;
 font-family: 'Segoe UI', sans-serif;
 }
@@ -9,7 +9,6 @@ margin: 0;
 background: linear-gradient(180deg, #0f4c75, #1b6ca8);
 display: flex;
 justify-content: center;
-overflow-x: hidden;
 }
 
 .map-container {
@@ -26,10 +25,7 @@ margin-bottom: 20px;
 
 .map-wrapper {
 position: relative;
-width: 100%;
-min-height: 120vh;   /* grows with screen */
-max-width: 420px;
-margin: 0 auto;
+height: 900px;
 }
 
 /* SVG Path */
@@ -39,7 +35,6 @@ width: 100%;
 height: 100%;
 left: 0;
 top: 0;
-overflow: visible;
 }
 
 /* Lesson positioning */
@@ -94,63 +89,3 @@ animation: pulse 1.5s infinite;
 50% { transform: scale(1.1); }
 100% { transform: scale(1); }
 }
-
-@media (max-width: 600px) {
-.map-wrapper {
-min-height: 140vh;
-}
-
-.node {
-width: 52px;
-height: 52px;
-font-size: 18px;
-}
-}
-
-let completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
-
-const lessons = document.querySelectorAll(".lesson");
-
-lessons.forEach((lesson, index) => {
-const lessonNumber = index + 1;
-
-// reset states
-lesson.classList.remove("locked", "completed", "current");
-
-// ✅ COMPLETED LESSONS
-if (lessonNumber <= completedLessons) {
-lesson.classList.add("completed");
-addChampionBadge(lesson);
-}
-// ▶️ CURRENT (next unlocked)
-else if (lessonNumber === completedLessons + 1) {
-lesson.classList.add("current");
-}
-// 🔒 LOCKED
-else {
-lesson.classList.add("locked");
-}
-
-// CLICK HANDLER
-lesson.addEventListener("click", () => {
-if (lesson.classList.contains("locked")) return;
-
-// ♻️ allow replay of completed lessons  
-window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
-
-});
-});
-
-/* 🏆 CHAMPION BADGE FOR COMPLETED LESSONS */
-function addChampionBadge(lesson) {
-// prevent duplicate emoji
-if (lesson.querySelector(".champion")) return;
-
-const badge = document.createElement("span");
-badge.className = "champion";
-badge.textContent = " 🏆";
-badge.style.marginLeft = "6px";
-badge.style.fontSize = "1.2rem";
-
-lesson.appendChild(badge);
-  }
