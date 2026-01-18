@@ -36,8 +36,6 @@ h1 {
   font-size: 40px;
   letter-spacing: 0.04em;
   color: #C7e4ee;
-  position: fixed;
-  z-index: 0;
 }
 
 #fire {
@@ -132,7 +130,7 @@ h1 {
 main,
 form {
   position: relative;
-  /* NO z-index */
+  z-index: 5;/* NO z-index */
 }
 
 .header-bg {
@@ -407,6 +405,7 @@ form {
     z-index: 1000;        /* higher than header bg */
   }
   h1 {
+   position: fixed;
    z-index: 0;
   }
 }
