@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3 – Topic 2</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Verdana, sans-serif;
+  background: #eef4fa;
+  color: #222;
+}
+
+/* HEADER */
+header {
+  background: #1b5583;
+  color: white;
+  padding: 1rem 2rem;
+}
+
+header h1 {
+  margin: 0.5em;
+  font-size: 1.2rem;
+}
+
+/* MAIN */
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+h2 {
+  color: #1b5583;
+  margin-bottom: 1rem;
+}
+
+/* VIDEO */
+.video-wrapper {
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* BUTTON */
+button {
+  background: #1b5583;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #9fb6cc;
+  cursor: not-allowed;
+}
+
+/* PROGRESS TEXT */
+#progress {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.back {
+  margin-left: auto;
+  margin-right: 10%;
+  padding: 2px 0.5em;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: verdana;
+  font-weight: bold;
+  background-color: #e6eef4;
+  color: #1b5583;  
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  font-size: 15px;
+  margin-top: 5px;
+  display: flex;
+  justify-content: flex-start;
+  margin-left: auto;
+  margin-right: 20px;
+  line-height: 2em;
+
+}
+
+.back:hover,
+.tracker:hover {
+  background-color: #dbe7f0;
+}
+
+.heado {
+  display: flex;
+}
+
+/* STAR BAR */
+#star-bar {
+  position: fixed;
+  top: 1rem;
+  right: 1.5rem;
+  background: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 1.2rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+/* FLYING STAR */
+.star {
+  position: fixed;
+  font-size: 2rem;
+  z-index: 9999;
+  pointer-events: none;
+  animation: fly 1s ease-in-out forwards;
+}
+
+@keyframes fly {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.3) translate(300px, -300px);
+    opacity: 0;
+  }
+}
+
+/* CONFETTI */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: gold;
+  top: 50%;
+  left: 50%;
+  opacity: 0.9;
+  animation: fall 1s ease-out forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translate(
+      calc(-100px + 200px * var(--x)),
+      calc(200px + 300px * var(--y))
+    );
+    opacity: 0;
+  }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="heado">
+  <h1>Lesson 3 • Topic 2</h1>
+  <button class="back">Back</button>
+ </div>
+</header>
+
+<main>
+<!-- STAR COUNTER -->
+     <div id="star-bar">
+        ⭐ <span id="star-count">0</span>
+     </div>
+
+  <h2>Introduction</h2>
+
+  <div class="video-wrapper">
+    <iframe
+      title="Lesson 3 Topic 2"
+      src="https://drive.google.com/file/d/1Wz69Kfk8cddnorpToNAwCVJN4oBiMTUj/preview"
+      width="100%"
+      height="450"
+      allow="autoplay"
+      allowfullscreen
+     
+    ></iframe>
+  </div>
+
+  <button id="nextBtn" disabled>
+    Proceed to Topic 3 →
+  </button>
+
+  <p id="progress">Watching video…</p>
+</main>
+
+<script>
+const VIDEO_DURATION = 10;
+const STORAGE_KEY = "l3topic2_completed";
+const STAR_KEY = "total_stars";
+
+const nextBtn = document.getElementById("nextBtn");
+const progress = document.getElementById("progress");
+const starCountEl = document.getElementById("star-count");
+
+/* LOAD STARS */
+let stars = Number(localStorage.getItem(STAR_KEY)) || 0;
+starCountEl.textContent = stars;
+
+/* CHECK COMPLETION */
+if (localStorage.getItem(STORAGE_KEY) === "true") {
+  nextBtn.disabled = false;
+  progress.textContent = "✅ Topic already completed!";
+} else {
+  startTimer();
+}
+
+function startTimer() {
+  let watched = 0;
+  const timer = setInterval(() => {
+    watched++;
+    progress.textContent = `Watched ${watched} / ${VIDEO_DURATION} seconds`;
+
+    if (watched >= VIDEO_DURATION) {
+      clearInterval(timer);
+      completeTopic();
+    }
+  }, 1000);
+}
+
+/* COMPLETE TOPIC */
+function completeTopic() {
+  localStorage.setItem(STORAGE_KEY, "true");
+  nextBtn.disabled = false;
+  progress.textContent = "🎉 Topic completed!";
+  rewardStar();
+}
+
+/* STAR REWARD */
+function rewardStar() {
+  stars++;
+  localStorage.setItem(STAR_KEY, stars);
+  starCountEl.textContent = stars;
+
+  flyStar();
+  confettiBurst();
+
+  if (stars === 5) {
+    alert("🏆 Badge Unlocked!");
+  }
+}
+
+/* FLYING STAR */
+function flyStar() {
+  const star = document.createElement("div");
+  star.className = "star";
+  star.textContent = "⭐";
+  star.style.left = "50%";
+  star.style.top = "50%";
+  document.body.appendChild(star);
+  setTimeout(() => star.remove(), 1000);
+}
+
+/* CONFETTI */
+function confettiBurst() {
+  for (let i = 0; i < 15; i++) {
+    const conf = document.createElement("div");
+    conf.className = "confetti";
+    conf.style.setProperty("--x", Math.random());
+    conf.style.setProperty("--y", Math.random());
+    conf.style.background = ["gold", "orange", "#ffda33"][i % 3];
+    document.body.appendChild(conf);
+    setTimeout(() => conf.remove(), 1000);
+  }
+}
+
+/* NEXT */
+nextBtn.addEventListener("click", () => {
+  window.location.href = "l3topic3.html";
+});
+ 
+</script>
+
+</body>
+</html>
