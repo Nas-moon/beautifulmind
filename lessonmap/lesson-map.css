@@ -8,6 +8,7 @@ body {
   background: linear-gradient(180deg, #0f4c75, #1b6ca8);
   display: flex;
   justify-content: center;
+  overflow-x: hidden;
 }
 
 .map-container {
@@ -24,7 +25,10 @@ h1 {
 
 .map-wrapper {
   position: relative;
-  height: 900px;
+  width: 100%;
+  min-height: 120vh;   /* grows with screen */
+  max-width: 420px;
+  margin: 0 auto;
 }
 
 /* SVG Path */
@@ -34,6 +38,7 @@ h1 {
   height: 100%;
   left: 0;
   top: 0;
+  overflow: visible;
 }
 
 /* Lesson positioning */
@@ -87,4 +92,16 @@ h1 {
   0% { transform: scale(1); }
   50% { transform: scale(1.1); }
   100% { transform: scale(1); }
+}
+
+@media (max-width: 600px) {
+  .map-wrapper {
+    min-height: 140vh;
+  }
+
+  .node {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
 }
