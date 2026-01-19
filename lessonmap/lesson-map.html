@@ -147,10 +147,10 @@ main {
   animation: fadeInUp 0.6s ease-out backwards;
 }
 
-.lesson:nth-child(2) { animation-delay: 0.1s; }
-.lesson:nth-child(3) { animation-delay: 0.2s; }
-.lesson:nth-child(4) { animation-delay: 0.3s; }
-.lesson:nth-child(5) { animation-delay: 0.4s; }
+.lesson:nth-child(2) { animation-delay: 0.4s; }
+.lesson:nth-child(3) { animation-delay: 0.3s; }
+.lesson:nth-child(4) { animation-delay: 0.2s; }
+.lesson:nth-child(5) { animation-delay: 0.1s; }
 
 @keyframes fadeInUp {
   from {
@@ -202,6 +202,7 @@ main {
 .current .node {
   background: linear-gradient(135deg, #58cc02, #3cb043);
   animation: pulse 2s infinite, glow 2s infinite;
+  border-color: rgba(88, 204, 2, 0.4);
 }
 
 @keyframes pulse {
@@ -210,8 +211,8 @@ main {
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px rgba(88,204,2,0.4); }
-  50% { box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 40px rgba(88,204,2,0.8); }
+  0%, 100% { box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px rgba(88,204,2,0.5); }
+  50% { box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 40px rgba(88,204,2,0.9); }
 }
 
 /* Completed */
@@ -332,6 +333,57 @@ main {
   margin-top: 10px;
   font-weight: 600;
 }
+
+/* Unlock animation */
+@keyframes unlock {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(30px);
+  }
+  50% {
+    transform: scale(1.15) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.unlocking {
+  animation: unlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards !important;
+}
+
+/* Confetti effect */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(500px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 1000;
+  animation: confetti-fall 2s ease-out forwards;
+}
+
+/* Completion celebration */
+@keyframes celebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.2) rotate(-10deg); }
+  75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.celebrating .node {
+  animation: celebrate 0.6s ease-in-out;
+}
 </style>
 </head>
 <body>
@@ -349,9 +401,9 @@ main {
   </div>
 
   <div class="map-wrapper">
-    <!-- SVG curved path -->
+    <!-- SVG curved path - reversed for bottom to top -->
     <svg class="path-svg" viewBox="0 0 300 800" preserveAspectRatio="xMidYMin meet">
-      <path d="M80 50 Q80 120, 150 150 T220 250 T80 350 T220 450 T150 550 T220 650"
+      <path d="M220 650 Q220 580, 150 550 T80 450 T220 350 T80 250 T150 150 T80 50"
             fill="none" 
             stroke="rgba(255,255,255,0.4)" 
             stroke-width="8"
@@ -359,25 +411,11 @@ main {
             stroke-linejoin="round"/>
     </svg>
 
-    <!-- Lesson nodes -->
-    <div class="lesson lesson-1">
-      <div class="lesson-content">
-        <div class="node">1</div>
-        <div class="lesson-label">Getting Started</div>
-      </div>
-    </div>
-
-    <div class="lesson lesson-2 locked">
+    <!-- Lesson nodes - reversed order for bottom to top -->
+    <div class="lesson lesson-5 locked">
       <div class="lesson-content locked-content">
-        <div class="node">2</div>
-        <div class="lesson-label">Building Blocks</div>
-      </div>
-    </div>
-
-    <div class="lesson lesson-3 locked">
-      <div class="lesson-content locked-content">
-        <div class="node">3</div>
-        <div class="lesson-label">Level Up</div>
+        <div class="node">5</div>
+        <div class="lesson-label">Master Level</div>
       </div>
     </div>
 
@@ -388,10 +426,24 @@ main {
       </div>
     </div>
 
-    <div class="lesson lesson-5 locked">
+    <div class="lesson lesson-3 locked">
       <div class="lesson-content locked-content">
-        <div class="node">5</div>
-        <div class="lesson-label">Master Level</div>
+        <div class="node">3</div>
+        <div class="lesson-label">Level Up</div>
+      </div>
+    </div>
+
+    <div class="lesson lesson-2 locked">
+      <div class="lesson-content locked-content">
+        <div class="node">2</div>
+        <div class="lesson-label">Building Blocks</div>
+      </div>
+    </div>
+
+    <div class="lesson lesson-1">
+      <div class="lesson-content">
+        <div class="node">1</div>
+        <div class="lesson-label">Getting Started</div>
       </div>
     </div>
   </div>
@@ -413,6 +465,7 @@ for (let i = 0; i < 30; i++) {
 
 // Lesson management
 let completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
+let previousCompleted = Number(localStorage.getItem("previousCompleted")) || 0;
 
 const lessons = document.querySelectorAll(".lesson");
 const progressFill = document.getElementById("progressFill");
@@ -423,8 +476,13 @@ const progressPercentage = (completedLessons / 5) * 100;
 progressFill.style.width = progressPercentage + '%';
 completionText.textContent = `${completedLessons} of 5 lessons completed`;
 
+// Check if a new lesson was just unlocked
+const newLessonUnlocked = completedLessons > previousCompleted;
+
 lessons.forEach((lesson, index) => {
-  const lessonNumber = index + 1;
+  // Get the actual lesson number from the class name
+  const lessonClass = Array.from(lesson.classList).find(cls => cls.startsWith('lesson-'));
+  const lessonNumber = parseInt(lessonClass.split('-')[1]);
   const lessonContent = lesson.querySelector('.lesson-content');
 
   lesson.classList.remove("locked", "completed", "current");
@@ -433,9 +491,25 @@ lessons.forEach((lesson, index) => {
   if (lessonNumber <= completedLessons) {
     lesson.classList.add("completed");
     addChampionBadge(lessonContent);
+    
+    // Celebrate the just-completed lesson
+    if (newLessonUnlocked && lessonNumber === completedLessons) {
+      setTimeout(() => {
+        lesson.classList.add("celebrating");
+        createConfetti(lessonContent);
+      }, 300);
+    }
   }
   else if (lessonNumber === completedLessons + 1) {
     lesson.classList.add("current");
+    
+    // Animate unlock if this is newly unlocked
+    if (newLessonUnlocked) {
+      lessonContent.classList.add("unlocking");
+      setTimeout(() => {
+        lessonContent.classList.remove("unlocking");
+      }, 800);
+    }
   }
   else {
     lesson.classList.add("locked");
@@ -455,6 +529,9 @@ lessons.forEach((lesson, index) => {
   });
 });
 
+// Store current completed count for next visit
+localStorage.setItem("previousCompleted", completedLessons);
+
 function addChampionBadge(lessonContent) {
   if (lessonContent.querySelector(".champion-badge")) return;
 
@@ -463,6 +540,25 @@ function addChampionBadge(lessonContent) {
   badge.textContent = "🏆";
   
   lessonContent.querySelector('.node').appendChild(badge);
+}
+
+function createConfetti(element) {
+  const rect = element.getBoundingClientRect();
+  const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
+  
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = rect.left + rect.width / 2 + 'px';
+    confetti.style.top = rect.top + 'px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDelay = Math.random() * 0.3 + 's';
+    confetti.style.transform = `translateX(${(Math.random() - 0.5) * 200}px)`;
+    
+    document.body.appendChild(confetti);
+    
+    setTimeout(() => confetti.remove(), 2000);
+  }
 }
 
 // Shake animation for locked lessons
