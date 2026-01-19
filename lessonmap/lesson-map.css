@@ -73,7 +73,7 @@ h1 {
 
 /* CURRENT */
 .lesson-node.current {
-  animation: pulse 1.5s infinite;
+  animation: softPulse 2.8s ease-in-out infinite;
 }
 
 /* PULSE */
@@ -81,4 +81,15 @@ h1 {
   0%   { transform: scale(1); }
   50%  { transform: scale(1.1); }
   100% { transform: scale(1); }
+}
+
+/* ✅ Allow SVG nodes to be clickable */
+.lesson-node {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.lesson-node circle,
+.lesson-node text {
+  pointer-events: none; /* click handled by parent <g> */
 }
