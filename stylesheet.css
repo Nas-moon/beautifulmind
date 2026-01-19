@@ -426,3 +426,33 @@ form {
 .mobile-menu {
   backdrop-filter: blur(6px);
 }
+
+@media (max-width: 768px) {
+
+  /* LOWER the main heading slightly */
+  h1 {
+    margin-top: 1.2rem;     /* was effectively too large */
+    margin-bottom: 0.4rem;
+    font-size: 32px;        /* slightly smaller for mobile */
+  }
+
+  /* Tighten quote spacing */
+  .quote {
+    margin-top: 0.2rem;
+    margin-bottom: 0.4rem;
+    font-size: 18px;
+  }
+
+  /* Tighten instruction line */
+  .read {
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    font-size: 13px;
+  }
+
+  /* Pull content-layout UP without moving form */
+  .content-layout {
+    margin-top: 1.2rem;   /* 🔥 key: reduces gap */
+    padding-top: 1rem;
+  }
+}
