@@ -1,42 +1,480 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<title>Lesson Map</title>  
-<link rel="stylesheet" href="lesson-map.css">  
-</head>  
-<body>  <main>  
-<div class="map-container">  
-  <h1>Your Learning Journey 🌟</h1>    <div class="map-wrapper">  <!-- SVG CURVED PATH -->  
-<svg class="path-svg" viewBox="0 0 300 1000" preserveAspectRatio="xMidYMin meet">
-  <path d="M150 80 C50 180, 250 280, 150 380  
-           C50 480, 250 580, 150 680  
-           C50 780, 250 880, 150 980"  
-        fill="none" stroke="#ffffff88" stroke-width="6"  
-        stroke-linecap="round"/>  
-</svg>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson Map</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-<!-- LESSON NODES -->  
-<div class="lesson lesson-1">  
-  <div class="node">1</div>  
-</div>  
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
 
-<div class="lesson lesson-2 locked">  
-  <div class="node">2</div>  
-</div>  
+/* Floating background elements */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.1;
+  z-index: 0;
+}
 
-<div class="lesson lesson-3 locked">  
-  <div class="node">3</div>  
-</div>  
+body::before {
+  width: 300px;
+  height: 300px;
+  background: white;
+  top: -100px;
+  right: -100px;
+  animation: float 20s infinite ease-in-out;
+}
 
-<div class="lesson lesson-4 locked">  
-  <div class="node">4</div>  
-</div>  
+body::after {
+  width: 200px;
+  height: 200px;
+  background: white;
+  bottom: -50px;
+  left: -50px;
+  animation: float 15s infinite ease-in-out reverse;
+}
 
-<div class="lesson lesson-5 locked">  
-  <div class="node">5</div>  
-</div>
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(30px) rotate(180deg); }
+}
 
-  </div>  
-</div>  <script src="lesson-map.js"></script>    </main>  
-</body>  
+main {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header h1 {
+  color: #e6eef4;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  font-weight: 800;
+}
+
+.header p {
+  color: #e6eef4;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-weight: 500;
+}
+
+.progress-bar {
+  background: rgba(255,255,255,0.2);
+  border-radius: 20px;
+  height: 12px;
+  margin: 20px 0;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  height: 100%;
+  border-radius: 20px;
+  transition: width 1s ease-out;
+  box-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+.map-wrapper {
+  position: relative;
+  padding: 40px 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.path-svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  max-width: 500px;
+}
+
+.path-svg path {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawPath 2s ease-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.lesson {
+  position: relative;
+  margin: 80px 0;
+  display: flex;
+  justify-content: center;
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.lesson:nth-child(2) { animation-delay: 0.1s; }
+.lesson:nth-child(3) { animation-delay: 0.2s; }
+.lesson:nth-child(4) { animation-delay: 0.3s; }
+.lesson:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lesson:nth-child(odd) {
+  justify-content: flex-start;
+}
+
+.lesson:nth-child(even) {
+  justify-content: flex-end;
+}
+
+.lesson-content {
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.lesson-content:hover:not(.locked-content) {
+  transform: translateY(-8px);
+}
+
+.node {
+  width: clamp(70px, 15vw, 90px);
+  height: clamp(70px, 15vw, 90px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 900;
+  color: white;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  border: 4px solid rgba(255,255,255,0.3);
+  transition: all 0.3s ease;
+}
+
+/* Unlocked/Current */
+.current .node {
+  background: linear-gradient(135deg, #58cc02, #3cb043);
+  animation: pulse 2s infinite, glow 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px rgba(88,204,2,0.4); }
+  50% { box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 40px rgba(88,204,2,0.8); }
+}
+
+/* Completed */
+.completed .node {
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px rgba(255,215,0,0.5);
+}
+
+.completed .node::after {
+  content: '✓';
+  position: absolute;
+  font-size: 0.6em;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Locked */
+.locked .node {
+  background: linear-gradient(135deg, #8e8e93, #636366);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.locked .node::before {
+  content: '🔒';
+  position: absolute;
+  font-size: 0.5em;
+  filter: grayscale(1);
+}
+
+.lesson-label {
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: #e6eef4;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.locked .lesson-label {
+  opacity: 0.6;
+}
+
+.champion-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: white;
+  border-radius: 50%;
+  width: clamp(28px, 6vw, 36px);
+  height: clamp(28px, 6vw, 36px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  animation: starSpin 4s linear infinite;
+}
+
+@keyframes starSpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Stars decoration */
+.stars {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  main {
+    padding: 15px;
+  }
+  
+  .lesson {
+    margin: 60px 0;
+  }
+  
+  .header {
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .lesson {
+    margin: 100px 0;
+  }
+}
+
+/* Click effect */
+.node:active:not(.locked .node) {
+  transform: scale(0.95);
+}
+
+.completion-text {
+  color: #e6eef4;
+  text-align: center;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  margin-top: 10px;
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+<!-- Decorative stars -->
+<div class="stars" id="stars"></div>
+
+<main>
+  <div class="header">
+    <h1>🌟 Your Learning Journey</h1>
+    <p>Complete each lesson to unlock the next!</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p class="completion-text" id="completionText">0 of 5 lessons completed</p>
+  </div>
+
+  <div class="map-wrapper">
+    <!-- SVG curved path -->
+    <svg class="path-svg" viewBox="0 0 300 800" preserveAspectRatio="xMidYMin meet">
+      <path d="M80 50 Q80 120, 150 150 T220 250 T80 350 T220 450 T150 550 T220 650"
+            fill="none" 
+            stroke="rgba(255,255,255,0.4)" 
+            stroke-width="8"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+    </svg>
+
+    <!-- Lesson nodes -->
+    <div class="lesson lesson-1">
+      <div class="lesson-content">
+        <div class="node">1</div>
+        <div class="lesson-label">Getting Started</div>
+      </div>
+    </div>
+
+    <div class="lesson lesson-2 locked">
+      <div class="lesson-content locked-content">
+        <div class="node">2</div>
+        <div class="lesson-label">Building Blocks</div>
+      </div>
+    </div>
+
+    <div class="lesson lesson-3 locked">
+      <div class="lesson-content locked-content">
+        <div class="node">3</div>
+        <div class="lesson-label">Level Up</div>
+      </div>
+    </div>
+
+    <div class="lesson lesson-4 locked">
+      <div class="lesson-content locked-content">
+        <div class="node">4</div>
+        <div class="lesson-label">Advanced Skills</div>
+      </div>
+    </div>
+
+    <div class="lesson lesson-5 locked">
+      <div class="lesson-content locked-content">
+        <div class="node">5</div>
+        <div class="lesson-label">Master Level</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Create decorative stars
+const starsContainer = document.getElementById('stars');
+for (let i = 0; i < 30; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.width = Math.random() * 3 + 1 + 'px';
+  star.style.height = star.style.width;
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.animationDelay = Math.random() * 3 + 's';
+  starsContainer.appendChild(star);
+}
+
+// Lesson management
+let completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
+
+const lessons = document.querySelectorAll(".lesson");
+const progressFill = document.getElementById("progressFill");
+const completionText = document.getElementById("completionText");
+
+// Update progress bar
+const progressPercentage = (completedLessons / 5) * 100;
+progressFill.style.width = progressPercentage + '%';
+completionText.textContent = `${completedLessons} of 5 lessons completed`;
+
+lessons.forEach((lesson, index) => {
+  const lessonNumber = index + 1;
+  const lessonContent = lesson.querySelector('.lesson-content');
+
+  lesson.classList.remove("locked", "completed", "current");
+  lessonContent.classList.remove("locked-content");
+
+  if (lessonNumber <= completedLessons) {
+    lesson.classList.add("completed");
+    addChampionBadge(lessonContent);
+  }
+  else if (lessonNumber === completedLessons + 1) {
+    lesson.classList.add("current");
+  }
+  else {
+    lesson.classList.add("locked");
+    lessonContent.classList.add("locked-content");
+  }
+
+  lessonContent.addEventListener("click", () => {
+    if (lesson.classList.contains("locked")) {
+      // Shake animation for locked lessons
+      lessonContent.style.animation = 'none';
+      setTimeout(() => {
+        lessonContent.style.animation = 'shake 0.5s';
+      }, 10);
+      return;
+    }
+    window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+  });
+});
+
+function addChampionBadge(lessonContent) {
+  if (lessonContent.querySelector(".champion-badge")) return;
+
+  const badge = document.createElement("div");
+  badge.className = "champion-badge";
+  badge.textContent = "🏆";
+  
+  lessonContent.querySelector('.node').appendChild(badge);
+}
+
+// Shake animation for locked lessons
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+`;
+document.head.appendChild(style);
+</script>
+</body>
 </html>
