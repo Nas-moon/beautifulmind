@@ -456,3 +456,9 @@ form {
     padding-top: 1rem;
   }
 }
+
+@media (max-width: 768px) {
+  h1 {
+    background: red !important;
+  }
+}
