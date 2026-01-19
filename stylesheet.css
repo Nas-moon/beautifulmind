@@ -431,8 +431,7 @@ form {
 
   /* LOWER the main heading slightly */
   h1 {
-    margin-top: 1.2rem;     /* was effectively too large */
-    margin-bottom: 0.4rem;
+    padding-top: 1.2rem;     /* was effectively too large */
     font-size: 32px;        /* slightly smaller for mobile */
   }
 
@@ -457,8 +456,3 @@ form {
   }
 }
 
-@media (max-width: 768px) {
-  h1 {
-    background: red !important;
-  }
-}
