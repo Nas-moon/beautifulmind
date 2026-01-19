@@ -1,42 +1,68 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<title>Lesson Map</title>  
-<link rel="stylesheet" href="lesson-map.css">  
-</head>  
-<body>  <main>  
-<div class="map-container">  
-  <h1>Your Learning Journey 🌟</h1>    <div class="map-wrapper">  <!-- SVG CURVED PATH -->  
-<svg class="path-svg" viewBox="0 0 300 1000" preserveAspectRatio="xMidYMin meet">
-  <path d="M150 80 C50 180, 250 280, 150 380  
-           C50 480, 250 580, 150 680  
-           C50 780, 250 880, 150 980"  
-        fill="none" stroke="#ffffff88" stroke-width="6"  
-        stroke-linecap="round"/>  
-</svg>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lesson Map</title>
+  <link rel="stylesheet" href="lesson-map.css">
+</head>
 
-<!-- LESSON NODES -->  
-<div class="lesson lesson-1">  
-  <div class="node">1</div>  
-</div>  
+<body>
+<main>
+  <div class="map-container">
+    <h1>Your Learning Journey 🌟</h1>
 
-<div class="lesson lesson-2 locked">  
-  <div class="node">2</div>  
-</div>  
+    <div class="map-wrapper">
 
-<div class="lesson lesson-3 locked">  
-  <div class="node">3</div>  
-</div>  
+      <!-- SVG MAP (PATH + NODES TOGETHER) -->
+      <svg class="map-svg"
+           viewBox="0 0 300 1000"
+           preserveAspectRatio="xMidYMin meet">
 
-<div class="lesson lesson-4 locked">  
-  <div class="node">4</div>  
-</div>  
+        <!-- PATH -->
+        <path d="M150 80 C50 180, 250 280, 150 380
+                 C50 480, 250 580, 150 680
+                 C50 780, 250 880, 150 980"
+              fill="none"
+              stroke="#ffffff88"
+              stroke-width="6"
+              stroke-linecap="round" />
 
-<div class="lesson lesson-5 locked">  
-  <div class="node">5</div>  
-</div>
+        <!-- LESSON 1 -->
+        <g class="lesson-node current" data-lesson="1">
+          <circle cx="150" cy="80" r="32"/>
+          <text x="150" y="80">1</text>
+        </g>
 
-  </div>  
-</div>  <script src="lesson-map.js"></script>    </main>  
-</body>  
+        <!-- LESSON 2 -->
+        <g class="lesson-node locked" data-lesson="2">
+          <circle cx="90" cy="200" r="32"/>
+          <text x="90" y="200">2</text>
+        </g>
+
+        <!-- LESSON 3 -->
+        <g class="lesson-node locked" data-lesson="3">
+          <circle cx="210" cy="360" r="32"/>
+          <text x="210" y="360">3</text>
+        </g>
+
+        <!-- LESSON 4 -->
+        <g class="lesson-node locked" data-lesson="4">
+          <circle cx="90" cy="520" r="32"/>
+          <text x="90" y="520">4</text>
+        </g>
+
+        <!-- LESSON 5 -->
+        <g class="lesson-node locked" data-lesson="5">
+          <circle cx="210" cy="680" r="32"/>
+          <text x="210" y="680">5</text>
+        </g>
+
+      </svg>
+
+    </div>
+  </div>
+
+  <script src="lesson-map.js"></script>
+</main>
+</body>
 </html>
