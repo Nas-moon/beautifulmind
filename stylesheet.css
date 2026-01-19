@@ -431,8 +431,8 @@ form {
 
   /* LOWER the main heading slightly */
   h1 {
-    padding-top: 1.2rem;     /* was effectively too large */
-    font-size: 32px;        /* slightly smaller for mobile */
+    padding-top: 2.5rem;     /* was effectively too large */
+    font-size: 40px;        /* slightly smaller for mobile */
   }
 
   /* Tighten quote spacing */
