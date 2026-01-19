@@ -93,3 +93,7 @@ h1 {
 .lesson-node text {
   pointer-events: none; /* click handled by parent <g> */
 }
+
+.path-svg {
+  pointer-events: none;
+}
