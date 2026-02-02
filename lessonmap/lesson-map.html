@@ -681,6 +681,8 @@ main {
 
 <!-- Firebase SDK -->
 <script type="module">
+  localStorage.clear();
+
   // Import Firebase
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -906,8 +908,7 @@ main {
   `;
   document.head.appendChild(style);
 
-  localStorage.removeItem("savedProgress");
-
+  
 </script>
 </body>
 </html>
