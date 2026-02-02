@@ -54,7 +54,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     
     // Redirect to lesson map after 2 seconds
     setTimeout(() => {
-      window.location.href = 'lessonmap/lesson-map.html';
+      window.location.href = 'lessonmap/lesson-map.html'; 
     }, 2000);
   }, 1000);
 });
