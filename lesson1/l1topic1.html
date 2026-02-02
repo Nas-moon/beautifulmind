@@ -279,7 +279,23 @@ function confettiBurst() {
 nextBtn.addEventListener("click", () => {
   window.location.href = "l1topic2.html";
 });
- 
+
+  // Award stars for watching video
+function awardStars(amount) {
+  let totalStars = Number(localStorage.getItem("totalStars")) || 0;
+  totalStars += amount;
+  localStorage.setItem("totalStars", totalStars);
+  
+  console.log(`Awarded ${amount} stars! Total: ${totalStars}`);
+}
+
+// Call this when video ends or quiz is completed
+// Example: Award 10 stars for watching video
+awardStars(10);
+
+// Example: Award 20 stars for correct quiz answer
+// awardStars(20);
+  
 </script>
 
 </body>
