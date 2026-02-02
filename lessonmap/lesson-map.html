@@ -771,9 +771,6 @@ main {
     }
 
     lessonContent.addEventListener("click", () => {
-      console.log('Clicked lesson:', lessonNumber);
-      console.log('Is locked?', lesson.classList.contains("locked"));
-      
       if (lesson.classList.contains("locked")) {
         lessonContent.style.animation = 'none';
         setTimeout(() => {
@@ -782,9 +779,18 @@ main {
         return;
       }
       
-      const targetURL = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
-      console.log('Navigating to:', targetURL);
-      window.location.href = targetURL;
+      // UPDATED: Try different path formats
+      console.log('Clicked lesson', lessonNumber); // Debug
+      
+      // Try these paths in order (adjust based on your folder structure):
+      // Option 1: Same folder
+      // window.location.href = `l${lessonNumber}topic1.html`;
+      
+      // Option 2: Lesson folder inside current folder
+      window.location.href = `lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+      
+      // Option 3: Go up one level then into lesson folder
+      // window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
     });
   });
 
