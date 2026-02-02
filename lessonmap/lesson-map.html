@@ -771,6 +771,9 @@ main {
     }
 
     lessonContent.addEventListener("click", () => {
+      console.log('Clicked lesson:', lessonNumber);
+      console.log('Is locked?', lesson.classList.contains("locked"));
+      
       if (lesson.classList.contains("locked")) {
         lessonContent.style.animation = 'none';
         setTimeout(() => {
@@ -778,7 +781,10 @@ main {
         }, 10);
         return;
       }
-      window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+      
+      const targetURL = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+      console.log('Navigating to:', targetURL);
+      window.location.href = targetURL;
     });
   });
 
