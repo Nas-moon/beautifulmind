@@ -198,7 +198,7 @@ button:disabled {
 <script>
 const VIDEO_DURATION = 10;
 const STORAGE_KEY = "l1topic1_completed";
-const STAR_KEY = "total_stars";
+const STAR_KEY = "totalstars";
 
 const nextBtn = document.getElementById("nextBtn");
 const progress = document.getElementById("progress");
@@ -243,6 +243,8 @@ function rewardStar() {
   localStorage.setItem(STAR_KEY, stars);
   starCountEl.textContent = stars;
 
+  updateFirebase();
+  
   flyStar();
   confettiBurst();
 
@@ -250,6 +252,7 @@ function rewardStar() {
     alert("🏆 Badge Unlocked!");
   }
 }
+
 
 /* FLYING STAR */
 function flyStar() {
@@ -295,7 +298,31 @@ awardStars(10);
 
 // Example: Award 20 stars for correct quiz answer
 // awardStars(20);
+
+   async function updateFirebase() {
+  const userName = localStorage.getItem('userName') || 'Guest';
+  const userId = userName.toLowerCase().replace(/\s+/g, '_');
+  const completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
   
+  try {
+    const response = await fetch(`https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: userName,
+        stars: stars,
+        lessons: completedLessons,
+        lastUpdated: Date.now()
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ Firebase updated! Stars:', stars);
+    }
+  } catch (error) {
+    console.error('❌ Firebase error:', error);
+  }
+}
 </script>
 
 </body>
