@@ -115,61 +115,61 @@ const quiz = [
     q: "What makes a person truly beautiful according to the lesson?",
     options: ["A) Face", "B) Clothes", "C) Mind", "D) Money"],
     answer: 2,
-    stars: 1
+    stars: 3
   },
   {
     q: "A beautiful mind shows qualities like:",
     options: ["A) Anger and pride","B) Kindness and calmness","C) Laziness and fear", "D) Loud talking"],
     answer: 1,
-    stars: 1
+    stars: 3
   },
   {
     q: "Thinking is compared to which activity in the lesson?",
     options: ["A) Singing", "B) Sleeping", "C) Playing a sport", "D) Watching TV"],
     answer: 2,
-    stars: 1
+    stars: 3
   },
   {
     q: "What should we do before reacting when someone annoys us?",
     options: ["A) Shout","B) Ignore","C) Pause and think","D) Walk away"],
     answer: 2,
-    stars: 1
+    stars: 3
   },
   {
     q: "Beauty in interaction means:",
     options: ["A) Talking loudly", "B) Showing off", "C) Being kind and listening", "D) Using big words"],
     answer: 2,
-    stars: 1
+    stars: 3
   },
   {
     q: "Consectetur, adipisci velit, sed quia non numquam eius modi tempora?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 1,
-    stars: 1
+    stars: 3
   },
   {
     q: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 2,
-    stars: 2
+    stars: 3
   },
   {
     q: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 3,
-    stars: 1
+    stars: 3
   },
   {
     q: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 0,
-    stars: 2
+    stars: 3
   },
   {
     q: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 1,
-    stars: 1
+    stars: 3
   }
 ];
 
@@ -240,9 +240,10 @@ function endQuiz() {
   clearInterval(countdown);
 
   // SAVE STARS
-  const oldStars = Number(localStorage.getItem("stars")) || 0;
-  localStorage.setItem("stars", oldStars + totalStars);
-
+const oldStars = Number(localStorage.getItem("totalStars")) || 0;
+localStorage.setItem("totalStars", oldStars + totalStars);
+updateFirebase(oldStars + totalStars);
+  
   // MARK LESSON 1 COMPLETE
   localStorage.setItem("completedLessons", 1);
 
