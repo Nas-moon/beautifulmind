@@ -594,6 +594,12 @@ main {
   <div class="header">
     <h1>🌟 Your Learning Journey</h1>
     <p>Complete each lesson to unlock the next!</p>
+    
+    <!-- TESTING RESET BUTTON - Remove this in production -->
+    <button id="resetBtn" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; margin: 10px; font-size: 0.85rem;">
+      🔄 Reset Progress (Testing)
+    </button>
+    
     <div class="progress-bar">
       <div class="progress-fill" id="progressFill"></div>
     </div>
@@ -681,9 +687,6 @@ main {
 
 <!-- Firebase SDK -->
 <script type="module">
-  
-
-  
   // Import Firebase
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
@@ -790,7 +793,7 @@ main {
       // window.location.href = `l${lessonNumber}topic1.html`;
       
       // Option 2: Lesson folder inside current folder
-      window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
+      window.location.href = `lesson${lessonNumber}/l${lessonNumber}topic1.html`;
       
       // Option 3: Go up one level then into lesson folder
       // window.location.href = `../lesson${lessonNumber}/l${lessonNumber}topic1.html`;
@@ -859,10 +862,19 @@ main {
       // Sort by stars (descending)
       users.sort((a, b) => b.stars - a.stars);
       
+      // UPDATE: Get fresh star count from Firebase for current user
+      const currentUserData = users.find(u => u.name === currentUser);
+      if (currentUserData) {
+        totalStars = currentUserData.stars;
+        localStorage.setItem("totalStars", totalStars);
+        yourStarsEl.textContent = totalStars;
+      } else {
+        yourStarsEl.textContent = totalStars;
+      }
+      
       // Find current user's rank
       const userRank = users.findIndex(u => u.name === currentUser) + 1;
       yourRankEl.textContent = userRank || '-';
-      yourStarsEl.textContent = totalStars;
       
       // Display leaderboard
       if (users.length === 0) {
@@ -898,6 +910,26 @@ main {
   saveProgressToFirebase();
   displayLeaderboard();
 
+  // TESTING RESET BUTTON
+  document.getElementById('resetBtn').addEventListener('click', async () => {
+    if (confirm('⚠️ This will RESET ALL your progress! Are you sure?')) {
+      // Clear localStorage
+      localStorage.clear();
+      
+      // Clear Firebase data for current user
+      const userRef = ref(database, 'users/' + userId);
+      await set(userRef, {
+        name: currentUser,
+        stars: 0,
+        lessons: 0,
+        lastUpdated: Date.now()
+      });
+      
+      alert('✅ Progress reset! Redirecting to home...');
+      window.location.href = '../index.html';
+    }
+  });
+
   // Shake animation
   const style = document.createElement('style');
   style.textContent = `
@@ -908,8 +940,6 @@ main {
     }
   `;
   document.head.appendChild(style);
-
-  
 </script>
 </body>
 </html>
