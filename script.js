@@ -3,11 +3,29 @@ function toggleLesson(header) {
   lesson.classList.toggle("open");
 }
 
-const form = document.querySelector("form");
-const status = document.getElementById("form-status");
-const iframe = document.getElementById("hidden_iframe");
-const burgerBtn = document.getElementById("burgerBtn");
+const form    = document.querySelector("form");
+const status  = document.getElementById("form-status");
+const iframe  = document.getElementById("hidden_iframe");
+const burgerBtn  = document.getElementById("burgerBtn");
 const mobileMenu = document.getElementById("mobileMenu");
+
+// Create a visible debug box on screen
+const debugBox = document.createElement('div');
+debugBox.id = 'debugBox';
+debugBox.style.cssText = `
+  position: fixed; bottom: 10px; left: 10px; right: 10px;
+  background: rgba(0,0,0,0.85); color: #0f0; font-family: monospace;
+  font-size: 13px; padding: 10px; border-radius: 8px;
+  z-index: 9999; max-height: 150px; overflow-y: auto;
+  display: none;
+`;
+document.body.appendChild(debugBox);
+
+function log(msg) {
+  debugBox.style.display = 'block';
+  debugBox.innerHTML += msg + '<br>';
+  debugBox.scrollTop = debugBox.scrollHeight;
+}
 
 // Burger menu
 burgerBtn.addEventListener("click", (e) => {
@@ -15,81 +33,87 @@ burgerBtn.addEventListener("click", (e) => {
   mobileMenu.classList.toggle("show");
 });
 
-document.addEventListener("click", () => {
-  mobileMenu.classList.remove("show");
+document.addEventListener("click", (e) => {
+  if (!mobileMenu.contains(e.target) && e.target !== burgerBtn) {
+    mobileMenu.classList.remove("show");
+  }
 });
 
 // ============================================
-// SINGLE SUBMIT HANDLER - Handles everything
+// SINGLE SUBMIT HANDLER
 // ============================================
-let submitted = false;
-let savedUserData = {}; // Store form data BEFORE form resets
+let submitted  = false;
+let savedUserData = {};
 
-form.addEventListener("submit", async function(e) {
-  // Read ALL form values immediately before anything resets them
+form.addEventListener("submit", function() {
+  // Grab ALL values immediately
   const userName    = document.getElementById('name').value.trim();
   const userStd     = document.getElementById('std').value.trim();
   const userEmail   = document.getElementById('email').value.trim();
   const userPhone   = document.getElementById('number').value.trim();
   const userAddress = document.getElementById('add').value.trim();
 
-  // Save to localStorage immediately
-  localStorage.setItem('userName',    userName);
-  localStorage.setItem('userStandard', userStd);
-  localStorage.setItem('userEmail',   userEmail);
-  localStorage.setItem('userPhone',   userPhone);
-  localStorage.setItem('userAddress', userAddress);
+  log('📝 Form submitted by: ' + userName);
 
-  // Store for Firebase (in case iframe loads before fetch completes)
+  // Save to localStorage right away
+  localStorage.setItem('userName',     userName);
+  localStorage.setItem('userStandard', userStd);
+  localStorage.setItem('userEmail',    userEmail);
+  localStorage.setItem('userPhone',    userPhone);
+  localStorage.setItem('userAddress',  userAddress);
+
   savedUserData = {
-    name:        userName,
-    standard:    userStd,
-    email:       userEmail,
-    phone:       userPhone,
-    address:     userAddress,
-    stars:       0,
-    lessons:     0,
+    name:         userName,
+    standard:     userStd,
+    email:        userEmail,
+    phone:        userPhone,
+    address:      userAddress,
+    stars:        0,
+    lessons:      0,
     registeredAt: Date.now(),
     lastUpdated:  Date.now()
   };
 
   submitted = true;
-
-  // Save to Firebase
-  const userId = userName.toLowerCase().replace(/\s+/g, '_');
-  try {
-    const response = await fetch(
-      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(savedUserData)
-      }
-    );
-
-    if (response.ok) {
-      console.log('✅ User registered in Firebase with all details!');
-    } else {
-      console.error('❌ Firebase registration failed:', response.status);
-    }
-  } catch (error) {
-    console.error('❌ Firebase error:', error);
-  }
+  log('💾 Saved to localStorage ✅');
 });
 
-// Iframe load → form submitted to Google successfully
-iframe.addEventListener("load", () => {
+// After Google Form iframe confirms submission
+iframe.addEventListener("load", async () => {
   if (!submitted) return;
-
   submitted = false;
 
-  // Show success message
   status.hidden = false;
   status.focus();
   form.reset();
 
-  // Redirect to lesson map after 2 seconds
+  log('📡 Sending to Firebase...');
+
+  const userId = savedUserData.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+  try {
+    const res = await fetch(
+      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
+      {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(savedUserData)
+      }
+    );
+
+    if (res.ok) {
+      log('✅ Firebase saved! Status: ' + res.status);
+      log('👤 User: ' + savedUserData.name + ' | Email: ' + savedUserData.email);
+    } else {
+      log('❌ Firebase failed! Status: ' + res.status);
+    }
+  } catch (err) {
+    log('❌ Network error: ' + err.message);
+  }
+
+  // Redirect after 3 seconds (enough time to see debug messages)
+  log('⏳ Redirecting in 3 seconds...');
   setTimeout(() => {
     window.location.href = 'lessonmap/lesson-map.html';
-  }, 2000);
+  }, 3000);
 });
