@@ -72,16 +72,22 @@ button:disabled {
 
 .back {
   margin-left: auto;
-  margin-right: 20px;
+  margin-right: 10%;
   padding: 2px 0.5em;
   border-radius: 8px;
+  box-sizing: border-box;
   font-family: verdana;
   font-weight: bold;
   background-color: #e6eef4;
-  color: #1b5583;
+  color: #1b5583;  
   border: none;
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   font-size: 15px;
+  margin-top: 5px;
+  display: flex;
+  justify-content: flex-start;
+  margin-left: auto;
+  margin-right: 20px;
   line-height: 2em;
 }
 
@@ -116,8 +122,14 @@ button:disabled {
 }
 
 @keyframes fly {
-  0% { transform: scale(1) translate(0, 0); opacity: 1; }
-  100% { transform: scale(0.3) translate(300px, -300px); opacity: 0; }
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.3) translate(300px, -300px);
+    opacity: 0;
+  }
 }
 
 /* CONFETTI */
@@ -147,29 +159,28 @@ button:disabled {
 <body>
 
 <header>
-  <div class="heado">
-    <h1>Lesson 2 • Topic 2</h1>
-    <button class="back" onclick="history.back()">Back</button>
-  </div>
+ <div class="heado">
+  <h1>Lesson 2 • Topic 2</h1>
+  <button class="back" onclick="history.back()">Back</button>
+ </div>
 </header>
 
 <main>
-
   <!-- STAR COUNTER -->
   <div id="star-bar">
     ⭐ <span id="star-count">0</span>
   </div>
 
-  <h2>Deep Dive</h2>
+  <h2>Introduction</h2>
 
   <div class="video-wrapper">
     <iframe
-      src="https://drive.google.com/file/d/1COqeSJruycYXosBUJ9nrii48oBzJir9s/preview"
+      src="https://drive.google.com/file/d/1LrT1HwzWpf-NLNV8kPL8UGB5B9eMz4Nb/preview"
       width="100%"
       height="450"
       allow="autoplay"
-      allowfullscreen>
-    </iframe>
+      allowfullscreen
+    ></iframe>
   </div>
 
   <button id="nextBtn" disabled>
@@ -177,23 +188,27 @@ button:disabled {
   </button>
 
   <p id="progress">Watching video…</p>
-
 </main>
 
 <script>
-const VIDEO_DURATION = 10;
-const STORAGE_KEY = "l2topic2_completed";
-const STAR_KEY = "total_stars";
+// =============================================
+// CONFIG - CHANGE THESE FOR EACH PAGE
+// =============================================
+const VIDEO_DURATION = 10;                    // seconds to watch
+const STORAGE_KEY = "l2topic2_completed";     // unique key per topic
+const STARS_TO_EARN = 10;                     // stars earned for this topic
+const NEXT_PAGE = "l2topic3.html";            // next page link
+// =============================================
 
 const nextBtn = document.getElementById("nextBtn");
 const progress = document.getElementById("progress");
 const starCountEl = document.getElementById("star-count");
 
-/* LOAD STARS */
-let stars = Number(localStorage.getItem(STAR_KEY)) || 0;
-starCountEl.textContent = stars;
+// LOAD CURRENT TOTAL STARS (one single key "totalStars")
+let totalStars = Number(localStorage.getItem("totalStars")) || 0;
+starCountEl.textContent = totalStars;
 
-/* CHECK COMPLETION */
+// CHECK IF ALREADY COMPLETED
 if (localStorage.getItem(STORAGE_KEY) === "true") {
   nextBtn.disabled = false;
   progress.textContent = "✅ Topic already completed!";
@@ -201,6 +216,7 @@ if (localStorage.getItem(STORAGE_KEY) === "true") {
   startTimer();
 }
 
+// TIMER
 function startTimer() {
   let watched = 0;
   const timer = setInterval(() => {
@@ -214,29 +230,28 @@ function startTimer() {
   }, 1000);
 }
 
-/* COMPLETE TOPIC */
+// COMPLETE TOPIC
 function completeTopic() {
   localStorage.setItem(STORAGE_KEY, "true");
   nextBtn.disabled = false;
   progress.textContent = "🎉 Topic completed!";
-  rewardStar();
+  rewardStars();
 }
 
-/* STAR REWARD */
-function rewardStar() {
-  stars++;
-  localStorage.setItem(STAR_KEY, stars);
-  starCountEl.textContent = stars;
+// REWARD STARS + FIREBASE UPDATE
+function rewardStars() {
+  totalStars += STARS_TO_EARN;
+  localStorage.setItem("totalStars", totalStars);
+  starCountEl.textContent = totalStars;
 
   flyStar();
   confettiBurst();
+  updateFirebase();
 
-  if (stars === 5) {
-    alert("🏆 Badge Unlocked!");
-  }
+  console.log(`⭐ Earned ${STARS_TO_EARN} stars! Total: ${totalStars}`);
 }
 
-/* FLYING STAR */
+// FLYING STAR ANIMATION
 function flyStar() {
   const star = document.createElement("div");
   star.className = "star";
@@ -247,7 +262,7 @@ function flyStar() {
   setTimeout(() => star.remove(), 1000);
 }
 
-/* CONFETTI */
+// CONFETTI
 function confettiBurst() {
   for (let i = 0; i < 15; i++) {
     const conf = document.createElement("div");
@@ -260,11 +275,61 @@ function confettiBurst() {
   }
 }
 
-/* NEXT */
+// NEXT BUTTON
 nextBtn.addEventListener("click", () => {
-  window.location.href = "l2topic3.html";
+  window.location.href = NEXT_PAGE;
 });
 
+// Visible status box — no console needed!
+const statusBox = document.createElement('div');
+statusBox.style.cssText = `
+  position: fixed; bottom: 10px; left: 10px; right: 10px;
+  background: rgba(0,0,0,0.85); color: #0f0;
+  font-family: monospace; font-size: 13px;
+  padding: 10px; border-radius: 8px; z-index: 9999;
+  max-height: 120px; overflow-y: auto; display: none;
+`;
+document.body.appendChild(statusBox);
+
+function log(msg) {
+  statusBox.style.display = 'block';
+  statusBox.innerHTML += msg + '<br>';
+  statusBox.scrollTop = statusBox.scrollHeight;
+}
+
+// FIREBASE UPDATE
+async function updateFirebase() {
+  const userName = localStorage.getItem("userName") || "Guest";
+  const userId   = userName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+  const completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
+
+  log('📡 Saving to Firebase... User: ' + userName);
+  log('⭐ Stars: ' + totalStars);
+
+  try {
+    const response = await fetch(
+      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name:        userName,
+          stars:       totalStars,
+          lessons:     completedLessons,
+          lastUpdated: Date.now()
+        })
+      }
+    );
+
+    if (response.ok) {
+      log('✅ Firebase updated! Stars: ' + totalStars);
+    } else {
+      log('❌ Firebase failed! Status: ' + response.status);
+    }
+  } catch (error) {
+    log('❌ Error: ' + error.message);
+  }
+}
 </script>
 
 </body>
