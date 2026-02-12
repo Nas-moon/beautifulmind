@@ -6,27 +6,10 @@ function toggleLesson(header) {
 const form = document.querySelector("form");
 const status = document.getElementById("form-status");
 const iframe = document.getElementById("hidden_iframe");
-let submitted = false;
-
-form.addEventListener("submit", () => {
-  submitted = true;
-});
-
-iframe.addEventListener("load", () => {
-  if (!submitted) return;
-  // Safe: Google has received the data
-  status.hidden = false;
-  status.focus();
-  form.reset();
-  submitted = false;
-});
-
-const submitBtn = form.querySelector("input[type='submit']");
-submitBtn.disabled = false;
-
 const burgerBtn = document.getElementById("burgerBtn");
 const mobileMenu = document.getElementById("mobileMenu");
 
+// Burger menu
 burgerBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   mobileMenu.classList.toggle("show");
@@ -37,22 +20,41 @@ document.addEventListener("click", () => {
 });
 
 // ============================================
-// SAVE USER DATA TO FIREBASE + LOCALSTORAGE
+// SINGLE SUBMIT HANDLER - Handles everything
 // ============================================
-document.querySelector('form').addEventListener('submit', async function(e) {
-  const userName = document.getElementById('name').value;
-  const userStandard = document.getElementById('std').value;
-  const userEmail = document.getElementById('email').value;
-  const userPhone = document.getElementById('number').value;
-  const userAddress = document.getElementById('add').value;
-  
-  // Save to localStorage
-  localStorage.setItem('userName', userName);
-  localStorage.setItem('userStandard', userStandard);
-  localStorage.setItem('userEmail', userEmail);
-  localStorage.setItem('userPhone', userPhone);
+let submitted = false;
+let savedUserData = {}; // Store form data BEFORE form resets
+
+form.addEventListener("submit", async function(e) {
+  // Read ALL form values immediately before anything resets them
+  const userName    = document.getElementById('name').value.trim();
+  const userStd     = document.getElementById('std').value.trim();
+  const userEmail   = document.getElementById('email').value.trim();
+  const userPhone   = document.getElementById('number').value.trim();
+  const userAddress = document.getElementById('add').value.trim();
+
+  // Save to localStorage immediately
+  localStorage.setItem('userName',    userName);
+  localStorage.setItem('userStandard', userStd);
+  localStorage.setItem('userEmail',   userEmail);
+  localStorage.setItem('userPhone',   userPhone);
   localStorage.setItem('userAddress', userAddress);
-  
+
+  // Store for Firebase (in case iframe loads before fetch completes)
+  savedUserData = {
+    name:        userName,
+    standard:    userStd,
+    email:       userEmail,
+    phone:       userPhone,
+    address:     userAddress,
+    stars:       0,
+    lessons:     0,
+    registeredAt: Date.now(),
+    lastUpdated:  Date.now()
+  };
+
+  submitted = true;
+
   // Save to Firebase
   const userId = userName.toLowerCase().replace(/\s+/g, '_');
   try {
@@ -61,38 +63,33 @@ document.querySelector('form').addEventListener('submit', async function(e) {
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: userName,
-          standard: userStandard,
-          email: userEmail,
-          phone: userPhone,
-          address: userAddress,
-          stars: 0,
-          lessons: 0,
-          registeredAt: Date.now(),
-          lastUpdated: Date.now()
-        })
+        body: JSON.stringify(savedUserData)
       }
     );
-    
+
     if (response.ok) {
-      console.log('✅ User registered in Firebase!');
+      console.log('✅ User registered in Firebase with all details!');
     } else {
-      console.error('❌ Firebase registration failed');
+      console.error('❌ Firebase registration failed:', response.status);
     }
   } catch (error) {
-    console.error('❌ Firebase registration error:', error);
+    console.error('❌ Firebase error:', error);
   }
-  
-  // Show success message and redirect
+});
+
+// Iframe load → form submitted to Google successfully
+iframe.addEventListener("load", () => {
+  if (!submitted) return;
+
+  submitted = false;
+
+  // Show success message
+  status.hidden = false;
+  status.focus();
+  form.reset();
+
+  // Redirect to lesson map after 2 seconds
   setTimeout(() => {
-    const status = document.getElementById('form-status');
-    status.hidden = false;
-    status.focus();
-    
-    // Redirect to lesson map after 2 seconds
-    setTimeout(() => {
-      window.location.href = 'lessonmap/lesson-map.html'; 
-    }, 2000);
-  }, 1000);
+    window.location.href = 'lessonmap/lesson-map.html';
+  }, 2000);
 });
