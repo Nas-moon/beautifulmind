@@ -219,6 +219,19 @@ async function updateFirebase(newStarTotal) {
 
   const userId = userName.toLowerCase().replace(/[^a-z0-9]/g, "_");
 
+  // Collect completed topics & quizzes
+  const completedTopics  = {};
+  const completedQuizzes = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes('topic') && key.includes('_completed')) {
+      completedTopics[key] = localStorage.getItem(key);
+    }
+    if (key && key.startsWith('quiz_')) {
+      completedQuizzes[key] = localStorage.getItem(key);
+    }
+  }
+
   try {
     const res = await fetch(
       `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
@@ -226,16 +239,19 @@ async function updateFirebase(newStarTotal) {
         method:  "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name:        userName,
-          stars:       newStarTotal,
-          lessons:     LESSON_NUMBER,
-          lastUpdated: Date.now()
+          name:             userName,
+          stars:            newStarTotal,
+          lessons:          LESSON_NUMBER,
+          completedTopics:  completedTopics,
+          completedQuizzes: completedQuizzes,
+          lastUpdated:      Date.now()
         })
       }
     );
-    if (res.ok) console.log("✅ Firebase updated! Stars:", newStarTotal);
+    if (res.ok) console.log('✅ Quiz Firebase updated! Stars:', newStarTotal);
+    else        console.log('❌ Firebase failed! Status:', res.status);
   } catch (e) {
-    console.error("❌ Firebase error:", e);
+    console.log('❌ Error:', e.message);
   }
 }
 
