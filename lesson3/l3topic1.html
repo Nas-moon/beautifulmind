@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lesson 3 – Topic 1</title>
-
 <style>
 body {
   margin: 0;
@@ -13,7 +12,6 @@ body {
   color: #222;
 }
 
-/* HEADER */
 header {
   background: #1b5583;
   color: white;
@@ -21,9 +19,49 @@ header {
 }
 
 header h1 {
-  margin: 0.5em;
+  margin: 0.5em 0;
   font-size: 1.2rem;
 }
+
+.heado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* HEADER BUTTONS GROUP */
+.header-btns {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.back, .map-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: Verdana;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1.8;
+  transition: background 0.2s;
+}
+
+/* Back button - light */
+.back {
+  background-color: #e6eef4;
+  color: #1b5583;
+}
+.back:hover { background-color: #dbe7f0; }
+
+/* Map button - accent */
+.map-btn {
+  background-color: #ffd700;
+  color: #0f2f4a;
+}
+.map-btn:hover { background-color: #ffc800; }
 
 /* MAIN */
 main {
@@ -35,20 +73,15 @@ main {
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 
-h2 {
-  color: #1b5583;
-  margin-bottom: 1rem;
-}
+h2 { color: #1b5583; margin-bottom: 1rem; }
 
-/* VIDEO */
 .video-wrapper {
   margin-bottom: 1.5rem;
   border-radius: 1rem;
   overflow: hidden;
 }
 
-/* BUTTON */
-button {
+button#nextBtn {
   background: #1b5583;
   color: white;
   border: none;
@@ -57,46 +90,15 @@ button {
   font-size: 1rem;
   cursor: pointer;
 }
-
-button:disabled {
+button#nextBtn:disabled {
   background: #9fb6cc;
   cursor: not-allowed;
 }
 
-/* PROGRESS TEXT */
 #progress {
   margin-top: 1rem;
   font-size: 0.9rem;
   color: #444;
-}
-
-.back {
-  margin-left: auto;
-  margin-right: 10%;
-  padding: 2px 0.5em;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-family: verdana;
-  font-weight: bold;
-  background-color: #e6eef4;
-  color: #1b5583;  
-  border: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  font-size: 15px;
-  margin-top: 5px;
-  display: flex;
-  justify-content: flex-start;
-  margin-left: auto;
-  margin-right: 20px;
-  line-height: 2em;
-}
-
-.back:hover {
-  background-color: #dbe7f0;
-}
-
-.heado {
-  display: flex;
 }
 
 /* STAR BAR */
@@ -120,30 +122,20 @@ button:disabled {
   pointer-events: none;
   animation: fly 1s ease-in-out forwards;
 }
-
 @keyframes fly {
-  0% {
-    transform: scale(1) translate(0, 0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.3) translate(300px, -300px);
-    opacity: 0;
-  }
+  0%   { transform: scale(1) translate(0,0); opacity: 1; }
+  100% { transform: scale(0.3) translate(300px,-300px); opacity: 0; }
 }
 
 /* CONFETTI */
 .confetti {
   position: fixed;
-  width: 8px;
-  height: 8px;
+  width: 8px; height: 8px;
   background: gold;
-  top: 50%;
-  left: 50%;
+  top: 50%; left: 50%;
   opacity: 0.9;
   animation: fall 1s ease-out forwards;
 }
-
 @keyframes fall {
   to {
     transform: translate(
@@ -153,29 +145,46 @@ button:disabled {
     opacity: 0;
   }
 }
+
+/* Status box for debugging */
+#statusBox {
+  position: fixed;
+  bottom: 10px; left: 10px; right: 10px;
+  background: rgba(0,0,0,0.85);
+  color: #0f0;
+  font-family: monospace;
+  font-size: 13px;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 9999;
+  max-height: 120px;
+  overflow-y: auto;
+  display: none;
+}
 </style>
 </head>
 
 <body>
 
 <header>
- <div class="heado">
-  <h1>Lesson 3 • Topic 1</h1>
-  <button class="back" onclick="history.back()">Back</button>
- </div>
+  <div class="heado">
+    <h1>Lesson 3 • Topic 1</h1>
+    <div class="header-btns">
+      <button class="back" onclick="history.back()">← Back</button>
+      <button class="map-btn" onclick="window.location.href='../lessonmap/lesson-map.html'">🗺️ Lesson Map</button>
+    </div>
+  </div>
 </header>
 
 <main>
   <!-- STAR COUNTER -->
-  <div id="star-bar">
-    ⭐ <span id="star-count">0</span>
-  </div>
+  <div id="star-bar">⭐ <span id="star-count">0</span></div>
 
   <h2>Introduction</h2>
 
   <div class="video-wrapper">
     <iframe
-      src="https://drive.google.com/file/d/1LrT1HwzWpf-NLNV8kPL8UGB5B9eMz4Nb/preview"
+      src="https://drive.google.com/file/d/1Fobyz1eymtHe66a7X4aEMpZb9QkzLsIy/preview"
       width="100%"
       height="450"
       allow="autoplay"
@@ -183,32 +192,40 @@ button:disabled {
     ></iframe>
   </div>
 
-  <button id="nextBtn" disabled>
-    Proceed to Topic 2 →
-  </button>
-
+  <button id="nextBtn" disabled>Proceed to Topic 2 →</button>
   <p id="progress">Watching video…</p>
 </main>
+
+<div id="statusBox"></div>
 
 <script>
 // =============================================
 // CONFIG - CHANGE THESE FOR EACH PAGE
 // =============================================
-const VIDEO_DURATION = 10;                    // seconds to watch
-const STORAGE_KEY = "l3topic1_completed";     // unique key per topic
-const STARS_TO_EARN = 10;                     // stars earned for this topic
-const NEXT_PAGE = "l3topic2.html";            // next page link
+const VIDEO_DURATION = 10;
+const STORAGE_KEY    = "l3topic1_completed";
+const STARS_TO_EARN  = 10;
+const NEXT_PAGE      = "l3topic2.html";
+const MAP_PATH       = "../lessonmap/lesson-map.html";
 // =============================================
 
-const nextBtn = document.getElementById("nextBtn");
-const progress = document.getElementById("progress");
+// Status logger (visible on screen)
+function log(msg) {
+  const box = document.getElementById('statusBox');
+  box.style.display = 'block';
+  box.innerHTML += msg + '<br>';
+  box.scrollTop = box.scrollHeight;
+}
+
+const nextBtn    = document.getElementById("nextBtn");
+const progress   = document.getElementById("progress");
 const starCountEl = document.getElementById("star-count");
 
-// LOAD CURRENT TOTAL STARS (one single key "totalStars")
+// Load current total stars
 let totalStars = Number(localStorage.getItem("totalStars")) || 0;
 starCountEl.textContent = totalStars;
 
-// CHECK IF ALREADY COMPLETED
+// Check if already completed
 if (localStorage.getItem(STORAGE_KEY) === "true") {
   nextBtn.disabled = false;
   progress.textContent = "✅ Topic already completed!";
@@ -216,13 +233,11 @@ if (localStorage.getItem(STORAGE_KEY) === "true") {
   startTimer();
 }
 
-// TIMER
 function startTimer() {
   let watched = 0;
   const timer = setInterval(() => {
     watched++;
     progress.textContent = `Watched ${watched} / ${VIDEO_DURATION} seconds`;
-
     if (watched >= VIDEO_DURATION) {
       clearInterval(timer);
       completeTopic();
@@ -230,7 +245,6 @@ function startTimer() {
   }, 1000);
 }
 
-// COMPLETE TOPIC
 function completeTopic() {
   localStorage.setItem(STORAGE_KEY, "true");
   nextBtn.disabled = false;
@@ -238,96 +252,88 @@ function completeTopic() {
   rewardStars();
 }
 
-// REWARD STARS + FIREBASE UPDATE
 function rewardStars() {
   totalStars += STARS_TO_EARN;
   localStorage.setItem("totalStars", totalStars);
   starCountEl.textContent = totalStars;
-
   flyStar();
   confettiBurst();
   updateFirebase();
-
-  console.log(`⭐ Earned ${STARS_TO_EARN} stars! Total: ${totalStars}`);
+  log(`⭐ Earned ${STARS_TO_EARN} stars! Total: ${totalStars}`);
 }
 
-// FLYING STAR ANIMATION
 function flyStar() {
   const star = document.createElement("div");
   star.className = "star";
   star.textContent = "⭐";
   star.style.left = "50%";
-  star.style.top = "50%";
+  star.style.top  = "50%";
   document.body.appendChild(star);
   setTimeout(() => star.remove(), 1000);
 }
 
-// CONFETTI
 function confettiBurst() {
   for (let i = 0; i < 15; i++) {
-    const conf = document.createElement("div");
-    conf.className = "confetti";
-    conf.style.setProperty("--x", Math.random());
-    conf.style.setProperty("--y", Math.random());
-    conf.style.background = ["gold", "orange", "#ffda33"][i % 3];
-    document.body.appendChild(conf);
-    setTimeout(() => conf.remove(), 1000);
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.setProperty("--x", Math.random());
+    c.style.setProperty("--y", Math.random());
+    c.style.background = ["gold","orange","#ffda33"][i % 3];
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1000);
   }
 }
 
-// NEXT BUTTON
 nextBtn.addEventListener("click", () => {
   window.location.href = NEXT_PAGE;
 });
 
-// Visible status box — no console needed!
-const statusBox = document.createElement('div');
-statusBox.style.cssText = `
-  position: fixed; bottom: 10px; left: 10px; right: 10px;
-  background: rgba(0,0,0,0.85); color: #0f0;
-  font-family: monospace; font-size: 13px;
-  padding: 10px; border-radius: 8px; z-index: 9999;
-  max-height: 120px; overflow-y: auto; display: none;
-`;
-document.body.appendChild(statusBox);
-
-function log(msg) {
-  statusBox.style.display = 'block';
-  statusBox.innerHTML += msg + '<br>';
-  statusBox.scrollTop = statusBox.scrollHeight;
-}
-
-// FIREBASE UPDATE
 async function updateFirebase() {
-  const userName = localStorage.getItem("userName") || "Guest";
-  const userId   = userName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+  let userName = localStorage.getItem("userName") || '';
+  if (!userName || userName === 'Guest') {
+    const entered = prompt('👋 Enter your name to save progress:');
+    userName = (entered && entered.trim()) ? entered.trim() : 'Student';
+    localStorage.setItem('userName', userName);
+  }
+
+  const userId = userName.toLowerCase().replace(/[^a-z0-9]/g, "_");
   const completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
 
-  log('📡 Saving to Firebase... User: ' + userName);
-  log('⭐ Stars: ' + totalStars);
+  // Collect ALL completed topic keys from localStorage
+  const completedTopics = {};
+  const completedQuizzes = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.includes('topic') && key.includes('_completed')) {
+      completedTopics[key] = localStorage.getItem(key);
+    }
+    if (key && key.startsWith('quiz_')) {
+      completedQuizzes[key] = localStorage.getItem(key);
+    }
+  }
+
+  log('📡 Saving... User: ' + userName + ' | Stars: ' + totalStars);
 
   try {
-    const response = await fetch(
+    const res = await fetch(
       `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
       {
-        method: "PUT",
+        method:  "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name:        userName,
-          stars:       totalStars,
-          lessons:     completedLessons,
-          lastUpdated: Date.now()
+          name:             userName,
+          stars:            totalStars,
+          lessons:          completedLessons,
+          completedTopics:  completedTopics,
+          completedQuizzes: completedQuizzes,
+          lastUpdated:      Date.now()
         })
       }
     );
-
-    if (response.ok) {
-      log('✅ Firebase updated! Stars: ' + totalStars);
-    } else {
-      log('❌ Firebase failed! Status: ' + response.status);
-    }
-  } catch (error) {
-    log('❌ Error: ' + error.message);
+    if (res.ok) log('✅ Firebase updated! Stars: ' + totalStars);
+    else        log('❌ Firebase failed! Status: ' + res.status);
+  } catch (e) {
+    log('❌ Error: ' + e.message);
   }
 }
 </script>
