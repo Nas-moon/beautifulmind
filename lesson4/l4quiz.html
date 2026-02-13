@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lesson 4 • Quiz</title>
-
 <style>
 body {
   margin: 0;
@@ -12,7 +11,6 @@ body {
   background: linear-gradient(#0f3d5e, #0b2e47);
   color: white;
 }
-
 header {
   padding: 1rem 2rem;
   background: #1b5583;
@@ -20,7 +18,6 @@ header {
   justify-content: space-between;
   align-items: center;
 }
-
 .timer {
   font-weight: bold;
   background: #fff;
@@ -28,7 +25,6 @@ header {
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
 }
-
 main {
   max-width: 700px;
   margin: 2rem auto;
@@ -38,52 +34,23 @@ main {
   border-radius: 1.5rem;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
-
-.question {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
+.question { font-size: 1.2rem; margin-bottom: 1rem; }
 .options button {
-  display: block;
-  width: 100%;
-  margin: 0.6rem 0;
-  padding: 0.8rem;
-  border-radius: 10px;
-  border: 2px solid #1b5583;
-  background: #eef4fa;
-  cursor: pointer;
-  font-size: 1rem;
+  display: block; width: 100%;
+  margin: 0.6rem 0; padding: 0.8rem;
+  border-radius: 10px; border: 2px solid #1b5583;
+  background: #eef4fa; cursor: pointer; font-size: 1rem;
 }
-
-.options button:hover {
-  background: #dbe7f0;
-}
-
-.options button.correct {
-  background: #c8f7c5;
-  border-color: #2ecc71;
-}
-
-.options button.wrong {
-  background: #f7c5c5;
-  border-color: #e74c3c;
-}
-
+.options button:hover  { background: #dbe7f0; }
+.options button.correct { background: #c8f7c5; border-color: #2ecc71; }
+.options button.wrong   { background: #f7c5c5; border-color: #e74c3c; }
 .footer {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-top: 1.5rem; display: flex;
+  justify-content: space-between; align-items: center;
 }
-
-.stars {
-  font-weight: bold;
-  color: #f1c40f;
-}
+.stars { font-weight: bold; color: #f1c40f; }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -93,9 +60,7 @@ main {
 
 <main>
   <div class="question" id="question"></div>
-
-  <div class="options" id="options"></div>
-
+  <div class="options"  id="options"></div>
   <div class="footer">
     <div class="stars">⭐ Stars: <span id="stars">0</span></div>
     <div>Question <span id="qNum">1</span>/10</div>
@@ -103,90 +68,88 @@ main {
 </main>
 
 <script>
+// =============================================
+// CONFIG - ONLY CHANGE THESE FOR EACH QUIZ
+// =============================================
+const QUIZ_KEY         = "quiz_l4_done";   // unique per lesson
+const LESSON_NUMBER    = 4;                // which lesson this completes
+const REDIRECT_ON_DONE = "../lessonmap/lesson-map.html";
+// =============================================
 
-if (localStorage.getItem("l4quiz_done") === "true") {
+// Check if already completed
+if (localStorage.getItem(QUIZ_KEY) === "true") {
   alert("✅ You have already completed this quiz.");
-  window.location.href = "lesson-map.html";
+  window.location.href = REDIRECT_ON_DONE;
 }
 
 const quiz = [
   {
-    q: "Consectetur, adipisci velit, sed quia non numquam eius modi tempora?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 0,
-    stars: 1
+    q: "What makes a person truly beautiful according to the lesson?",
+    options: ["A) Face", "B) Clothes", "C) Mind", "D) Money"],
+    answer: 2, stars: 3
   },
   {
-    q: "Itaque earum rerum hic tenetur a sapiente delectus?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 1,
-    stars: 1
+    q: "A beautiful mind shows qualities like:",
+    options: ["A) Anger and pride","B) Kindness and calmness","C) Laziness and fear","D) Loud talking"],
+    answer: 1, stars: 3
   },
   {
-    q: "At vero eos et accusamus et iusto odio dignissimos ducimus?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 2,
-    stars: 1
+    q: "Thinking is compared to which activity in the lesson?",
+    options: ["A) Singing","B) Sleeping","C) Playing a sport","D) Watching TV"],
+    answer: 2, stars: 3
   },
   {
-    q: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 3,
-    stars: 1
+    q: "What should we do before reacting when someone annoys us?",
+    options: ["A) Shout","B) Ignore","C) Pause and think","D) Walk away"],
+    answer: 2, stars: 3
   },
   {
-    q: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 0,
-    stars: 1
+    q: "Beauty in interaction means:",
+    options: ["A) Talking loudly","B) Showing off","C) Being kind and listening","D) Using big words"],
+    answer: 2, stars: 3
   },
   {
     q: "Consectetur, adipisci velit, sed quia non numquam eius modi tempora?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 1,
-    stars: 1
+    options: ["Option A","Option B","Option C","Option D"],
+    answer: 1, stars: 3
   },
   {
     q: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 2,
-    stars: 1
+    options: ["Option A","Option B","Option C","Option D"],
+    answer: 2, stars: 3
   },
   {
     q: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 3,
-    stars: 1
+    options: ["Option A","Option B","Option C","Option D"],
+    answer: 3, stars: 3
   },
   {
     q: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 0,
-    stars: 1
+    options: ["Option A","Option B","Option C","Option D"],
+    answer: 0, stars: 3
   },
   {
     q: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 1,
-    stars: 1
+    options: ["Option A","Option B","Option C","Option D"],
+    answer: 1, stars: 3
   }
 ];
 
 let index = 0;
-let totalStars = 0;
+let quizStars = 0; // stars earned THIS quiz only
 
 const questionEl = document.getElementById("question");
-const optionsEl = document.getElementById("options");
-const starsEl = document.getElementById("stars");
-const qNumEl = document.getElementById("qNum");
+const optionsEl  = document.getElementById("options");
+const starsEl    = document.getElementById("stars");
+const qNumEl     = document.getElementById("qNum");
 
 function loadQuestion() {
-  const current = quiz[index];
-  questionEl.textContent = current.q;
-  optionsEl.innerHTML = "";
-  qNumEl.textContent = index + 1;
+  const cur = quiz[index];
+  questionEl.textContent = cur.q;
+  optionsEl.innerHTML    = "";
+  qNumEl.textContent     = index + 1;
 
-  current.options.forEach((opt, i) => {
+  cur.options.forEach((opt, i) => {
     const btn = document.createElement("button");
     btn.textContent = opt;
     btn.onclick = () => selectAnswer(btn, i);
@@ -194,66 +157,89 @@ function loadQuestion() {
   });
 }
 
-function selectAnswer(button, selected) {
-  const correct = quiz[index].answer;
-  const buttons = optionsEl.querySelectorAll("button");
+function selectAnswer(btn, selected) {
+  const correct  = quiz[index].answer;
+  const buttons  = optionsEl.querySelectorAll("button");
 
   buttons.forEach(b => b.disabled = true);
 
   if (selected === correct) {
-    button.classList.add("correct");
-    totalStars += quiz[index].stars;
-    starsEl.textContent = totalStars;
+    btn.classList.add("correct");
+    quizStars += quiz[index].stars;
+    starsEl.textContent = quizStars;
   } else {
-    button.classList.add("wrong");
+    btn.classList.add("wrong");
     buttons[correct].classList.add("correct");
   }
 
   setTimeout(() => {
     index++;
-    if (index < quiz.length) {
-      loadQuestion();
-    } else {
-      endQuiz();
-    }
+    if (index < quiz.length) loadQuestion();
+    else endQuiz();
   }, 900);
 }
 
 /* TIMER */
 let time = 300;
 const timerEl = document.getElementById("timer");
-
-
 const countdown = setInterval(() => {
   time--;
   const min = String(Math.floor(time / 60)).padStart(2, "0");
   const sec = String(time % 60).padStart(2, "0");
   timerEl.textContent = `${min}:${sec}`;
-
-  if (time <= 0) {
-    clearInterval(countdown);
-    endQuiz();
-  }
+  if (time <= 0) { clearInterval(countdown); endQuiz(); }
 }, 1000);
 
 function endQuiz() {
   clearInterval(countdown);
 
-  // SAVE STARS
-  const oldStars = Number(localStorage.getItem("stars")) || 0;
-  localStorage.setItem("stars", oldStars + totalStars);
+  // Add quiz stars to existing total
+  const oldStars    = Number(localStorage.getItem("totalStars")) || 0;
+  const newTotal    = oldStars + quizStars;
 
-  // MARK LESSON 4 COMPLETE
-  localStorage.setItem("completedLessons", 4);
+  // Save everything
+  localStorage.setItem("totalStars",       newTotal);
+  localStorage.setItem(QUIZ_KEY,           "true");
+  localStorage.setItem("completedLessons", LESSON_NUMBER);
 
-  alert(`Quiz completed! ⭐ Stars earned: ${totalStars}`);
+  // Push to Firebase
+  updateFirebase(newTotal);
 
-  // NEXT: GO BACK TO MAP
-  window.location.href = "../lessonmap/lesson-map.html";
+  alert(`Quiz done! ⭐ You earned ${quizStars} stars!`);
+  window.location.href = REDIRECT_ON_DONE;
+}
+
+async function updateFirebase(newStarTotal) {
+  let userName = localStorage.getItem("userName") || '';
+  if (!userName || userName === 'Guest') {
+    const entered = prompt('👋 Enter your name to save progress:');
+    userName = (entered && entered.trim()) ? entered.trim() : 'Student';
+    localStorage.setItem('userName', userName);
+  }
+
+  const userId = userName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+  try {
+    const res = await fetch(
+      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
+      {
+        method:  "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name:        userName,
+          stars:       newStarTotal,
+          lessons:     LESSON_NUMBER,
+          lastUpdated: Date.now()
+        })
+      }
+    );
+    if (res.ok) console.log("✅ Firebase updated! Stars:", newStarTotal);
+  } catch (e) {
+    console.error("❌ Firebase error:", e);
+  }
 }
 
 loadQuestion();
 </script>
-
 </body>
 </html>
