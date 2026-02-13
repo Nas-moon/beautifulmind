@@ -120,16 +120,19 @@ main {
 /* MAP */
 .map-wrapper {
   position: relative;
-  padding: 60px 10px;
+  padding: 60px 30px;
   min-height: 600px;
+  overflow: visible;
 }
 .path-svg {
   position: absolute;
-  width: calc(100% - 20px);
+  width: calc(100% - 60px);
   height: 100%;
-  left: 10px; top: 0;
+  left: 30px;
+  top: 0;
   pointer-events: none;
   z-index: 0;
+  overflow: visible;
 }
 .path-svg path {
   stroke-dasharray: 2000;
@@ -154,8 +157,8 @@ main {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.lesson:nth-child(odd)  { justify-content: flex-start; padding-left: 20px; }
-.lesson:nth-child(even) { justify-content: flex-end;   padding-right: 20px; }
+.lesson:nth-child(odd)  { justify-content: flex-start; padding-left: 40px; }
+.lesson:nth-child(even) { justify-content: flex-end;   padding-right: 40px; }
 
 .lesson-content {
   position: relative;
@@ -588,7 +591,7 @@ main {
 
   <div class="map-wrapper">
     <svg class="path-svg" viewBox="0 0 300 800" preserveAspectRatio="none">
-      <path d="M240 720 Q220 640, 150 600 T70 480 T230 360 T70 240 T150 120 T70 20"
+      <path d="M210 720 Q200 640, 150 600 T90 480 T210 360 T90 240 T150 120 T90 20"
             fill="none"
             stroke="rgba(255,255,255,0.4)"
             stroke-width="8"
@@ -631,7 +634,7 @@ main {
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
@@ -655,12 +658,28 @@ for (let i = 0; i < 30; i++) {
   starsEl.appendChild(s);
 }
 
-// User data
-const currentUser = localStorage.getItem('userName') || 'Guest';
-const userId = currentUser.toLowerCase().replace(/\s+/g, '_');
-let completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
+// ============================================
+// GET USER NAME - Check localStorage first,
+// if missing ask the user so nothing breaks
+// ============================================
+let currentUser = localStorage.getItem('userName') || '';
+
+if (!currentUser || currentUser === 'Guest' || currentUser.trim() === '') {
+  // Name missing from localStorage - ask user
+  const entered = prompt('👋 Please enter your name to continue:');
+  if (entered && entered.trim() !== '') {
+    currentUser = entered.trim();
+    localStorage.setItem('userName', currentUser);
+  } else {
+    currentUser = 'Student';
+    localStorage.setItem('userName', currentUser);
+  }
+}
+
+const userId = currentUser.toLowerCase().replace(/[^a-z0-9]/g, '_');
+let completedLessons  = Number(localStorage.getItem("completedLessons"))  || 0;
 let previousCompleted = Number(localStorage.getItem("previousCompleted")) || 0;
-let totalStars = Number(localStorage.getItem("totalStars")) || 0;
+let totalStars        = Number(localStorage.getItem("totalStars"))        || 0;
 
 // Progress bar
 document.getElementById('progressFill').style.width = (completedLessons / 5 * 100) + '%';
@@ -747,44 +766,61 @@ async function saveProgress() {
 
 // Display leaderboard
 function displayLeaderboard() {
-  onValue(ref(db, 'users'), (snap) => {
-    const list = document.getElementById('leaderboardList');
-    const users = [];
-    snap.forEach(c => users.push(c.val()));
-    users.sort((a, b) => b.stars - a.stars);
+  const list     = document.getElementById('leaderboardList');
+  const rankEl   = document.getElementById('yourRank');
+  const starsEl2 = document.getElementById('yourStars');
 
-    // Update your stats
-    const me = users.find(u => u.name === currentUser);
-    if (me) {
-      totalStars = me.stars;
-      localStorage.setItem("totalStars", totalStars);
-    }
-    const rank = users.findIndex(u => u.name === currentUser) + 1;
-    document.getElementById('yourRank').textContent = rank || '-';
-    document.getElementById('yourStars').textContent = totalStars;
+  list.innerHTML = '<div class="lb-loading">⏳ Loading...</div>';
 
-    list.innerHTML = '';
-    if (!users.length) {
-      list.innerHTML = '<div class="lb-loading">No students yet!</div>';
-      return;
-    }
+  // Fetch directly via REST — more reliable than SDK onValue
+  fetch('https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users.json')
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(data => {
+      list.innerHTML = '';
 
-    users.forEach((p, i) => {
-      const r = i + 1;
-      const isMe = p.name === currentUser;
-      const item = document.createElement('div');
-      item.className = `lb-item${isMe ? ' me' : ''}`;
-      item.innerHTML = `
-        <div class="lb-rank${r<=3?' r'+r:''}">${r===1?'🥇':r===2?'🥈':r===3?'🥉':'#'+r}</div>
-        <div class="lb-info">
-          <div class="lb-name">${p.name}${isMe?' (You)':''}</div>
-          <div class="lb-sub">${p.lessons||0}/5 lessons</div>
-        </div>
-        <div class="lb-stars">⭐ ${p.stars||0}</div>
-      `;
-      list.appendChild(item);
+      if (!data) {
+        list.innerHTML = '<div class="lb-loading">No students yet! Be the first 🌟</div>';
+        return;
+      }
+
+      // Convert object to array
+      const users = Object.values(data);
+
+      // Sort by stars descending
+      users.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+
+      // Find current user's rank & update stats box
+      const myIndex = users.findIndex(u =>
+        u.name && u.name.toLowerCase() === currentUser.toLowerCase()
+      );
+      rankEl.textContent   = myIndex >= 0 ? '#' + (myIndex + 1) : '-';
+      starsEl2.textContent = myIndex >= 0 ? (users[myIndex].stars || 0) : totalStars;
+
+      // Render each row
+      users.forEach((p, i) => {
+        const r    = i + 1;
+        const isMe = p.name && p.name.toLowerCase() === currentUser.toLowerCase();
+        const medal = r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : '#' + r;
+
+        const item = document.createElement('div');
+        item.className = 'lb-item' + (isMe ? ' me' : '');
+        item.innerHTML = `
+          <div class="lb-rank${r<=3?' r'+r:''}">${medal}</div>
+          <div class="lb-info">
+            <div class="lb-name">${p.name || 'Unknown'}${isMe ? ' 👈' : ''}</div>
+            <div class="lb-sub">${p.lessons || 0}/5 lessons completed</div>
+          </div>
+          <div class="lb-stars">⭐ ${p.stars || 0}</div>
+        `;
+        list.appendChild(item);
+      });
+    })
+    .catch(err => {
+      list.innerHTML = `<div class="lb-loading">❌ Error: ${err.message}<br>Check Firebase rules!</div>`;
     });
-  });
 }
 
 // Panel open/close
