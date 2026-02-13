@@ -103,72 +103,73 @@ main {
 </main>
 
 <script>
-
-if (localStorage.getItem("l3quiz_done") === "true") {
+// Check if quiz already completed
+if (localStorage.getItem("quiz_l1_done") === "true") {
   alert("✅ You have already completed this quiz.");
-  window.location.href = "lesson-map.html";
+  window.location.href = "../lessonmap/lesson-map.html";
 }
 
+// Quiz questions
 const quiz = [
   {
-    q: "Consectetur, adipisci velit, sed quia non numquam eius modi tempora?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 0,
-    stars: 1
-  },
-  {
-    q: "Itaque earum rerum hic tenetur a sapiente delectus?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 1,
-    stars: 1
-  },
-  {
-    q: "At vero eos et accusamus et iusto odio dignissimos ducimus?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
+    q: "What makes a person truly beautiful according to the lesson?",
+    options: ["A) Face", "B) Clothes", "C) Mind", "D) Money"],
     answer: 2,
-    stars: 1
+    stars: 3
   },
   {
-    q: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 3,
-    stars: 1
+    q: "A beautiful mind shows qualities like:",
+    options: ["A) Anger and pride","B) Kindness and calmness","C) Laziness and fear", "D) Loud talking"],
+    answer: 1,
+    stars: 3
   },
   {
-    q: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet?",
-    options: ["Option A", "Option B", "Option C", "Option D"],
-    answer: 0,
-    stars: 1
+    q: "Thinking is compared to which activity in the lesson?",
+    options: ["A) Singing", "B) Sleeping", "C) Playing a sport", "D) Watching TV"],
+    answer: 2,
+    stars: 3
+  },
+  {
+    q: "What should we do before reacting when someone annoys us?",
+    options: ["A) Shout","B) Ignore","C) Pause and think","D) Walk away"],
+    answer: 2,
+    stars: 3
+  },
+  {
+    q: "Beauty in interaction means:",
+    options: ["A) Talking loudly", "B) Showing off", "C) Being kind and listening", "D) Using big words"],
+    answer: 2,
+    stars: 3
   },
   {
     q: "Consectetur, adipisci velit, sed quia non numquam eius modi tempora?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 1,
-    stars: 1
+    stars: 3
   },
   {
     q: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 2,
-    stars: 1
+    stars: 3
   },
   {
     q: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 3,
-    stars: 1
+    stars: 3
   },
   {
     q: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 0,
-    stars: 1
+    stars: 3
   },
   {
     q: "Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus?",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answer: 1,
-    stars: 1
+    stars: 3
   }
 ];
 
@@ -223,7 +224,6 @@ function selectAnswer(button, selected) {
 let time = 300;
 const timerEl = document.getElementById("timer");
 
-
 const countdown = setInterval(() => {
   time--;
   const min = String(Math.floor(time / 60)).padStart(2, "0");
@@ -239,19 +239,60 @@ const countdown = setInterval(() => {
 function endQuiz() {
   clearInterval(countdown);
 
-  // SAVE STARS
-  const oldStars = Number(localStorage.getItem("stars")) || 0;
-  localStorage.setItem("stars", oldStars + totalStars);
-
-  // MARK LESSON 3 COMPLETE
-  localStorage.setItem("completedLessons", 3);
+  // Calculate new total stars
+  const oldStars = Number(localStorage.getItem("totalStars")) || 0;
+  const newTotalStars = oldStars + totalStars;
+  
+  // Save to localStorage
+  localStorage.setItem("totalStars", newTotalStars);
+  localStorage.setItem("quiz_l3_done", "true");
+  
+  // Mark Lesson 1 as complete
+  localStorage.setItem("completedLessons", 1);
+  
+  // Update Firebase
+  updateFirebase(newTotalStars);
 
   alert(`Quiz completed! ⭐ Stars earned: ${totalStars}`);
 
-  // NEXT: GO BACK TO MAP
+  // Redirect to lesson map
   window.location.href = "../lessonmap/lesson-map.html";
 }
 
+// ============================================
+// FIREBASE UPDATE FUNCTION
+// ============================================
+async function updateFirebase(newStarTotal) {
+  const userName = localStorage.getItem("userName") || "Guest";
+  const userId = userName.toLowerCase().replace(/\s+/g, "_");
+  const completedLessons = Number(localStorage.getItem("completedLessons")) || 0;
+
+  try {
+    const response = await fetch(
+      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: userName,
+          stars: newStarTotal,
+          lessons: completedLessons,
+          lastUpdated: Date.now()
+        })
+      }
+    );
+    
+    if (response.ok) {
+      console.log("✅ Quiz Firebase updated! Stars:", newStarTotal);
+    } else {
+      console.error("❌ Quiz Firebase update failed");
+    }
+  } catch (error) {
+    console.error("❌ Firebase error:", error);
+  }
+}
+
+// Start the quiz
 loadQuestion();
 </script>
 
