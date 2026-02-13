@@ -1,33 +1,21 @@
+// ============================================
+// SKIP FORM IF ALREADY LOGGED IN ON THIS DEVICE
+// ============================================
+if (localStorage.getItem('userName')) {
+  window.location.href = 'lessonmap/lesson-map.html';
+}
+
+// ============================================
+// HELPERS
+// ============================================
 function toggleLesson(header) {
   const lesson = header.parentElement;
   lesson.classList.toggle("open");
 }
 
-const form    = document.querySelector("form");
-const status  = document.getElementById("form-status");
-const iframe  = document.getElementById("hidden_iframe");
 const burgerBtn  = document.getElementById("burgerBtn");
 const mobileMenu = document.getElementById("mobileMenu");
 
-// Create a visible debug box on screen
-const debugBox = document.createElement('div');
-debugBox.id = 'debugBox';
-debugBox.style.cssText = `
-  position: fixed; bottom: 10px; left: 10px; right: 10px;
-  background: rgba(0,0,0,0.85); color: #0f0; font-family: monospace;
-  font-size: 13px; padding: 10px; border-radius: 8px;
-  z-index: 9999; max-height: 150px; overflow-y: auto;
-  display: none;
-`;
-document.body.appendChild(debugBox);
-
-function log(msg) {
-  debugBox.style.display = 'block';
-  debugBox.innerHTML += msg + '<br>';
-  debugBox.scrollTop = debugBox.scrollHeight;
-}
-
-// Burger menu
 burgerBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   mobileMenu.classList.toggle("show");
@@ -40,45 +28,30 @@ document.addEventListener("click", (e) => {
 });
 
 // ============================================
-// SINGLE SUBMIT HANDLER
+// FORM SUBMISSION
 // ============================================
-let submitted  = false;
+const form    = document.querySelector("form");
+const status  = document.getElementById("form-status");
+const iframe  = document.getElementById("hidden_iframe");
+
+let submitted    = false;
 let savedUserData = {};
 
-form.addEventListener("submit", function() {
-  // Grab ALL values immediately
+form.addEventListener("submit", function () {
+  // Read ALL values immediately
   const userName    = document.getElementById('name').value.trim();
   const userStd     = document.getElementById('std').value.trim();
   const userEmail   = document.getElementById('email').value.trim();
   const userPhone   = document.getElementById('number').value.trim();
   const userAddress = document.getElementById('add').value.trim();
 
-  log('📝 Form submitted by: ' + userName);
-
-  // Save to localStorage right away
-  localStorage.setItem('userName',     userName);
-  localStorage.setItem('userStandard', userStd);
-  localStorage.setItem('userEmail',    userEmail);
-  localStorage.setItem('userPhone',    userPhone);
-  localStorage.setItem('userAddress',  userAddress);
-
-  savedUserData = {
-    name:         userName,
-    standard:     userStd,
-    email:        userEmail,
-    phone:        userPhone,
-    address:      userAddress,
-    stars:        0,
-    lessons:      0,
-    registeredAt: Date.now(),
-    lastUpdated:  Date.now()
-  };
-
+  // Store for Firebase
+  savedUserData = { name: userName, standard: userStd, email: userEmail,
+                    phone: userPhone, address: userAddress };
   submitted = true;
-  log('💾 Saved to localStorage ✅');
 });
 
-// After Google Form iframe confirms submission
+// After Google Form confirms submission via iframe
 iframe.addEventListener("load", async () => {
   if (!submitted) return;
   submitted = false;
@@ -87,33 +60,91 @@ iframe.addEventListener("load", async () => {
   status.focus();
   form.reset();
 
-  log('📡 Sending to Firebase...');
+  const userName = savedUserData.name;
+  const userId   = userName.toLowerCase().replace(/[^a-z0-9]/g, '_');
 
-  const userId = savedUserData.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-
+  // ============================================
+  // CHECK FIREBASE: Does this student exist?
+  // ============================================
   try {
-    const res = await fetch(
-      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
-      {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(savedUserData)
-      }
+    const checkRes  = await fetch(
+      `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`
     );
+    const existing = await checkRes.json();
 
-    if (res.ok) {
-      log('✅ Firebase saved! Status: ' + res.status);
-      log('👤 User: ' + savedUserData.name + ' | Email: ' + savedUserData.email);
+    if (existing && existing.name) {
+      // ✅ RETURNING STUDENT — restore their progress to localStorage
+      localStorage.setItem('userName',        existing.name);
+      localStorage.setItem('userStandard',    existing.standard    || '');
+      localStorage.setItem('userEmail',       existing.email       || '');
+      localStorage.setItem('userPhone',       existing.phone       || '');
+      localStorage.setItem('userAddress',     existing.address     || '');
+      localStorage.setItem('totalStars',      existing.stars       || 0);
+      localStorage.setItem('completedLessons',existing.lessons     || 0);
+
+      // Restore topic completion flags
+      if (existing.completedTopics) {
+        Object.entries(existing.completedTopics).forEach(([key, val]) => {
+          localStorage.setItem(key, val);
+        });
+      }
+
+      // Restore quiz completion flags
+      if (existing.completedQuizzes) {
+        Object.entries(existing.completedQuizzes).forEach(([key, val]) => {
+          localStorage.setItem(key, val);
+        });
+      }
+
+      console.log('✅ Returning student! Progress restored:', existing.stars, 'stars');
+
     } else {
-      log('❌ Firebase failed! Status: ' + res.status);
+      // 🆕 NEW STUDENT — create fresh profile in Firebase
+      const newProfile = {
+        name:             userName,
+        standard:         savedUserData.standard,
+        email:            savedUserData.email,
+        phone:            savedUserData.phone,
+        address:          savedUserData.address,
+        stars:            0,
+        lessons:          0,
+        completedTopics:  {},
+        completedQuizzes: {},
+        registeredAt:     Date.now(),
+        lastUpdated:      Date.now()
+      };
+
+      await fetch(
+        `https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app/users/${userId}.json`,
+        {
+          method:  'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(newProfile)
+        }
+      );
+
+      // Save to localStorage
+      localStorage.setItem('userName',         userName);
+      localStorage.setItem('userStandard',     savedUserData.standard);
+      localStorage.setItem('userEmail',        savedUserData.email);
+      localStorage.setItem('userPhone',        savedUserData.phone);
+      localStorage.setItem('userAddress',      savedUserData.address);
+      localStorage.setItem('totalStars',       0);
+      localStorage.setItem('completedLessons', 0);
+
+      console.log('✅ New student registered!');
     }
+
   } catch (err) {
-    log('❌ Network error: ' + err.message);
+    // Firebase failed — save locally anyway
+    localStorage.setItem('userName',         userName);
+    localStorage.setItem('totalStars',       0);
+    localStorage.setItem('completedLessons', 0);
+    console.error('❌ Firebase check failed:', err);
   }
 
-  // Redirect after 3 seconds (enough time to see debug messages)
-  log('⏳ Redirecting in 3 seconds...');
+  // Redirect after 2 seconds
   setTimeout(() => {
     window.location.href = 'lessonmap/lesson-map.html';
-  }, 3000);
+  }, 2000);
 });
