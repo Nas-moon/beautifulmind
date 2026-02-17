@@ -10,27 +10,55 @@ import { ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/fire
 // ============================================
 // GET FRESH PROGRESS DATA FROM FIREBASE
 // ============================================
+let lastProgressCache = null;
+let lastProgressTime = 0;
+
 export async function getProgressData(uid) {
   try {
+    // Use cache if data is less than 5 seconds old
+    const now = Date.now();
+    if (lastProgressCache && (now - lastProgressTime) < 5000) {
+      console.log('✅ Using cached progress data');
+      return lastProgressCache;
+    }
+
     const snapshot = await get(ref(db, `users/${uid}`));
     if (snapshot.exists()) {
       const data = snapshot.val();
-      return {
+      const result = {
         stars: data.stars || 0,
         lessons: data.lessons || 0,
         completedTopics: data.completedTopics || {},
         completedQuizzes: data.completedQuizzes || {}
       };
+      
+      // Cache the result
+      lastProgressCache = result;
+      lastProgressTime = now;
+      
+      return result;
     }
-    return {
+    
+    const emptyResult = {
       stars: 0,
       lessons: 0,
       completedTopics: {},
       completedQuizzes: {}
     };
+    
+    lastProgressCache = emptyResult;
+    lastProgressTime = now;
+    return emptyResult;
+    
   } catch (error) {
     console.error('❌ Error getting progress:', error.message);
-    return null;
+    // Return cached data on error instead of null
+    return lastProgressCache || {
+      stars: 0,
+      lessons: 0,
+      completedTopics: {},
+      completedQuizzes: {}
+    };
   }
 }
 
