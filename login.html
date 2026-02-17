@@ -1,74 +1,24 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to Beautiful Mind - Nurturing Minds">
   <title>Login - Beautiful Mind</title>
+  <link rel="stylesheet" href="stylesheet.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      width: 300px;
-      height: 300px;
-      background: white;
-      border-radius: 50%;
-      opacity: 0.1;
-      top: -100px;
-      right: -100px;
-      animation: float 20s infinite ease-in-out;
-      z-index: 0;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(30px) rotate(180deg); }
-    }
-
-    .stars {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .star {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 3s infinite;
-    }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-
+    /* LOGIN PAGE SPECIFIC STYLES */
     main {
       position: relative;
       z-index: 1;
-      max-width: 420px;
-      width: 100%;
-      padding: 20px;
+      padding: 40px 20px;
+      max-width: 500px;
+      margin: 0 auto;
+      min-height: calc(100vh - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .login-card {
@@ -77,6 +27,8 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       padding: 40px;
       animation: slideUp 0.8s ease-out;
+      width: 100%;
+      max-width: 420px;
     }
 
     @keyframes slideUp {
@@ -100,11 +52,13 @@
       margin-bottom: 10px;
     }
 
-    .logo h1 {
+    .logo h2 {
       color: #1b5583;
       font-size: 1.8rem;
       margin-bottom: 5px;
       font-weight: 800;
+      font-family: optima;
+      margin-top: 0;
     }
 
     .logo p {
@@ -221,17 +175,62 @@
     .demo-text strong {
       color: #1b5583;
     }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      main {
+        min-height: auto;
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+
+      .login-card {
+        padding: 25px;
+      }
+
+      .logo h2 {
+        font-size: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
+<div class="starfield">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<header class="site-header">
+  <div class="header-bg"></div>
+  
+  <nav class="navi">
+    <div class="ice">
+      <svg id="fire" xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><title xmlns="">star-fill</title><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#ffda33" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></g></svg>
+      <div class="logoname">
+        <p>BEAUTIFUL MIND</p>
+      </div>
+    </div>
+    <div class="right">
+      <a href="instru.html"><input type="button" class="instru" value="Instructions"></a>
+      <a href="about-contact.html"><input type="button" class="tracker" value="About & Contact"></a>
+    </div>
+    <!-- BURGER (mobile only) -->
+    <input type="button" value="☰" class="burger" id="burgerBtn">
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="instru.html">Instructions</a>
+      <a href="about-contact.html">About & Contact</a>
+    </div>
+  </nav>
+</header>
 
 <main>
   <div class="login-card">
     <div class="logo">
       <div class="logo-icon">🌟</div>
-      <h1>Beautiful Mind</h1>
+      <h2>Beautiful Mind</h2>
       <p>Login to Continue Your Learning Journey</p>
     </div>
 
@@ -277,22 +276,35 @@
   </div>
 </main>
 
+<footer></footer>
+
 <script type="module">
 import { loginStudent } from './firebase-config.js';
 
-// Create decorative stars
-const starsEl = document.getElementById('stars');
-for (let i = 0; i < 20; i++) {
-  const star = document.createElement('div');
-  star.className = 'star';
-  star.style.cssText = `
-    width: ${Math.random() * 3 + 1}px;
-    height: ${Math.random() * 3 + 1}px;
-    left: ${Math.random() * 100}%;
-    top: ${Math.random() * 100}%;
-    animation-delay: ${Math.random() * 3}s;
-  `;
-  starsEl.appendChild(star);
+// Initialize mobile menu
+function initMobileMenu() {
+  const burgerBtn = document.getElementById('burgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  if (!burgerBtn || !mobileMenu) return;
+
+  burgerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mobileMenu.classList.toggle('show');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!mobileMenu.contains(e.target) && e.target !== burgerBtn) {
+      mobileMenu.classList.remove('show');
+    }
+  });
+
+  const menuLinks = mobileMenu.querySelectorAll('a');
+  menuLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('show');
+    });
+  });
 }
 
 // Handle login form
@@ -333,11 +345,9 @@ loginForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Show loading state
   loginBtn.disabled = true;
   loading.style.display = 'block';
 
-  // Attempt login
   const result = await loginStudent(email, password);
 
   if (result.success) {
@@ -355,6 +365,9 @@ loginForm.addEventListener('submit', async (e) => {
     loading.style.display = 'none';
   }
 });
+
+// Initialize on load
+initMobileMenu();
 </script>
 
 </body>
