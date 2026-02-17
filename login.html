@@ -4,18 +4,71 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Beautiful Mind</title>
-  <link rel="stylesheet" href="stylesheet.css">
   <style>
-    main {
-      position: relative;
-      z-index: 1;
-      padding: 40px 20px;
-      max-width: 500px;
-      margin: 0 auto;
-      min-height: calc(100vh - 120px);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.1;
+      top: -100px;
+      right: -100px;
+      animation: float 20s infinite ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(30px) rotate(180deg); }
+    }
+
+    .stars {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
     }
 
     .login-card {
@@ -24,13 +77,17 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       padding: 40px;
       animation: slideUp 0.8s ease-out;
-      width: 100%;
-      max-width: 420px;
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .logo {
@@ -43,13 +100,11 @@
       margin-bottom: 10px;
     }
 
-    .logo h2 {
+    .logo h1 {
       color: #1b5583;
       font-size: 1.8rem;
       margin-bottom: 5px;
       font-weight: 800;
-      font-family: optima;
-      margin-top: 0;
     }
 
     .logo p {
@@ -77,7 +132,6 @@
       border-radius: 8px;
       font-size: 1rem;
       transition: border-color 0.3s;
-      font-family: verdana;
     }
 
     input[type="email"]:focus,
@@ -99,10 +153,9 @@
       cursor: pointer;
       transition: all 0.3s;
       margin-top: 10px;
-      font-family: verdana;
     }
 
-    .login-btn:hover:not(:disabled) {
+    .login-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(27, 85, 131, 0.4);
     }
@@ -110,6 +163,7 @@
     .login-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
     }
 
     .error-message {
@@ -120,7 +174,6 @@
       margin-bottom: 20px;
       display: none;
       border-left: 4px solid #c33;
-      font-family: verdana;
     }
 
     .success-message {
@@ -131,7 +184,27 @@
       margin-bottom: 20px;
       display: none;
       border-left: 4px solid #3c3;
-      font-family: verdana;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #666;
+      margin-top: 15px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #ddd;
+      border-top-color: #1b5583;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .demo-text {
@@ -143,7 +216,6 @@
       font-size: 0.85rem;
       color: #666;
       border-left: 4px solid #1b5583;
-      font-family: verdana;
     }
 
     .demo-text strong {
@@ -153,39 +225,13 @@
 </head>
 <body>
 
-<div class="starfield">
-  <span></span><span></span><span></span><span></span><span></span>
-  <span></span><span></span><span></span><span></span><span></span>
-  <span></span><span></span><span></span><span></span><span></span>
-</div>
-
-<header class="site-header">
-  <div class="header-bg"></div>
-  
-  <nav class="navi">
-    <div class="ice">
-      <svg id="fire" xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><title xmlns="">star-fill</title><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#ffda33" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></g></svg>
-      <div class="logoname">
-        <p>BEAUTIFUL MIND</p>
-      </div>
-    </div>
-    <div class="right">
-      <a href="instru.html"><input type="button" class="instru" value="Instructions"></a>
-      <a href="about-contact.html"><input type="button" class="tracker" value="About & Contact"></a>
-    </div>
-    <input type="button" value="☰" class="burger" id="burgerBtn">
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="instru.html">Instructions</a>
-      <a href="about-contact.html">About & Contact</a>
-    </div>
-  </nav>
-</header>
+<div class="stars" id="stars"></div>
 
 <main>
   <div class="login-card">
     <div class="logo">
       <div class="logo-icon">🌟</div>
-      <h2>Beautiful Mind</h2>
+      <h1>Beautiful Mind</h1>
       <p>Login to Continue Your Learning Journey</p>
     </div>
 
@@ -198,6 +244,7 @@
         <input 
           type="email" 
           id="email" 
+          name="email" 
           placeholder="student1@beautifulmind.com"
           required
         >
@@ -208,12 +255,18 @@
         <input 
           type="password" 
           id="password" 
+          name="password" 
           placeholder="••••••••"
           required
         >
       </div>
 
       <button type="submit" class="login-btn" id="loginBtn">🚀 Login</button>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px;">Authenticating...</p>
+      </div>
     </form>
 
     <div class="demo-text">
@@ -224,101 +277,85 @@
   </div>
 </main>
 
-<script>
-// Initialize mobile menu
-const burgerBtn = document.getElementById('burgerBtn');
-const mobileMenu = document.getElementById('mobileMenu');
+<script type="module">
+import { loginStudent } from './firebase-config.js';
 
-burgerBtn.addEventListener('click', () => {
-  mobileMenu.classList.toggle('show');
-});
+// Create decorative stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 20; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.cssText = `
+    width: ${Math.random() * 3 + 1}px;
+    height: ${Math.random() * 3 + 1}px;
+    left: ${Math.random() * 100}%;
+    top: ${Math.random() * 100}%;
+    animation-delay: ${Math.random() * 3}s;
+  `;
+  starsEl.appendChild(star);
+}
 
-document.addEventListener('click', (e) => {
-  if (!mobileMenu.contains(e.target) && e.target !== burgerBtn) {
-    mobileMenu.classList.remove('show');
-  }
-});
+// Handle login form
+const loginForm = document.getElementById('loginForm');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const errorMessage = document.getElementById('errorMessage');
+const successMessage = document.getElementById('successMessage');
+const loading = document.getElementById('loading');
 
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
-  authDomain: "beautifulmind-19645.firebaseapp.com",
-  databaseURL: "https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "beautifulmind-19645",
-  storageBucket: "beautifulmind-19645.firebasestorage.app",
-  messagingSenderId: "799227957055",
-  appId: "1:799227957055:web:6a7397f3c43c7a9ed54d8a"
-};
+function showError(msg) {
+  errorMessage.textContent = msg;
+  errorMessage.style.display = 'block';
+  successMessage.style.display = 'none';
+}
 
-// Load Firebase scripts
-Promise.all([
-  fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js').then(r => r.text()),
-  fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(r => r.text()),
-  fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js').then(r => r.text())
-]).then(() => {
-  console.log('Firebase scripts loaded');
-}).catch(err => {
-  console.error('Error loading Firebase:', err);
-});
+function showSuccess(msg) {
+  successMessage.textContent = msg;
+  successMessage.style.display = 'block';
+  errorMessage.style.display = 'none';
+}
 
-// Handle form submission
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+function hideMessages() {
+  errorMessage.style.display = 'none';
+  successMessage.style.display = 'none';
+}
+
+loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  console.log('Form submitted!');
-  
-  const email = document.getElementById('email').value.trim().toLowerCase();
-  const password = document.getElementById('password').value;
-  
-  console.log('Email:', email);
-  console.log('Password:', password ? '***' : 'empty');
-  
+  hideMessages();
+
+  const email = emailInput.value.trim().toLowerCase();
+  const password = passwordInput.value;
+
   if (!email || !password) {
     showError('❌ Please enter both email and password');
     return;
   }
 
-  // For now, let's do a simple test login
-  // This will work with the demo credentials
-  if (email === 'student1@beautifulmind.com' && password === 'password123') {
-    console.log('✅ Credentials match demo!');
+  // Show loading state
+  loginBtn.disabled = true;
+  loading.style.display = 'block';
+
+  // Attempt login
+  const result = await loginStudent(email, password);
+
+  if (result.success) {
     showSuccess('✅ Login successful! Redirecting...');
-    
-    // Save to localStorage
-    localStorage.setItem('uid', 'demo-uid-' + Date.now());
-    localStorage.setItem('userName', 'Student One');
-    localStorage.setItem('userEmail', email);
-    localStorage.setItem('userRole', 'student');
-    
     setTimeout(() => {
-      console.log('Redirecting to lesson-map.html');
-      window.location.href = 'lesson-map.html';
+      if (result.role === 'admin') {
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        window.location.href = 'lessonmap/lesson-map.html';
+      }
     }, 1500);
   } else {
-    console.log('❌ Credentials do not match');
-    showError('❌ Invalid email or password');
+    showError(result.error || '❌ Login failed. Please try again.');
+    loginBtn.disabled = false;
+    loading.style.display = 'none';
   }
 });
-
-function showError(msg) {
-  const errorEl = document.getElementById('errorMessage');
-  errorEl.textContent = msg;
-  errorEl.style.display = 'block';
-  document.getElementById('successMessage').style.display = 'none';
-  console.log(msg);
-}
-
-function showSuccess(msg) {
-  const successEl = document.getElementById('successMessage');
-  successEl.textContent = msg;
-  successEl.style.display = 'block';
-  document.getElementById('errorMessage').style.display = 'none';
-  console.log(msg);
-}
-
-console.log('Login page script loaded');
 </script>
-
-<footer></footer>
 
 </body>
 </html>
