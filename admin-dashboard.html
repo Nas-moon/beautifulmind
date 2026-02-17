@@ -1,1 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Beautiful Mind</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
+  min-height: 100vh;
+  color: #222;
+}
+
+header {
+  background: #1b5583;
+  color: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background: rgba(231, 76, 60, 1);
+  transform: translateY(-2px);
+}
+
+main {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #1b5583;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.students-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.students-container h2 {
+  color: #1b5583;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.search-box {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 10px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.search-box button {
+  padding: 10px 20px;
+  background: #1b5583;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.search-box button:hover {
+  background: #0f3c5f;
+  transform: translateY(-2px);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f0f4f8;
+  color: #1b5583;
+  padding: 12px;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 2px solid #1b5583;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background: #f9f9f9;
+}
+
+.reset-btn {
+  padding: 6px 12px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.reset-btn:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+.export-btn {
+  padding: 10px 20px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s;
+}
+
+.export-btn:hover {
+  background: #229954;
+  transform: translateY(-2px);
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrapper {
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>👨‍💼 Admin Dashboard</h1>
+  <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+</header>
+
+<main>
+  <!-- Stats Cards -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <div class="stat-value" id="totalStudents">0</div>
+      <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="avgStars">0</div>
+      <div class="stat-label">Avg Stars</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="lessonsCompleted">0</div>
+      <div class="stat-label">Total Lessons Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="topScore">0</div>
+      <div class="stat-label">Highest Score</div>
+    </div>
+  </div>
+
+  <!-- Students Table -->
+  <div class="students-container">
+    <h2>📊 Student Progress</h2>
+
+    <button class="export-btn" id="exportBtn">📥 Export to CSV</button>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search student by name or email...">
+      <button onclick="filterStudents()">Search</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="studentsTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>⭐ Stars</th>
+            <th>📚 Lessons</th>
+            <th>Last Updated</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="studentsList">
+          <tr>
+            <td colspan="6" class="loading">Loading students...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { getCurrentUser, logoutStudent } from './firebase-config.js';
+import { resetProgress } from './progress-manager.js';
+import { db } from './firebase-config.js';
+import { ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+// Check if admin
+const user = getCurrentUser();
+if (!user || user.role !== 'admin') {
+  alert('❌ Access Denied. Admin only.');
+  window.location.href = '../login.html';
+}
+
+console.log('✅ Admin logged in:', user.name);
+
+const logoutBtn = document.getElementById('logoutBtn');
+const studentsList = document.getElementById('studentsList');
+const exportBtn = document.getElementById('exportBtn');
+
+let allStudents = [];
+
+// Logout
+logoutBtn.addEventListener('click', async () => {
+  if (confirm('Logout?')) {
+    await logoutStudent();
+    window.location.href = '../login.html';
+  }
+});
+
+// Load all students
+async function loadStudents() {
+  try {
+    const snapshot = await get(ref(db, 'users'));
+    studentsList.innerHTML = '';
+
+    if (!snapshot.exists()) {
+      studentsList.innerHTML = '<tr><td colspan="6" class="loading">No students found</td></tr>';
+      return;
+    }
+
+    allStudents = Object.values(snapshot.val()).filter(u => u.role === 'student');
+    allStudents.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+
+    // Update stats
+    updateStats();
+
+    // Display students
+    allStudents.forEach((student) => {
+      const row = document.createElement('tr');
+      const lastUpdated = student.lastUpdated ? new Date(student.lastUpdated).toLocaleString() : '-';
+
+      row.innerHTML = `
+        <td>${student.name || '-'}</td>
+        <td>${student.email || '-'}</td>
+        <td>⭐ ${student.stars || 0}</td>
+        <td>${student.lessons || 0}/5</td>
+        <td>${lastUpdated}</td>
+        <td>
+          <button class="reset-btn" onclick="resetStudentProgress('${student.email}')">Reset</button>
+        </td>
+      `;
+      studentsList.appendChild(row);
+    });
+  } catch (error) {
+    console.error('❌ Error loading students:', error);
+    studentsList.innerHTML = '<tr><td colspan="6" class="loading">❌ Error loading data</td></tr>';
+  }
+}
+
+function updateStats() {
+  const totalStudents = allStudents.length;
+  const totalStars = allStudents.reduce((sum, s) => sum + (s.stars || 0), 0);
+  const avgStars = totalStudents > 0 ? Math.round(totalStars / totalStudents) : 0;
+  const lessonsCompleted = allStudents.reduce((sum, s) => sum + (s.lessons || 0), 0);
+  const topScore = allStudents.length > 0 ? (allStudents[0].stars || 0) : 0;
+
+  document.getElementById('totalStudents').textContent = totalStudents;
+  document.getElementById('avgStars').textContent = avgStars;
+  document.getElementById('lessonsCompleted').textContent = lessonsCompleted;
+  document.getElementById('topScore').textContent = topScore;
+}
+
+window.filterStudents = function() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const rows = document.querySelectorAll('#studentsList tr');
+
+  rows.forEach(row => {
+    const name = row.cells[0].textContent.toLowerCase();
+    const email = row.cells[1].textContent.toLowerCase();
+
+    if (name.includes(query) || email.includes(query)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+};
+
+window.resetStudentProgress = async function(email) {
+  if (confirm(`Are you sure? This will reset all progress for ${email}`)) {
+    // Find student UID and reset
+    const snapshot = await get(ref(db, 'users'));
+    if (snapshot.exists()) {
+      const users = snapshot.val();
+      for (const uid in users) {
+        if (users[uid].email === email) {
+          await resetProgress(uid);
+          alert('✅ Progress reset');
+          loadStudents();
+          return;
+        }
+      }
+    }
+  }
+};
+
+// Export to CSV
+exportBtn.addEventListener('click', () => {
+  let csv = 'Name,Email,Stars,Lessons,Last Updated\n';
+
+  allStudents.forEach(s => {
+    const lastUpdated = s.lastUpdated ? new Date(s.lastUpdated).toLocaleString() : '-';
+    csv += `"${s.name || '-'}","${s.email || '-'}",${s.stars || 0},${s.lessons || 0},"${lastUpdated}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `beautiful-mind-students-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+});
+
+// Initialize
+loadStudents();
+
+// Refresh every 30 seconds
+setInterval(loadStudents, 30000);
+</script>
+
+</body>
+</html>
