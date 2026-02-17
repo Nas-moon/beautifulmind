@@ -269,7 +269,7 @@
 
     <div class="demo-text">
       <strong>Demo Credentials:</strong><br>
-      Email: student1@beautifulmind.com<br>
+      Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d5a6a1a0b1b0bba1e495b7b0b4a0a1bcb3a0b9b8bcbbb1fbb6bab8">[email&#160;protected]</a><br>
       Password: password123
     </div>
   </div>
@@ -277,7 +277,7 @@
 
 <footer></footer>
 
-<script type="module">
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
 import { loginStudent } from './firebase-config.js';
 
 // Initialize mobile menu
@@ -353,21 +353,9 @@ loginForm.addEventListener('submit', async (e) => {
     showSuccess('✅ Login successful! Redirecting...');
     setTimeout(() => {
       if (result.role === 'admin') {
+        console.log('Redirecting admin to admin-dashboard.html');
         window.location.href = 'admin-dashboard.html';
       } else {
-        window.location.href = 'lessonmap/lesson-map.html';
+        console.log('Redirecting student to lesson-map.html');
+        window.location.href = 'lesson-map.html';
       }
-    }, 1500);
-  } else {
-    showError(result.error || '❌ Login failed. Please try again.');
-    loginBtn.disabled = false;
-    loading.style.display = 'none';
-  }
-});
-
-// Initialize on load
-initMobileMenu();
-</script>
-
-</body>
-</html>
