@@ -1,1 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1 - Quiz</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(#0f3d5e, #0b2e47);
+  color: white;
+  min-height: 100vh;
+}
+
+header {
+  padding: 1rem 2rem;
+  background: #1b5583;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+header h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.timer {
+  font-weight: bold;
+  background: #fff;
+  color: #1b5583;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
+}
+
+main {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: white;
+  color: #222;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.question {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1b5583;
+}
+
+.options button {
+  display: block;
+  width: 100%;
+  margin: 0.8rem 0;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 2px solid #1b5583;
+  background: #eef4fa;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  text-align: left;
+}
+
+.options button:hover:not(:disabled) {
+  background: #dbe7f0;
+  transform: translateX(5px);
+}
+
+.options button:disabled {
+  cursor: not-allowed;
+}
+
+.options button.correct {
+  background: #c8f7c5;
+  border-color: #2ecc71;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+.options button.wrong {
+  background: #f7c5c5;
+  border-color: #e74c3c;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 2px solid #eee;
+}
+
+.stars {
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 1.1rem;
+}
+
+.progress {
+  color: #666;
+  font-weight: 600;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  main {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .question {
+    font-size: 1rem;
+  }
+
+  .options button {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>Lesson 1 • Rapid Quiz</h2>
+  <div class="timer" id="timer">05:00</div>
+</header>
+
+<main>
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+  <div class="footer">
+    <div class="stars">⭐ Earned: <span id="stars">0</span></div>
+    <div class="progress">Question <span id="qNum">1</span>/10</div>
+  </div>
+</main>
+
+<script type="module">
+import { getCurrentUser } from './firebase-config.js';
+import { completeQuizInFirebase, getProgressData } from './progress-manager.js';
+
+// ============================================
+// CONFIG
+// ============================================
+const QUIZ_ID = "quiz_l1";
+const LESSON_NUMBER = 1;
+const STARS_PER_QUESTION = 3;
+const TOTAL_TIME = 300; // 5 minutes in seconds
+const MAP_PATH = "../lessonmap/lesson-map.html";
+// ============================================
+
+// Quiz Questions
+const quiz = [
+  {
+    q: "What makes a person truly beautiful according to the lesson?",
+    options: ["A) Face", "B) Clothes", "C) Mind", "D) Money"],
+    answer: 2,
+  },
+  {
+    q: "A beautiful mind shows qualities like:",
+    options: ["A) Anger and pride", "B) Kindness and calmness", "C) Laziness and fear", "D) Loud talking"],
+    answer: 1,
+  },
+  {
+    q: "Thinking is compared to which activity?",
+    options: ["A) Singing", "B) Playing a sport", "C) Sleeping", "D) Watching TV"],
+    answer: 1,
+  },
+  {
+    q: "What should we do before reacting when annoyed?",
+    options: ["A) Shout", "B) Ignore", "C) Pause and think", "D) Walk away"],
+    answer: 2,
+  },
+  {
+    q: "Beauty in interaction means:",
+    options: ["A) Talking loudly", "B) Showing off", "C) Being kind and listening", "D) Using big words"],
+    answer: 2,
+  },
+  {
+    q: "How does a beautiful mind handle mistakes?",
+    options: ["A) Blame others", "B) Learn from them", "C) Hide them", "D) Ignore them"],
+    answer: 1,
+  },
+  {
+    q: "What is the foundation of a beautiful mind?",
+    options: ["A) Wealth", "B) Fame", "C) Self-awareness", "D) Appearance"],
+    answer: 2,
+  },
+  {
+    q: "How can we nurture a beautiful mind?",
+    options: ["A) Meditation and reading", "B) Spending money", "C) Sleeping more", "D) Watching TV"],
+    answer: 0,
+  },
+  {
+    q: "What role does empathy play in a beautiful mind?",
+    options: ["A) No role", "B) Understanding others' feelings", "C) Avoiding emotions", "D) Being selfish"],
+    answer: 1,
+  },
+  {
+    q: "How do we show our beautiful mind to the world?",
+    options: ["A) Through actions", "B) Bragging", "C) Getting expensive things", "D) Being rude"],
+    answer: 0,
+  }
+];
+
+// Check authentication
+const user = getCurrentUser();
+if (!user) {
+  alert('❌ Not authenticated');
+  window.location.href = '../login.html';
+}
+
+// Check if already completed
+async function checkQuizCompletion() {
+  const progressData = await getProgressData(user.uid);
+  if (progressData.completedQuizzes[QUIZ_ID]) {
+    alert("✅ You have already completed this quiz.");
+    window.location.href = MAP_PATH;
+  }
+}
+
+checkQuizCompletion();
+
+let index = 0;
+let totalStars = 0;
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const starsEl = document.getElementById("stars");
+const qNumEl = document.getElementById("qNum");
+const timerEl = document.getElementById("timer");
+
+function loadQuestion() {
+  const current = quiz[index];
+  questionEl.textContent = current.q;
+  optionsEl.innerHTML = "";
+  qNumEl.textContent = index + 1;
+
+  current.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(btn, i, current.answer);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(button, selected, correctAnswer) {
+  const buttons = optionsEl.querySelectorAll("button");
+  buttons.forEach(b => b.disabled = true);
+
+  if (selected === correctAnswer) {
+    button.classList.add("correct");
+    totalStars += STARS_PER_QUESTION;
+    starsEl.textContent = totalStars;
+  } else {
+    button.classList.add("wrong");
+    buttons[correctAnswer].classList.add("correct");
+  }
+
+  setTimeout(() => {
+    index++;
+    if (index < quiz.length) {
+      loadQuestion();
+    } else {
+      endQuiz();
+    }
+  }, 900);
+}
+
+// Timer
+let time = TOTAL_TIME;
+const countdown = setInterval(() => {
+  time--;
+  const min = String(Math.floor(time / 60)).padStart(2, "0");
+  const sec = String(time % 60).padStart(2, "0");
+  timerEl.textContent = `${min}:${sec}`;
+
+  if (time <= 0) {
+    clearInterval(countdown);
+    endQuiz();
+  }
+}, 1000);
+
+async function endQuiz() {
+  clearInterval(countdown);
+
+  // Calculate score percentage
+  const scorePercent = Math.round((totalStars / (quiz.length * STARS_PER_QUESTION)) * 100);
+
+  console.log(`📊 Quiz Complete - Score: ${scorePercent}% | Stars: ${totalStars}`);
+
+  // Save to Firebase
+  const result = await completeQuizInFirebase(user.uid, QUIZ_ID, totalStars, scorePercent);
+
+  if (result.success) {
+    alert(`🎉 Quiz Complete!\n\n⭐ Stars Earned: ${totalStars}\n📊 Score: ${scorePercent}%`);
+    
+    // Check if lesson complete
+    if (result.lessonsCompleted >= LESSON_NUMBER) {
+      alert('🎊 Lesson Complete!');
+    }
+
+    window.location.href = MAP_PATH;
+  } else {
+    alert('❌ Error saving quiz: ' + result.error);
+  }
+}
+
+// Start
+loadQuestion();
+</script>
+
+</body>
+</html>
