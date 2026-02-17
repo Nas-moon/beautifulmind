@@ -90,12 +90,14 @@ h2 {
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  position: relative;
 }
 
 .video-wrapper iframe {
   width: 100%;
   height: 450px;
   border: none;
+  display: block;
 }
 
 button#nextBtn {
@@ -127,6 +129,23 @@ button#nextBtn:disabled {
   font-size: 0.9rem;
   color: #666;
   font-weight: 600;
+}
+
+.progress-indicator {
+  width: 100%;
+  height: 8px;
+  background: #ddd;
+  border-radius: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #1b5583, #0f3c5f);
+  width: 0%;
+  transition: width 0.1s linear;
+  border-radius: 4px;
 }
 
 #star-bar {
@@ -165,6 +184,7 @@ button#nextBtn:disabled {
   opacity: 0.9;
   animation: fall 1s ease-out forwards;
   z-index: 1000;
+  pointer-events: none;
 }
 
 @keyframes fall {
@@ -177,22 +197,11 @@ button#nextBtn:disabled {
   }
 }
 
-#statusBox {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.85);
-  color: #0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  z-index: 9999;
-  max-height: 100px;
-  overflow-y: auto;
-  display: none;
-  border: 1px solid #0f0;
+.timer-display {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1b5583;
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 768px) {
@@ -256,19 +265,26 @@ button#nextBtn:disabled {
   </div>
 
   <button id="nextBtn" disabled>Proceed to Topic 2 →</button>
-  <p id="progress">Watching video…</p>
+  
+  <p id="progress">
+    ⏱️ Watch the video to unlock the next page...
+  </p>
+
+  <div class="progress-indicator">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="timer-display" id="timerDisplay"></div>
 </main>
 
-<div id="statusBox"></div>
-
 <script type="module">
-import { getCurrentUser } from './firebase-config.js';
-import { completeTopicInFirebase, getProgressData } from './progress-manager.js';
+import { getCurrentUser } from '../firebase-config.js';
+import { completeTopicInFirebase, getProgressData } from '../progress-manager.js';
 
 // ============================================
 // CONFIG - CHANGE FOR EACH PAGE
 // ============================================
-const VIDEO_DURATION = 10; // seconds
+const VIDEO_DURATION = 10; // 10 seconds timer
 const TOPIC_ID = "l2topic1";
 const STARS_TO_EARN = 10;
 const NEXT_PAGE = "l2topic2.html";
@@ -278,6 +294,8 @@ const MAP_PATH = "../lessonmap/lesson-map.html";
 const nextBtn = document.getElementById("nextBtn");
 const progress = document.getElementById("progress");
 const starCountEl = document.getElementById("star-count");
+const progressBar = document.getElementById("progressBar");
+const timerDisplay = document.getElementById("timerDisplay");
 
 // Check authentication
 const user = getCurrentUser();
@@ -301,6 +319,7 @@ async function checkCompletion() {
   if (progressData.completedTopics[TOPIC_ID]) {
     nextBtn.disabled = false;
     progress.textContent = "✅ Topic already completed! Click to proceed.";
+    timerDisplay.textContent = "";
     console.log('✅ Topic already completed');
   } else {
     startTimer();
@@ -308,33 +327,73 @@ async function checkCompletion() {
 }
 
 function startTimer() {
-  let watched = 0;
-  const timer = setInterval(() => {
-    watched++;
-    const percent = Math.min((watched / VIDEO_DURATION) * 100, 100);
-    progress.innerHTML = `Watched ${watched} / ${VIDEO_DURATION} seconds <br><progress value="${percent}" max="100" style="width:100%; margin-top:8px;"></progress>`;
-    
-    if (watched >= VIDEO_DURATION) {
-      clearInterval(timer);
-      completeTopic();
+  let secondsWatched = 0;
+
+  const timerInterval = setInterval(() => {
+    secondsWatched++;
+    const remaining = VIDEO_DURATION - secondsWatched;
+    const percent = (secondsWatched / VIDEO_DURATION) * 100;
+
+    // Update progress bar
+    progressBar.style.width = percent + '%';
+
+    // Update timer display
+    timerDisplay.textContent = `⏳ ${remaining}s remaining...`;
+
+    // Update progress text
+    progress.textContent = `Watching video... (${secondsWatched}/${VIDEO_DURATION}s)`;
+
+    if (secondsWatched >= VIDEO_DURATION) {
+      clearInterval(timerInterval);
+      unlockButton();
     }
   }, 1000);
 }
 
-async function completeTopic() {
+function unlockButton() {
+  nextBtn.disabled = false;
+  progress.innerHTML = '✅ Video watched! Click below to proceed and earn stars.';
+  timerDisplay.textContent = '';
+  progressBar.style.width = '100%';
+  progressBar.style.background = 'linear-gradient(90deg, #58cc02, #3cb043)';
+  
+  // Play unlock sound effect (visual)
+  flashButton();
+}
+
+function flashButton() {
+  nextBtn.style.animation = 'pulse 0.6s ease-out';
+  setTimeout(() => {
+    nextBtn.style.animation = 'none';
+  }, 600);
+}
+
+nextBtn.addEventListener('click', async () => {
+  if (nextBtn.disabled) return;
+
   console.log('🎯 Completing topic...');
-  
+  nextBtn.disabled = true;
+  nextBtn.textContent = 'Saving progress...';
+
   const result = await completeTopicInFirebase(user.uid, TOPIC_ID, STARS_TO_EARN);
-  
+
   if (result.success) {
-    nextBtn.disabled = false;
-    progress.innerHTML = `🎉 Topic completed! You earned ${STARS_TO_EARN} stars!<br>Total: ${result.totalStars} ⭐`;
+    nextBtn.textContent = `✅ +${STARS_TO_EARN} Stars! Going to next page...`;
     starCountEl.textContent = result.totalStars;
+    
+    // Play celebration animations
     rewardAnimation();
+
+    // Wait a moment for animations then proceed
+    setTimeout(() => {
+      window.location.href = NEXT_PAGE;
+    }, 1500);
   } else {
     progress.textContent = '❌ Error saving progress: ' + result.error;
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Proceed to Topic 2 →';
   }
-}
+});
 
 function rewardAnimation() {
   flyStar();
@@ -362,10 +421,6 @@ function confettiBurst() {
     setTimeout(() => c.remove(), 1000);
   }
 }
-
-nextBtn.addEventListener("click", () => {
-  window.location.href = NEXT_PAGE;
-});
 
 // Initialize
 loadCurrentStars();
