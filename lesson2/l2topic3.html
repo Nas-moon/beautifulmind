@@ -1,1 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2 – Topic 3</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #eef4fa;
+  color: #222;
+}
 
+header {
+  background: #1b5583;
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+header h1 {
+  margin: 0.5em 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.heado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-btns {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.back, .map-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Segoe UI', Verdana;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back {
+  background-color: #e6eef4;
+  color: #1b5583;
+}
+
+.back:hover { 
+  background-color: #dbe7f0;
+  transform: translateY(-2px);
+}
+
+.map-btn {
+  background-color: #ffd700;
+  color: #0f2f4a;
+  font-weight: bold;
+}
+
+.map-btn:hover { 
+  background-color: #ffc800;
+  transform: translateY(-2px);
+}
+
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+h2 { 
+  color: #1b5583;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.video-wrapper {
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.video-wrapper iframe {
+  width: 100%;
+  height: 450px;
+  border: none;
+}
+
+button#nextBtn {
+  background: linear-gradient(135deg, #1b5583, #0f3c5f);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(27, 85, 131, 0.3);
+}
+
+button#nextBtn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(27, 85, 131, 0.4);
+}
+
+button#nextBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+#progress {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+}
+
+#star-bar {
+  position: fixed;
+  top: 1rem;
+  right: 1.5rem;
+  background: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 1.2rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border: 2px solid #ffd700;
+}
+
+.star {
+  position: fixed;
+  font-size: 2rem;
+  z-index: 9999;
+  pointer-events: none;
+  animation: fly 1s ease-in-out forwards;
+}
+
+@keyframes fly {
+  0%   { transform: scale(1) translate(0,0); opacity: 1; }
+  100% { transform: scale(0.3) translate(300px,-300px); opacity: 0; }
+}
+
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: #ffd700;
+  top: 50%;
+  left: 50%;
+  opacity: 0.9;
+  animation: fall 1s ease-out forwards;
+  z-index: 1000;
+}
+
+@keyframes fall {
+  to {
+    transform: translate(
+      calc(-100px + 200px * var(--x)),
+      calc(200px + 300px * var(--y))
+    );
+    opacity: 0;
+  }
+}
+
+#statusBox {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.85);
+  color: #0f0;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 9999;
+  max-height: 100px;
+  overflow-y: auto;
+  display: none;
+  border: 1px solid #0f0;
+}
+
+@media (max-width: 768px) {
+  .heado {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .header-btns {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .back, .map-btn {
+    flex: 1;
+    padding: 10px;
+  }
+
+  main {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .video-wrapper iframe {
+    height: 300px;
+  }
+
+  #star-bar {
+    top: auto;
+    bottom: 80px;
+    right: 1rem;
+    left: auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="heado">
+    <h1>Lesson 2 • Topic 3 - Introduction</h1>
+    <div class="header-btns">
+      <button class="back" onclick="history.back()">← Back</button>
+      <button class="map-btn" onclick="window.location.href='../lessonmap/lesson-map.html'">🗺️ Map</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="star-bar">⭐ <span id="star-count">0</span></div>
+
+  <h2>Introduction</h2>
+
+  <div class="video-wrapper">
+    <iframe
+      src="https://drive.google.com/file/d/1Fobyz1eymtHe66a7X4aEMpZb9QkzLsIy/preview"
+      allow="autoplay"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <button id="nextBtn" disabled>Proceed to Quiz →</button>
+  <p id="progress">Watching video…</p>
+</main>
+
+<div id="statusBox"></div>
+
+<script type="module">
+import { getCurrentUser } from './firebase-config.js';
+import { completeTopicInFirebase, getProgressData } from './progress-manager.js';
+
+// ============================================
+// CONFIG - CHANGE FOR EACH PAGE
+// ============================================
+const VIDEO_DURATION = 10; // seconds
+const TOPIC_ID = "l2topic3";
+const STARS_TO_EARN = 10;
+const NEXT_PAGE = "l2topic3.html";
+const MAP_PATH = "../lessonmap/lesson-map.html";
+// ============================================
+
+const nextBtn = document.getElementById("nextBtn");
+const progress = document.getElementById("progress");
+const starCountEl = document.getElementById("star-count");
+
+// Check authentication
+const user = getCurrentUser();
+if (!user) {
+  alert('❌ Not authenticated');
+  window.location.href = '../login.html';
+}
+
+console.log('✅ User:', user.name, '| Topic:', TOPIC_ID);
+
+// Load current stars
+async function loadCurrentStars() {
+  const progressData = await getProgressData(user.uid);
+  starCountEl.textContent = progressData.stars;
+}
+
+// Check if already completed
+async function checkCompletion() {
+  const progressData = await getProgressData(user.uid);
+  
+  if (progressData.completedTopics[TOPIC_ID]) {
+    nextBtn.disabled = false;
+    progress.textContent = "✅ Topic already completed! Click to proceed.";
+    console.log('✅ Topic already completed');
+  } else {
+    startTimer();
+  }
+}
+
+function startTimer() {
+  let watched = 0;
+  const timer = setInterval(() => {
+    watched++;
+    const percent = Math.min((watched / VIDEO_DURATION) * 100, 100);
+    progress.innerHTML = `Watched ${watched} / ${VIDEO_DURATION} seconds <br><progress value="${percent}" max="100" style="width:100%; margin-top:8px;"></progress>`;
+    
+    if (watched >= VIDEO_DURATION) {
+      clearInterval(timer);
+      completeTopic();
+    }
+  }, 1000);
+}
+
+async function completeTopic() {
+  console.log('🎯 Completing topic...');
+  
+  const result = await completeTopicInFirebase(user.uid, TOPIC_ID, STARS_TO_EARN);
+  
+  if (result.success) {
+    nextBtn.disabled = false;
+    progress.innerHTML = `🎉 Topic completed! You earned ${STARS_TO_EARN} stars!<br>Total: ${result.totalStars} ⭐`;
+    starCountEl.textContent = result.totalStars;
+    rewardAnimation();
+  } else {
+    progress.textContent = '❌ Error saving progress: ' + result.error;
+  }
+}
+
+function rewardAnimation() {
+  flyStar();
+  confettiBurst();
+}
+
+function flyStar() {
+  const star = document.createElement("div");
+  star.className = "star";
+  star.textContent = "⭐";
+  star.style.left = "50%";
+  star.style.top = "50%";
+  document.body.appendChild(star);
+  setTimeout(() => star.remove(), 1000);
+}
+
+function confettiBurst() {
+  for (let i = 0; i < 15; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.setProperty("--x", Math.random());
+    c.style.setProperty("--y", Math.random());
+    c.style.background = ["#ffd700", "#ff6b6b", "#ffed4e"][i % 3];
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1000);
+  }
+}
+
+nextBtn.addEventListener("click", () => {
+  window.location.href = NEXT_PAGE;
+});
+
+// Initialize
+loadCurrentStars();
+checkCompletion();
+</script>
+
+</body>
+</html>
