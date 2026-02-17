@@ -745,13 +745,24 @@ logoutBtn.addEventListener('click', async () => {
   }
 });
 
-// Load progress
+// Load progress with timeout
 async function loadProgress() {
   try {
-    const progressData = await getProgressData(user.uid);
+    // Set a timeout - if loading takes more than 10 seconds, show error
+    const timeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error('Progress loading timeout - taking too long'));
+      }, 10000);
+    });
+
+    // Race between actual load and timeout
+    const progressData = await Promise.race([
+      getProgressData(user.uid),
+      timeoutPromise
+    ]);
     
     if (!progressData) {
-      throw new Error('Could not load progress');
+      throw new Error('No progress data found');
     }
 
     const completedLessons = progressData.lessons;
@@ -777,7 +788,7 @@ async function loadProgress() {
       });
     }
 
-    // Load leaderboard
+    // Load leaderboard (non-blocking)
     loadLeaderboard(totalStars);
 
     // Hide loading screen
@@ -785,7 +796,16 @@ async function loadProgress() {
 
   } catch (error) {
     console.error('❌ Error loading progress:', error.message);
-    alert('Error loading progress. Please refresh the page.');
+    
+    // Show error and default state
+    loadingScreen.style.display = 'none';
+    document.getElementById('completionText').textContent = '⚠️ Error loading progress - Click lesson to continue';
+    
+    // Render lessons with default values (0 lessons completed)
+    renderLessons(0);
+    
+    // Still show leaderboard even if progress load fails
+    loadLeaderboard(0);
   }
 }
 
@@ -829,10 +849,20 @@ async function loadLeaderboard(currentStars) {
   const rankEl = document.getElementById('yourRank');
   const starsEl2 = document.getElementById('yourStars');
 
-  list.innerHTML = '<div class="lb-loading">⏳ Loading...</div>';
+  // Don't block - load in background
+  list.innerHTML = '<div class="lb-loading">⏳ Loading leaderboard...</div>';
 
   try {
-    const snapshot = await get(ref(db, 'users'));
+    // Add 8 second timeout for leaderboard
+    const timeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(() => reject(new Error('Leaderboard loading timeout')), 8000);
+    });
+
+    const snapshot = await Promise.race([
+      get(ref(db, 'users')),
+      timeoutPromise
+    ]);
+
     list.innerHTML = '';
 
     if (!snapshot.exists()) {
@@ -849,8 +879,9 @@ async function loadLeaderboard(currentStars) {
     if (rankEl) rankEl.textContent = myIndex >= 0 ? '#' + (myIndex + 1) : '-';
     if (starsEl2) starsEl2.textContent = currentStars;
 
-    users.forEach((p, i) => {
-      const r = i + 1;
+    users.slice(0, 10).forEach((p, i) => {
+      const realIndex = users.findIndex(x => x.email === p.email);
+      const r = realIndex + 1;
       const isMe = p.email === user.email;
       const medal = r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : '#' + r;
 
@@ -868,7 +899,7 @@ async function loadLeaderboard(currentStars) {
     });
   } catch (err) {
     console.error('❌ Leaderboard error:', err);
-    list.innerHTML = '<div class="lb-loading">❌ Error loading leaderboard</div>';
+    list.innerHTML = '<div class="lb-loading">📊 Leaderboard loading (check again later)</div>';
   }
 }
 
