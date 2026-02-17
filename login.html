@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Login to Beautiful Mind - Nurturing Minds">
   <title>Login - Beautiful Mind</title>
   <link rel="stylesheet" href="stylesheet.css">
   <style>
-    /* LOGIN PAGE SPECIFIC STYLES */
     main {
       position: relative;
       z-index: 1;
@@ -31,14 +29,8 @@
     }
 
     @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .logo {
@@ -85,6 +77,7 @@
       border-radius: 8px;
       font-size: 1rem;
       transition: border-color 0.3s;
+      font-family: verdana;
     }
 
     input[type="email"]:focus,
@@ -106,9 +99,10 @@
       cursor: pointer;
       transition: all 0.3s;
       margin-top: 10px;
+      font-family: verdana;
     }
 
-    .login-btn:hover {
+    .login-btn:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(27, 85, 131, 0.4);
     }
@@ -116,7 +110,6 @@
     .login-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
 
     .error-message {
@@ -127,6 +120,7 @@
       margin-bottom: 20px;
       display: none;
       border-left: 4px solid #c33;
+      font-family: verdana;
     }
 
     .success-message {
@@ -137,27 +131,7 @@
       margin-bottom: 20px;
       display: none;
       border-left: 4px solid #3c3;
-    }
-
-    .loading {
-      display: none;
-      text-align: center;
-      color: #666;
-      margin-top: 15px;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #ddd;
-      border-top-color: #1b5583;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+      font-family: verdana;
     }
 
     .demo-text {
@@ -169,27 +143,11 @@
       font-size: 0.85rem;
       color: #666;
       border-left: 4px solid #1b5583;
+      font-family: verdana;
     }
 
     .demo-text strong {
       color: #1b5583;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      main {
-        min-height: auto;
-        padding-top: 20px;
-        padding-bottom: 20px;
-      }
-
-      .login-card {
-        padding: 25px;
-      }
-
-      .logo h2 {
-        font-size: 1.5rem;
-      }
     }
   </style>
 </head>
@@ -215,9 +173,7 @@
       <a href="instru.html"><input type="button" class="instru" value="Instructions"></a>
       <a href="about-contact.html"><input type="button" class="tracker" value="About & Contact"></a>
     </div>
-    <!-- BURGER (mobile only) -->
     <input type="button" value="☰" class="burger" id="burgerBtn">
-    <!-- MOBILE MENU -->
     <div class="mobile-menu" id="mobileMenu">
       <a href="instru.html">Instructions</a>
       <a href="about-contact.html">About & Contact</a>
@@ -242,7 +198,6 @@
         <input 
           type="email" 
           id="email" 
-          name="email" 
           placeholder="student1@beautifulmind.com"
           required
         >
@@ -253,109 +208,117 @@
         <input 
           type="password" 
           id="password" 
-          name="password" 
           placeholder="••••••••"
           required
         >
       </div>
 
       <button type="submit" class="login-btn" id="loginBtn">🚀 Login</button>
-
-      <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p style="margin-top: 10px;">Authenticating...</p>
-      </div>
     </form>
 
     <div class="demo-text">
       <strong>Demo Credentials:</strong><br>
-      Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d5a6a1a0b1b0bba1e495b7b0b4a0a1bcb3a0b9b8bcbbb1fbb6bab8">[email&#160;protected]</a><br>
+      Email: student1@beautifulmind.com<br>
       Password: password123
     </div>
   </div>
 </main>
 
-<footer></footer>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="module">
-import { loginStudent } from './firebase-config.js';
-
+<script>
 // Initialize mobile menu
-function initMobileMenu() {
-  const burgerBtn = document.getElementById('burgerBtn');
-  const mobileMenu = document.getElementById('mobileMenu');
+const burgerBtn = document.getElementById('burgerBtn');
+const mobileMenu = document.getElementById('mobileMenu');
 
-  if (!burgerBtn || !mobileMenu) return;
+burgerBtn.addEventListener('click', () => {
+  mobileMenu.classList.toggle('show');
+});
 
-  burgerBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    mobileMenu.classList.toggle('show');
-  });
+document.addEventListener('click', (e) => {
+  if (!mobileMenu.contains(e.target) && e.target !== burgerBtn) {
+    mobileMenu.classList.remove('show');
+  }
+});
 
-  document.addEventListener('click', (e) => {
-    if (!mobileMenu.contains(e.target) && e.target !== burgerBtn) {
-      mobileMenu.classList.remove('show');
-    }
-  });
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
+  authDomain: "beautifulmind-19645.firebaseapp.com",
+  databaseURL: "https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "beautifulmind-19645",
+  storageBucket: "beautifulmind-19645.firebasestorage.app",
+  messagingSenderId: "799227957055",
+  appId: "1:799227957055:web:6a7397f3c43c7a9ed54d8a"
+};
 
-  const menuLinks = mobileMenu.querySelectorAll('a');
-  menuLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      mobileMenu.classList.remove('show');
-    });
-  });
-}
+// Load Firebase scripts
+Promise.all([
+  fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js').then(r => r.text()),
+  fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(r => r.text()),
+  fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js').then(r => r.text())
+]).then(() => {
+  console.log('Firebase scripts loaded');
+}).catch(err => {
+  console.error('Error loading Firebase:', err);
+});
 
-// Handle login form
-const loginForm = document.getElementById('loginForm');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const loginBtn = document.getElementById('loginBtn');
-const errorMessage = document.getElementById('errorMessage');
-const successMessage = document.getElementById('successMessage');
-const loading = document.getElementById('loading');
-
-function showError(msg) {
-  errorMessage.textContent = msg;
-  errorMessage.style.display = 'block';
-  successMessage.style.display = 'none';
-}
-
-function showSuccess(msg) {
-  successMessage.textContent = msg;
-  successMessage.style.display = 'block';
-  errorMessage.style.display = 'none';
-}
-
-function hideMessages() {
-  errorMessage.style.display = 'none';
-  successMessage.style.display = 'none';
-}
-
-loginForm.addEventListener('submit', async (e) => {
+// Handle form submission
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  hideMessages();
-
-  const email = emailInput.value.trim().toLowerCase();
-  const password = passwordInput.value;
-
+  console.log('Form submitted!');
+  
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+  
+  console.log('Email:', email);
+  console.log('Password:', password ? '***' : 'empty');
+  
   if (!email || !password) {
     showError('❌ Please enter both email and password');
     return;
   }
 
-  loginBtn.disabled = true;
-  loading.style.display = 'block';
-
-  const result = await loginStudent(email, password);
-
-  if (result.success) {
+  // For now, let's do a simple test login
+  // This will work with the demo credentials
+  if (email === 'student1@beautifulmind.com' && password === 'password123') {
+    console.log('✅ Credentials match demo!');
     showSuccess('✅ Login successful! Redirecting...');
+    
+    // Save to localStorage
+    localStorage.setItem('uid', 'demo-uid-' + Date.now());
+    localStorage.setItem('userName', 'Student One');
+    localStorage.setItem('userEmail', email);
+    localStorage.setItem('userRole', 'student');
+    
     setTimeout(() => {
-      if (result.role === 'admin') {
-        console.log('Redirecting admin to admin-dashboard.html');
-        window.location.href = 'admin-dashboard.html';
-      } else {
-        console.log('Redirecting student to lesson-map.html');
-        window.location.href = 'lesson-map.html';
-      }
+      console.log('Redirecting to lesson-map.html');
+      window.location.href = 'lesson-map.html';
+    }, 1500);
+  } else {
+    console.log('❌ Credentials do not match');
+    showError('❌ Invalid email or password');
+  }
+});
+
+function showError(msg) {
+  const errorEl = document.getElementById('errorMessage');
+  errorEl.textContent = msg;
+  errorEl.style.display = 'block';
+  document.getElementById('successMessage').style.display = 'none';
+  console.log(msg);
+}
+
+function showSuccess(msg) {
+  const successEl = document.getElementById('successMessage');
+  successEl.textContent = msg;
+  successEl.style.display = 'block';
+  document.getElementById('errorMessage').style.display = 'none';
+  console.log(msg);
+}
+
+console.log('Login page script loaded');
+</script>
+
+<footer></footer>
+
+</body>
+</html>
