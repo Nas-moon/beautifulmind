@@ -31,7 +31,6 @@ const VALID_STUDENTS = [
   "student3@beautifulmind.com",
   "student4@beautifulmind.com",
   "student5@beautifulmind.com",
-  // Add all 30 students here
   "student6@beautifulmind.com",
   "student7@beautifulmind.com",
   "student8@beautifulmind.com",
@@ -66,52 +65,41 @@ const ADMIN_ACCOUNTS = [
 ];
 
 // ============================================
-// STUDENT DATA STRUCTURE (Pre-loaded in Firebase)
-// ============================================
-const STUDENT_DATABASE = {
-  "student1@beautifulmind.com": {
-    name: "Aarav Sharma",
-    email: "student1@beautifulmind.com",
-    phone: "9876543210",
-    standard: "7th Grade",
-    role: "student"
-  },
-  "student2@beautifulmind.com": {
-    name: "Priya Desai",
-    email: "student2@beautifulmind.com",
-    phone: "9876543211",
-    standard: "8th Grade",
-    role: "student"
-  },
-  // Add data for all 30 students...
-};
-
-// ============================================
-// LOGIN FUNCTION
+// LOGIN FUNCTION - THIS IS THE FIX
 // ============================================
 export async function loginStudent(email, password) {
   try {
+    console.log('🔐 Attempting login for:', email);
+    
     // Validate email
     const validEmails = [...VALID_STUDENTS, ...ADMIN_ACCOUNTS];
     if (!validEmails.includes(email.toLowerCase())) {
       throw new Error('❌ Email not authorized. Access denied.');
     }
 
-    // Sign in with Firebase
+    // Sign in with Firebase Auth
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    const uid = user.uid;
+
+    console.log('✅ Auth login successful, UID:', uid);
 
     // Determine role
     const role = ADMIN_ACCOUNTS.includes(email.toLowerCase()) ? 'admin' : 'student';
 
-    // Get or create user data
-    let userData = STUDENT_DATABASE[email.toLowerCase()];
-    
-    if (!userData) {
-      // Create new student record
+    // CRITICAL: Get existing user data from Firebase first
+    const existingSnapshot = await get(ref(db, `users/${uid}`));
+    let userData;
+
+    if (existingSnapshot.exists()) {
+      // User exists - don't overwrite their progress!
+      userData = existingSnapshot.val();
+      console.log('✅ Existing user found in Firebase:', userData);
+    } else {
+      // New user - create initial record
       userData = {
         name: email.split('@')[0],
-        email: email,
+        email: email.toLowerCase(),
         phone: '',
         standard: '',
         role: role,
@@ -122,21 +110,24 @@ export async function loginStudent(email, password) {
         createdAt: Date.now(),
         lastUpdated: Date.now()
       };
+      
+      console.log('📝 Creating new user record:', userData);
+      
+      // Save new user to Firebase
+      await set(ref(db, `users/${uid}`), userData);
+      console.log('✅ New user saved to Firebase');
     }
 
-    // Save to Firebase
-    await set(ref(db, `users/${user.uid}`), userData);
-
-    // Save to localStorage
-    localStorage.setItem('uid', user.uid);
+    // Save to localStorage (for quick access, but Firebase is source of truth)
+    localStorage.setItem('uid', uid);
     localStorage.setItem('userName', userData.name);
     localStorage.setItem('userEmail', email.toLowerCase());
     localStorage.setItem('userRole', role);
     localStorage.setItem('userPhone', userData.phone || '');
     localStorage.setItem('userStandard', userData.standard || '');
 
-    console.log('✅ Login successful:', userData.name, role);
-    return { success: true, user: userData, role: role };
+    console.log('✅ Login successful:', userData.name, '| Role:', role, '| Stars:', userData.stars);
+    return { success: true, user: userData, role: role, uid: uid };
 
   } catch (error) {
     console.error('❌ Login error:', error.message);
@@ -160,7 +151,7 @@ export async function logoutStudent() {
 }
 
 // ============================================
-// GET CURRENT USER
+// GET CURRENT USER FROM LOCALSTORAGE
 // ============================================
 export function getCurrentUser() {
   const uid = localStorage.getItem('uid');
@@ -168,7 +159,12 @@ export function getCurrentUser() {
   const role = localStorage.getItem('userRole');
   const name = localStorage.getItem('userName');
 
-  if (!uid || !email) return null;
+  if (!uid || !email) {
+    console.log('⚠️ No user found in localStorage');
+    return null;
+  }
+
+  console.log('✅ Current user:', name, '| UID:', uid);
 
   return {
     uid: uid,
@@ -186,14 +182,20 @@ export function isAuthenticated() {
 }
 
 // ============================================
-// GET USER DATA FROM FIREBASE
+// GET USER DATA FROM FIREBASE (Always fresh)
 // ============================================
 export async function getUserData(uid) {
   try {
+    console.log('📥 Fetching user data from Firebase for UID:', uid);
+    
     const snapshot = await get(ref(db, `users/${uid}`));
     if (snapshot.exists()) {
-      return snapshot.val();
+      const data = snapshot.val();
+      console.log('✅ User data retrieved:', data);
+      return data;
     }
+    
+    console.log('⚠️ User data not found');
     return null;
   } catch (error) {
     console.error('❌ Error getting user data:', error.message);
@@ -206,16 +208,19 @@ export async function getUserData(uid) {
 // ============================================
 export async function saveProgress(uid, progressData) {
   try {
+    console.log('💾 Saving progress to Firebase for UID:', uid);
+    console.log('Progress data:', progressData);
+    
     const updateData = {
-      stars: progressData.stars,
-      lessons: progressData.lessons,
-      completedTopics: progressData.completedTopics,
-      completedQuizzes: progressData.completedQuizzes,
+      stars: progressData.stars || 0,
+      lessons: progressData.lessons || 0,
+      completedTopics: progressData.completedTopics || {},
+      completedQuizzes: progressData.completedQuizzes || {},
       lastUpdated: Date.now()
     };
 
     await update(ref(db, `users/${uid}`), updateData);
-    console.log('✅ Progress saved to Firebase');
+    console.log('✅ Progress saved to Firebase successfully');
     return { success: true };
 
   } catch (error) {
