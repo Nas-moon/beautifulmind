@@ -96,6 +96,7 @@ h2 {
   width: 100%;
   height: 450px;
   border: none;
+  display: block;
 }
 
 button#nextBtn {
@@ -165,6 +166,7 @@ button#nextBtn:disabled {
   opacity: 0.9;
   animation: fall 1s ease-out forwards;
   z-index: 1000;
+  pointer-events: none;
 }
 
 @keyframes fall {
@@ -175,24 +177,6 @@ button#nextBtn:disabled {
     );
     opacity: 0;
   }
-}
-
-#statusBox {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.85);
-  color: #0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  padding: 10px;
-  border-radius: 8px;
-  z-index: 9999;
-  max-height: 100px;
-  overflow-y: auto;
-  display: none;
-  border: 1px solid #0f0;
 }
 
 @media (max-width: 768px) {
@@ -234,7 +218,7 @@ button#nextBtn:disabled {
 
 <header>
   <div class="heado">
-    <h1>Lesson 2 • Topic 2 - Introduction</h1>
+    <h1>Lesson 1 • Topic 1 - Introduction</h1>
     <div class="header-btns">
       <button class="back" onclick="history.back()">← Back</button>
       <button class="map-btn" onclick="window.location.href='../lessonmap/lesson-map.html'">🗺️ Map</button>
@@ -256,28 +240,29 @@ button#nextBtn:disabled {
   </div>
 
   <button id="nextBtn" disabled>Proceed to Topic 3 →</button>
-  <p id="progress">Watching video…</p>
+  
+  <p id="progress">
+    ⏱️ <span id="timerText">0/10</span> - Watch to unlock
+  </p>
 </main>
 
-<div id="statusBox"></div>
-
 <script type="module">
-import { getCurrentUser } from './firebase-config.js';
-import { completeTopicInFirebase, getProgressData } from './progress-manager.js';
+import { getCurrentUser } from '../firebase-config.js';
+import { completeTopicInFirebase, getProgressData } from '../progress-manager.js';
 
 // ============================================
 // CONFIG - CHANGE FOR EACH PAGE
 // ============================================
-const VIDEO_DURATION = 10; // seconds
+const VIDEO_DURATION = 10; // 10 seconds timer
 const TOPIC_ID = "l2topic2";
 const STARS_TO_EARN = 10;
 const NEXT_PAGE = "l2topic3.html";
-const MAP_PATH = "../lessonmap/lesson-map.html";
 // ============================================
 
 const nextBtn = document.getElementById("nextBtn");
 const progress = document.getElementById("progress");
 const starCountEl = document.getElementById("star-count");
+const timerText = document.getElementById("timerText");
 
 // Check authentication
 const user = getCurrentUser();
@@ -286,7 +271,10 @@ if (!user) {
   window.location.href = '../login.html';
 }
 
-console.log('✅ User:', user.name, '| Topic:', TOPIC_ID);
+console.log('✅ User:', user.name, 'UID:', user.uid, '| Topic:', TOPIC_ID);
+
+let topicCompleted = false;
+let starsEarned = false;
 
 // Load current stars
 async function loadCurrentStars() {
@@ -299,42 +287,65 @@ async function checkCompletion() {
   const progressData = await getProgressData(user.uid);
   
   if (progressData.completedTopics[TOPIC_ID]) {
+    topicCompleted = true;
+    starsEarned = true;
     nextBtn.disabled = false;
-    progress.textContent = "✅ Topic already completed! Click to proceed.";
-    console.log('✅ Topic already completed');
+    progress.textContent = "✅ Already completed! Click to proceed.";
+    console.log('✅ Topic already completed before');
   } else {
     startTimer();
   }
 }
 
 function startTimer() {
-  let watched = 0;
-  const timer = setInterval(() => {
-    watched++;
-    const percent = Math.min((watched / VIDEO_DURATION) * 100, 100);
-    progress.innerHTML = `Watched ${watched} / ${VIDEO_DURATION} seconds <br><progress value="${percent}" max="100" style="width:100%; margin-top:8px;"></progress>`;
-    
-    if (watched >= VIDEO_DURATION) {
-      clearInterval(timer);
-      completeTopic();
+  let secondsWatched = 0;
+
+  const timerInterval = setInterval(() => {
+    secondsWatched++;
+    timerText.textContent = `${secondsWatched}/${VIDEO_DURATION}`;
+
+    if (secondsWatched >= VIDEO_DURATION) {
+      clearInterval(timerInterval);
+      unlockAndEarnStars();
     }
   }, 1000);
 }
 
-async function completeTopic() {
-  console.log('🎯 Completing topic...');
+// Unlock button AND earn stars when timer completes
+async function unlockAndEarnStars() {
+  if (starsEarned) return; // Prevent double earning
   
+  console.log('⏱️ Timer finished - earning stars...');
+  starsEarned = true;
+
+  nextBtn.disabled = false;
+  progress.innerHTML = '✅ Video watched! Click to proceed.';
+  
+  // Immediately save progress to Firebase
   const result = await completeTopicInFirebase(user.uid, TOPIC_ID, STARS_TO_EARN);
   
   if (result.success) {
-    nextBtn.disabled = false;
-    progress.innerHTML = `🎉 Topic completed! You earned ${STARS_TO_EARN} stars!<br>Total: ${result.totalStars} ⭐`;
     starCountEl.textContent = result.totalStars;
+    console.log(`✅ Stars earned! Total: ${result.totalStars}`);
     rewardAnimation();
   } else {
-    progress.textContent = '❌ Error saving progress: ' + result.error;
+    console.error('❌ Error earning stars:', result.error);
   }
 }
+
+// Button click just navigates to next page (no star earning here)
+nextBtn.addEventListener('click', async () => {
+  if (nextBtn.disabled) return;
+
+  console.log('→ Proceeding to next topic...');
+  nextBtn.disabled = true;
+  nextBtn.textContent = 'Loading...';
+
+  // Small delay for UX, then navigate
+  setTimeout(() => {
+    window.location.href = NEXT_PAGE;
+  }, 500);
+});
 
 function rewardAnimation() {
   flyStar();
@@ -362,10 +373,6 @@ function confettiBurst() {
     setTimeout(() => c.remove(), 1000);
   }
 }
-
-nextBtn.addEventListener("click", () => {
-  window.location.href = NEXT_PAGE;
-});
 
 // Initialize
 loadCurrentStars();
