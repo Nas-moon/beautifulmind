@@ -385,7 +385,6 @@ main {
   gap: 1rem;
 }
 
-/* YOUR STATS SECTION */
 .lb-stats-section {
   background: rgba(76, 175, 80, 0.2);
   border: 2px solid rgba(76, 175, 80, 0.5);
@@ -430,7 +429,6 @@ main {
   font-weight: 600;
 }
 
-/* STUDENTS LIST SECTION */
 .lb-list-section-title {
   color: rgba(255,255,255,0.7);
   font-size: 0.75rem;
@@ -477,10 +475,6 @@ main {
   text-align: center;
   color: #ffd700;
 }
-
-.lb-rank.r1 { font-size: 1.6rem; }
-.lb-rank.r2 { font-size: 1.5rem; }
-.lb-rank.r3 { font-size: 1.5rem; }
 
 .lb-info {
   flex: 1;
@@ -816,7 +810,7 @@ logoutBtn.addEventListener('click', async () => {
   }
 });
 
-// Load progress
+// Load progress - THIS IS THE CRITICAL PART
 async function loadProgress() {
   try {
     console.log('📊 Fetching progress data...');
@@ -832,6 +826,16 @@ async function loadProgress() {
 
     console.log('✅ Progress loaded - Stars:', totalStars, 'Lessons:', completedLessons);
 
+    // ===== CRITICAL FIX: CHECK IF ALL LESSONS COMPLETE =====
+    if (completedLessons === 5) {
+      console.log('🎊 ALL 5 LESSONS COMPLETE! Redirecting to congratulations...');
+      setTimeout(() => {
+        window.location.href = '../lessonmap/congratulations.html';
+      }, 1000);
+      return; // Stop further execution
+    }
+
+    // Update progress bar and text
     document.getElementById('progressFill').style.width = (completedLessons / 5 * 100) + '%';
     document.getElementById('completionText').textContent = `${completedLessons} of 5 lessons completed`;
 
