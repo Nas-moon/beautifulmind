@@ -160,8 +160,8 @@ main {
 </main>
 
 <script type="module">
-import { getCurrentUser } from './firebase-config.js';
-import { completeQuizInFirebase, getProgressData } from './progress-manager.js';
+import { getCurrentUser } from '../firebase-config.js';
+import { completeQuizInFirebase, getProgressData } from '../progress-manager.js';
 
 // ============================================
 // CONFIG
@@ -173,7 +173,7 @@ const TOTAL_TIME = 300; // 5 minutes in seconds
 const MAP_PATH = "../lessonmap/lesson-map.html";
 // ============================================
 
-// Quiz Questions
+// Quiz Questions (10 selected from 15)
 const quiz = [
   {
     q: "What makes a person truly beautiful according to the lesson?",
@@ -186,12 +186,12 @@ const quiz = [
     answer: 1,
   },
   {
-    q: "Thinking is compared to which activity?",
-    options: ["A) Singing", "B) Playing a sport", "C) Sleeping", "D) Watching TV"],
-    answer: 1,
+    q: "Thinking is compared to which activity in the lesson?",
+    options: ["A) Singing", "B) Sleeping", "C) Playing a sport", "D) Watching TV"],
+    answer: 2,
   },
   {
-    q: "What should we do before reacting when annoyed?",
+    q: "What should we do before reacting when someone annoys us?",
     options: ["A) Shout", "B) Ignore", "C) Pause and think", "D) Walk away"],
     answer: 2,
   },
@@ -201,29 +201,29 @@ const quiz = [
     answer: 2,
   },
   {
-    q: "How does a beautiful mind handle mistakes?",
-    options: ["A) Blame others", "B) Learn from them", "C) Hide them", "D) Ignore them"],
-    answer: 1,
-  },
-  {
-    q: "What is the foundation of a beautiful mind?",
-    options: ["A) Wealth", "B) Fame", "C) Self-awareness", "D) Appearance"],
+    q: "Conversation becomes an art when we talk to:",
+    options: ["A) Win", "B) Show power", "C) Understand others", "D) Prove others wrong"],
     answer: 2,
   },
   {
-    q: "How can we nurture a beautiful mind?",
-    options: ["A) Meditation and reading", "B) Spending money", "C) Sleeping more", "D) Watching TV"],
-    answer: 0,
-  },
-  {
-    q: "What role does empathy play in a beautiful mind?",
-    options: ["A) No role", "B) Understanding others' feelings", "C) Avoiding emotions", "D) Being selfish"],
+    q: "Ego is described as the voice that says:",
+    options: ["A) I want to learn", "B) I am always right", "C) I will help you", "D) Let's try again"],
     answer: 1,
   },
   {
-    q: "How do we show our beautiful mind to the world?",
-    options: ["A) Through actions", "B) Bragging", "C) Getting expensive things", "D) Being rude"],
-    answer: 0,
+    q: "Open-mindedness means:",
+    options: ["A) Not listening", "B) Only talking", "C) Being ready to hear new ideas", "D) Being angry"],
+    answer: 2,
+  },
+  {
+    q: "A constructive thinker focuses on:",
+    options: ["A) Blaming others", "B) Finding mistakes", "C) Finding solutions", "D) Giving up"],
+    answer: 2,
+  },
+  {
+    q: "Small actions like helping classmates are called:",
+    options: ["A) Competition", "B) Contribution", "C) Punishment", "D) Complaint"],
+    answer: 1,
   }
 ];
 
