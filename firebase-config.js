@@ -4,7 +4,7 @@
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, get, set, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
@@ -22,40 +22,18 @@ const auth = getAuth(app);
 
 console.log('✅ Firebase initialized');
 
-// ============================================
-// VALID STUDENT & ADMIN EMAILS
-// ============================================
+// Valid students and admins
 const VALID_STUDENTS = [
-  "student1@beautifulmind.com",
-  "student2@beautifulmind.com",
-  "student3@beautifulmind.com",
-  "student4@beautifulmind.com",
-  "student5@beautifulmind.com",
-  "student6@beautifulmind.com",
-  "student7@beautifulmind.com",
-  "student8@beautifulmind.com",
-  "student9@beautifulmind.com",
-  "student10@beautifulmind.com",
-  "student11@beautifulmind.com",
-  "student12@beautifulmind.com",
-  "student13@beautifulmind.com",
-  "student14@beautifulmind.com",
-  "student15@beautifulmind.com",
-  "student16@beautifulmind.com",
-  "student17@beautifulmind.com",
-  "student18@beautifulmind.com",
-  "student19@beautifulmind.com",
-  "student20@beautifulmind.com",
-  "student21@beautifulmind.com",
-  "student22@beautifulmind.com",
-  "student23@beautifulmind.com",
-  "student24@beautifulmind.com",
-  "student25@beautifulmind.com",
-  "student26@beautifulmind.com",
-  "student27@beautifulmind.com",
-  "student28@beautifulmind.com",
-  "student29@beautifulmind.com",
-  "student30@beautifulmind.com",
+  "student1@beautifulmind.com", "student2@beautifulmind.com", "student3@beautifulmind.com",
+  "student4@beautifulmind.com", "student5@beautifulmind.com", "student6@beautifulmind.com",
+  "student7@beautifulmind.com", "student8@beautifulmind.com", "student9@beautifulmind.com",
+  "student10@beautifulmind.com", "student11@beautifulmind.com", "student12@beautifulmind.com",
+  "student13@beautifulmind.com", "student14@beautifulmind.com", "student15@beautifulmind.com",
+  "student16@beautifulmind.com", "student17@beautifulmind.com", "student18@beautifulmind.com",
+  "student19@beautifulmind.com", "student20@beautifulmind.com", "student21@beautifulmind.com",
+  "student22@beautifulmind.com", "student23@beautifulmind.com", "student24@beautifulmind.com",
+  "student25@beautifulmind.com", "student26@beautifulmind.com", "student27@beautifulmind.com",
+  "student28@beautifulmind.com", "student29@beautifulmind.com", "student30@beautifulmind.com",
 ];
 
 const ADMIN_ACCOUNTS = [
@@ -65,7 +43,7 @@ const ADMIN_ACCOUNTS = [
 ];
 
 // ============================================
-// LOGIN FUNCTION - THIS IS THE FIX
+// LOGIN FUNCTION - CRITICAL FIX
 // ============================================
 export async function loginStudent(email, password) {
   try {
@@ -87,16 +65,16 @@ export async function loginStudent(email, password) {
     // Determine role
     const role = ADMIN_ACCOUNTS.includes(email.toLowerCase()) ? 'admin' : 'student';
 
-    // CRITICAL: Get existing user data from Firebase first
+    // CHECK if user exists in Firebase
     const existingSnapshot = await get(ref(db, `users/${uid}`));
     let userData;
 
     if (existingSnapshot.exists()) {
-      // User exists - don't overwrite their progress!
+      // USER EXISTS - FETCH THEIR DATA WITH PROGRESS INTACT
       userData = existingSnapshot.val();
-      console.log('✅ Existing user found in Firebase:', userData);
+      console.log('✅ Existing user found - preserving all progress:', userData);
     } else {
-      // New user - create initial record
+      // NEW USER - CREATE INITIAL RECORD (ONLY ONCE)
       userData = {
         name: email.split('@')[0],
         email: email.toLowerCase(),
@@ -111,14 +89,14 @@ export async function loginStudent(email, password) {
         lastUpdated: Date.now()
       };
       
-      console.log('📝 Creating new user record:', userData);
+      console.log('📝 New user detected - creating initial record');
       
-      // Save new user to Firebase
+      // Use set() ONLY for brand new users
       await set(ref(db, `users/${uid}`), userData);
-      console.log('✅ New user saved to Firebase');
+      console.log('✅ New user created in Firebase');
     }
 
-    // Save to localStorage (for quick access, but Firebase is source of truth)
+    // Save to localStorage for quick access
     localStorage.setItem('uid', uid);
     localStorage.setItem('userName', userData.name);
     localStorage.setItem('userEmail', email.toLowerCase());
@@ -126,7 +104,7 @@ export async function loginStudent(email, password) {
     localStorage.setItem('userPhone', userData.phone || '');
     localStorage.setItem('userStandard', userData.standard || '');
 
-    console.log('✅ Login successful:', userData.name, '| Role:', role, '| Stars:', userData.stars);
+    console.log('✅ Login successful:', userData.name, '| Stars:', userData.stars, '| Lessons:', userData.lessons);
     return { success: true, user: userData, role: role, uid: uid };
 
   } catch (error) {
@@ -151,7 +129,7 @@ export async function logoutStudent() {
 }
 
 // ============================================
-// GET CURRENT USER FROM LOCALSTORAGE
+// GET CURRENT USER
 // ============================================
 export function getCurrentUser() {
   const uid = localStorage.getItem('uid');
@@ -160,11 +138,8 @@ export function getCurrentUser() {
   const name = localStorage.getItem('userName');
 
   if (!uid || !email) {
-    console.log('⚠️ No user found in localStorage');
     return null;
   }
-
-  console.log('✅ Current user:', name, '| UID:', uid);
 
   return {
     uid: uid,
@@ -182,50 +157,18 @@ export function isAuthenticated() {
 }
 
 // ============================================
-// GET USER DATA FROM FIREBASE (Always fresh)
+// GET USER DATA FROM FIREBASE
 // ============================================
 export async function getUserData(uid) {
   try {
-    console.log('📥 Fetching user data from Firebase for UID:', uid);
-    
     const snapshot = await get(ref(db, `users/${uid}`));
     if (snapshot.exists()) {
-      const data = snapshot.val();
-      console.log('✅ User data retrieved:', data);
-      return data;
+      return snapshot.val();
     }
-    
-    console.log('⚠️ User data not found');
     return null;
   } catch (error) {
     console.error('❌ Error getting user data:', error.message);
     return null;
-  }
-}
-
-// ============================================
-// SAVE PROGRESS TO FIREBASE
-// ============================================
-export async function saveProgress(uid, progressData) {
-  try {
-    console.log('💾 Saving progress to Firebase for UID:', uid);
-    console.log('Progress data:', progressData);
-    
-    const updateData = {
-      stars: progressData.stars || 0,
-      lessons: progressData.lessons || 0,
-      completedTopics: progressData.completedTopics || {},
-      completedQuizzes: progressData.completedQuizzes || {},
-      lastUpdated: Date.now()
-    };
-
-    await update(ref(db, `users/${uid}`), updateData);
-    console.log('✅ Progress saved to Firebase successfully');
-    return { success: true };
-
-  } catch (error) {
-    console.error('❌ Error saving progress:', error.message);
-    return { success: false, error: error.message };
   }
 }
 
