@@ -1,28 +1,30 @@
 // ============================================
 // PROGRESS MANAGER
 // Handles all progress tracking from Firebase
-// NO localStorage for progress data
 // ============================================
 
 import { db } from './firebase-config.js';
 import { ref, get, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-// ============================================
-// GET FRESH PROGRESS DATA FROM FIREBASE
-// ============================================
-let lastProgressCache = null;
-let lastProgressTime = 0;
+// Cache management
+let progressCache = {};
+let cacheTimes = {};
+const CACHE_DURATION = 2000; // 2 second cache to avoid stale data
 
 export async function getProgressData(uid) {
   try {
-    // Use cache if data is less than 5 seconds old
     const now = Date.now();
-    if (lastProgressCache && (now - lastProgressTime) < 5000) {
-      console.log('✅ Using cached progress data');
-      return lastProgressCache;
+    const cacheKey = `progress_${uid}`;
+    
+    // Return cache only if very fresh (< 2 seconds)
+    if (progressCache[uid] && cacheTimes[uid] && (now - cacheTimes[uid]) < CACHE_DURATION) {
+      console.log('✅ Using cached progress');
+      return progressCache[uid];
     }
 
+    // Fetch fresh data from Firebase
     const snapshot = await get(ref(db, `users/${uid}`));
+    
     if (snapshot.exists()) {
       const data = snapshot.val();
       const result = {
@@ -32,10 +34,11 @@ export async function getProgressData(uid) {
         completedQuizzes: data.completedQuizzes || {}
       };
       
-      // Cache the result
-      lastProgressCache = result;
-      lastProgressTime = now;
+      // Update cache
+      progressCache[uid] = result;
+      cacheTimes[uid] = now;
       
+      console.log(`✅ Progress fetched from Firebase - Stars: ${result.stars}, Lessons: ${result.lessons}`);
       return result;
     }
     
@@ -46,14 +49,16 @@ export async function getProgressData(uid) {
       completedQuizzes: {}
     };
     
-    lastProgressCache = emptyResult;
-    lastProgressTime = now;
+    progressCache[uid] = emptyResult;
+    cacheTimes[uid] = now;
+    
+    console.log('ℹ️ No progress found, returning empty');
     return emptyResult;
     
   } catch (error) {
     console.error('❌ Error getting progress:', error.message);
-    // Return cached data on error instead of null
-    return lastProgressCache || {
+    // Return cached data if available, otherwise empty
+    return progressCache[uid] || {
       stars: 0,
       lessons: 0,
       completedTopics: {},
@@ -62,22 +67,53 @@ export async function getProgressData(uid) {
   }
 }
 
-// ============================================
-// MARK TOPIC AS COMPLETED
-// ============================================
+// Clear cache to force fresh load
+export function clearProgressCache(uid) {
+  delete progressCache[uid];
+  delete cacheTimes[uid];
+  console.log('🔄 Progress cache cleared');
+}
+
 export async function completeTopicInFirebase(uid, topicId, starsEarned) {
   try {
-    const progress = await getProgressData(uid);
+    console.log(`🎯 Completing topic: ${topicId}, earning ${starsEarned} stars`);
     
+    // Get fresh data (don't use old cache for this operation)
+    const snapshot = await get(ref(db, `users/${uid}`));
+    
+    let progress;
+    if (snapshot.exists()) {
+      progress = snapshot.val();
+    } else {
+      progress = {
+        stars: 0,
+        lessons: 0,
+        completedTopics: {},
+        completedQuizzes: {}
+      };
+    }
+
+    // Check if already completed (prevent double counting)
+    if (progress.completedTopics && progress.completedTopics[topicId]) {
+      console.log(`⚠️ Topic ${topicId} already completed, skipping`);
+      return { 
+        success: true, 
+        totalStars: progress.stars || 0,
+        alreadyCompleted: true
+      };
+    }
+
     // Mark topic as completed
+    if (!progress.completedTopics) progress.completedTopics = {};
     progress.completedTopics[topicId] = {
       completed: true,
       completedAt: Date.now(),
       starsEarned: starsEarned
     };
 
-    // Update stars
-    progress.stars = (progress.stars || 0) + starsEarned;
+    // Add stars
+    const oldStars = progress.stars || 0;
+    progress.stars = oldStars + starsEarned;
 
     // Update Firebase
     await update(ref(db, `users/${uid}`), {
@@ -86,7 +122,10 @@ export async function completeTopicInFirebase(uid, topicId, starsEarned) {
       lastUpdated: Date.now()
     });
 
-    console.log(`✅ Topic ${topicId} completed! Earned ${starsEarned} stars. Total: ${progress.stars}`);
+    // Clear cache to force fresh load next time
+    clearProgressCache(uid);
+
+    console.log(`✅ Topic ${topicId} saved! Stars: ${oldStars} → ${progress.stars}`);
     return { success: true, totalStars: progress.stars };
 
   } catch (error) {
@@ -95,14 +134,38 @@ export async function completeTopicInFirebase(uid, topicId, starsEarned) {
   }
 }
 
-// ============================================
-// MARK QUIZ AS COMPLETED
-// ============================================
 export async function completeQuizInFirebase(uid, quizId, starsEarned, score) {
   try {
-    const progress = await getProgressData(uid);
+    console.log(`🎯 Completing quiz: ${quizId}, score: ${score}%, earning ${starsEarned} stars`);
+    
+    // Get fresh data
+    const snapshot = await get(ref(db, `users/${uid}`));
+    
+    let progress;
+    if (snapshot.exists()) {
+      progress = snapshot.val();
+    } else {
+      progress = {
+        stars: 0,
+        lessons: 0,
+        completedTopics: {},
+        completedQuizzes: {}
+      };
+    }
+
+    // Check if already completed
+    if (progress.completedQuizzes && progress.completedQuizzes[quizId]) {
+      console.log(`⚠️ Quiz ${quizId} already completed, skipping`);
+      return {
+        success: true,
+        totalStars: progress.stars || 0,
+        lessonsCompleted: progress.lessons || 0,
+        alreadyCompleted: true
+      };
+    }
 
     // Mark quiz as completed
+    if (!progress.completedQuizzes) progress.completedQuizzes = {};
     progress.completedQuizzes[quizId] = {
       completed: true,
       completedAt: Date.now(),
@@ -110,10 +173,11 @@ export async function completeQuizInFirebase(uid, quizId, starsEarned, score) {
       score: score
     };
 
-    // Update stars
-    progress.stars = (progress.stars || 0) + starsEarned;
+    // Add stars
+    const oldStars = progress.stars || 0;
+    progress.stars = oldStars + starsEarned;
 
-    // Check if lesson is now complete
+    // Check if lesson is complete
     const lessonNum = extractLessonNumber(quizId);
     if (isLessonComplete(progress, lessonNum)) {
       progress.lessons = Math.max(progress.lessons || 0, lessonNum);
@@ -127,8 +191,15 @@ export async function completeQuizInFirebase(uid, quizId, starsEarned, score) {
       lastUpdated: Date.now()
     });
 
-    console.log(`✅ Quiz ${quizId} completed! Score: ${score}% | Stars: ${starsEarned} | Total: ${progress.stars}`);
-    return { success: true, totalStars: progress.stars, lessonsCompleted: progress.lessons };
+    // Clear cache
+    clearProgressCache(uid);
+
+    console.log(`✅ Quiz ${quizId} saved! Stars: ${oldStars} → ${progress.stars}`);
+    return { 
+      success: true, 
+      totalStars: progress.stars, 
+      lessonsCompleted: progress.lessons 
+    };
 
   } catch (error) {
     console.error('❌ Error completing quiz:', error.message);
@@ -136,9 +207,6 @@ export async function completeQuizInFirebase(uid, quizId, starsEarned, score) {
   }
 }
 
-// ============================================
-// CHECK IF TOPIC IS COMPLETED
-// ============================================
 export async function isTopicCompleted(uid, topicId) {
   try {
     const progress = await getProgressData(uid);
@@ -149,9 +217,6 @@ export async function isTopicCompleted(uid, topicId) {
   }
 }
 
-// ============================================
-// CHECK IF QUIZ IS COMPLETED
-// ============================================
 export async function isQuizCompleted(uid, quizId) {
   try {
     const progress = await getProgressData(uid);
@@ -162,9 +227,6 @@ export async function isQuizCompleted(uid, quizId) {
   }
 }
 
-// ============================================
-// GET LESSON COMPLETION STATUS
-// ============================================
 export async function getLessonStatus(uid, lessonNum) {
   try {
     const progress = await getProgressData(uid);
@@ -186,10 +248,6 @@ export async function getLessonStatus(uid, lessonNum) {
   }
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
 function extractLessonNumber(topicOrQuizId) {
   const match = topicOrQuizId.match(/\d+/);
   return match ? parseInt(match[0]) : 0;
@@ -205,9 +263,6 @@ function isLessonComplete(progress, lessonNum) {
   return allTopicsCompleted && quizCompleted;
 }
 
-// ============================================
-// GET CURRENT PROGRESS FOR DISPLAY
-// ============================================
 export async function getCurrentProgress(uid) {
   try {
     const progress = await getProgressData(uid);
@@ -224,9 +279,6 @@ export async function getCurrentProgress(uid) {
   }
 }
 
-// ============================================
-// RESET PROGRESS (ADMIN ONLY)
-// ============================================
 export async function resetProgress(uid) {
   try {
     await update(ref(db, `users/${uid}`), {
@@ -237,6 +289,7 @@ export async function resetProgress(uid) {
       lastUpdated: Date.now()
     });
 
+    clearProgressCache(uid);
     console.log('✅ Progress reset for user');
     return { success: true };
   } catch (error) {
