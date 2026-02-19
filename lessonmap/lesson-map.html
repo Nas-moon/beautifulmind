@@ -265,7 +265,6 @@ main {
 
 .locked .lesson-label { opacity: 0.6; }
 
-/* FINISH NODE STYLES */
 .finish-node {
   background: linear-gradient(135deg, #ffd700, #ffed4e) !important;
   border-color: rgba(255,215,0,0.6) !important;
@@ -321,11 +320,163 @@ main {
   50% { box-shadow: 0 6px 20px rgba(0,0,0,0.35), 0 0 0 12px rgba(255,215,0,0); }
 }
 
+/* LEADERBOARD PANEL */
+.lb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.lb-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.leaderboard-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background: linear-gradient(to bottom, #1a4d7a 0%, #0f3c5f 100%);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.4);
+  z-index: 700;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.leaderboard-panel.open {
+  transform: translateX(0);
+}
+
+.lb-header {
+  background: linear-gradient(135deg, #1a4d7a 0%, #0f3c5f 100%);
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.lb-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.lb-close {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.lb-close:hover {
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
+}
+
+.lb-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lb-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.lb-item {
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(76, 175, 80, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.lb-item:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(76, 175, 80, 0.5);
+  transform: translateX(4px);
+}
+
+.lb-item.me {
+  background: rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.6);
+}
+
+.lb-rank {
+  font-size: 1.4rem;
+  font-weight: 900;
+  min-width: 40px;
+  text-align: center;
+  color: #ffd700;
+}
+
+.lb-info {
+  flex: 1;
+  text-align: left;
+}
+
+.lb-name {
+  color: #e6eef4;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.lb-lessons {
+  color: rgba(230, 238, 244, 0.7);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.lb-stars {
+  color: #ffd700;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.lb-loading {
+  text-align: center;
+  padding: 2rem 0;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
+}
+
 @media (max-width: 480px) {
   main { padding: 15px; }
   .lesson { margin: 60px 0; }
   .lb-fab span { display: none; }
   .lb-fab { padding: 14px; border-radius: 50%; }
+  .leaderboard-panel { max-width: 100%; }
 }
 
 @media (min-width: 768px) {
@@ -336,6 +487,22 @@ main {
 <body>
 
 <div class="stars" id="stars"></div>
+
+<!-- LEADERBOARD OVERLAY & PANEL -->
+<div class="lb-overlay" id="lbOverlay"></div>
+<div class="leaderboard-panel" id="lbPanel">
+  <div class="lb-header">
+    <h2>🏆 Leaderboard</h2>
+    <button class="lb-close" id="lbClose">✕</button>
+  </div>
+  <div class="lb-content">
+    <div class="lb-list" id="lbList">
+      <div class="lb-loading">⏳ Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- LEADERBOARD BUTTON -->
 <button class="lb-fab" id="lbFab">🏆 <span>Leaderboard</span></button>
 
 <main>
@@ -361,7 +528,7 @@ main {
             stroke-linejoin="round"/>
     </svg>
 
-    <!-- FINISH LINE NODE - Shows when all 5 lessons complete -->
+    <!-- FINISH LINE NODE -->
     <div class="lesson lesson-finish hidden" id="finishNode">
       <div class="lesson-content finish-content">
         <div class="node finish-node">🏁</div>
@@ -403,16 +570,23 @@ main {
 </main>
 
 <script type="module">
-import { getCurrentUser, logoutStudent } from '../firebase-config.js';
-import { getProgressData } from '../progress-manager.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-const user = getCurrentUser();
-if (!user) {
-  alert('❌ Not authenticated. Please login first.');
-  window.location.href = '../login.html';
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
+  authDomain: "beautifulmind-19645.firebaseapp.com",
+  databaseURL: "https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "beautifulmind-19645",
+  storageBucket: "beautifulmind-19645.firebasestorage.app",
+  messagingSenderId: "799227957055",
+  appId: "1:799227957055:web:6a7397f3c43c7a9ed54d8a"
+};
 
-console.log('✅ User authenticated:', user.name);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
 
 // Create decorative stars
 const starsEl = document.getElementById('stars');
@@ -423,38 +597,113 @@ for (let i = 0; i < 30; i++) {
   starsEl.appendChild(s);
 }
 
-// Logout
+let currentUser = null;
+
+// Wait for auth
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = '/login.html';
+    return;
+  }
+  currentUser = user;
+  loadProgress();
+});
+
+// LEADERBOARD
+const lbFab = document.getElementById('lbFab');
+const lbPanel = document.getElementById('lbPanel');
+const lbOverlay = document.getElementById('lbOverlay');
+const lbClose = document.getElementById('lbClose');
+const lbList = document.getElementById('lbList');
+
+lbFab.addEventListener('click', () => {
+  lbPanel.classList.add('open');
+  lbOverlay.classList.add('show');
+  loadLeaderboard();
+});
+
+lbClose.addEventListener('click', () => {
+  lbPanel.classList.remove('open');
+  lbOverlay.classList.remove('show');
+});
+
+lbOverlay.addEventListener('click', () => {
+  lbPanel.classList.remove('open');
+  lbOverlay.classList.remove('show');
+});
+
+async function loadLeaderboard() {
+  lbList.innerHTML = '<div class="lb-loading">⏳ Loading...</div>';
+  
+  try {
+    const snapshot = await get(ref(db, 'users'));
+    lbList.innerHTML = '';
+
+    if (snapshot.exists()) {
+      const students = Object.values(snapshot.val())
+        .filter(u => u.role === 'student')
+        .sort((a, b) => (b.stars || 0) - (a.stars || 0));
+
+      const medalEmojis = ['🥇', '🥈', '🥉'];
+
+      students.forEach((student, i) => {
+        const rank = i + 1;
+        const isMe = student.email === currentUser.email;
+        let rankDisplay = '#' + rank;
+        if (rank <= 3) rankDisplay = medalEmojis[rank - 1];
+
+        const item = document.createElement('div');
+        item.className = 'lb-item' + (isMe ? ' me' : '');
+        item.innerHTML = `
+          <div class="lb-rank">${rankDisplay}</div>
+          <div class="lb-info">
+            <div class="lb-name">${student.name || 'Unknown'}${isMe ? ' 👈' : ''}</div>
+            <div class="lb-lessons">${student.lessons || 0}/5 lessons</div>
+          </div>
+          <div class="lb-stars">⭐ ${student.stars || 0}</div>
+        `;
+        lbList.appendChild(item);
+      });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    lbList.innerHTML = '<div class="lb-loading">❌ Error loading leaderboard</div>';
+  }
+}
+
+// LOGOUT
 document.getElementById('logoutBtn').addEventListener('click', async () => {
-  if (confirm('Are you sure you want to logout?')) {
-    await logoutStudent();
-    window.location.href = '../login.html';
+  if (confirm('Logout?')) {
+    await signOut(auth);
+    window.location.href = '/login.html';
   }
 });
 
-// Load progress
+// LOAD PROGRESS
 async function loadProgress() {
   try {
-    console.log('📊 Fetching progress data...');
-    const progressData = await getProgressData(user.uid);
-    const completedLessons = progressData.lessons || 0;
+    const userSnap = await get(ref(db, `users/${currentUser.uid}`));
+    
+    if (!userSnap.exists()) {
+      document.getElementById('completionText').textContent = 'Loading...';
+      return;
+    }
 
-    console.log('✅ Progress loaded - Lessons:', completedLessons);
+    const userData = userSnap.val();
+    const completedLessons = userData.lessons || 0;
 
-    // Update progress bar
     document.getElementById('progressFill').style.width = (completedLessons / 5 * 100) + '%';
     document.getElementById('completionText').textContent = `${completedLessons} of 5 lessons completed`;
 
     renderLessons(completedLessons);
 
   } catch (error) {
-    console.error('❌ Error:', error.message);
-    document.getElementById('completionText').textContent = '⚠️ Error loading progress';
-    renderLessons(0);
+    console.error('Error:', error);
+    document.getElementById('completionText').textContent = 'Error loading progress';
   }
 }
 
 function renderLessons(completedLessons) {
-  // Render lesson nodes 1-5
   document.querySelectorAll(".lesson:not(.lesson-finish)").forEach((lesson) => {
     const cls = Array.from(lesson.classList).find(c => c.startsWith('lesson-'));
     const num = parseInt(cls.split('-')[1]);
@@ -474,28 +723,21 @@ function renderLessons(completedLessons) {
 
     content.addEventListener("click", () => {
       if (!lesson.classList.contains("locked")) {
-        console.log('Going to lesson', num);
         window.location.href = `../lesson${num}/l${num}topic1.html`;
       }
     });
   });
 
-  // Show finish node when all 5 lessons complete
+  // Show finish node
   if (completedLessons === 5) {
     const finishNode = document.getElementById('finishNode');
     finishNode.classList.remove('hidden');
     
-    const finishContent = finishNode.querySelector('.finish-content');
-    finishContent.addEventListener('click', () => {
-      console.log('🏁 Finish line clicked! Going to congratulations...');
+    finishNode.querySelector('.finish-content').addEventListener('click', () => {
       window.location.href = './congratulations.html';
     });
   }
 }
-
-// Initialize
-window.addEventListener('load', loadProgress);
-loadProgress();
 </script>
 
 </body>
