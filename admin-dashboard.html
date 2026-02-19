@@ -13,8 +13,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
-  min-height: 100vh;
+  background: #f5f5f5;
   color: #222;
 }
 
@@ -22,29 +21,31 @@ header {
   background: #1b5583;
   color: white;
   padding: 1.5rem 2rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 header h1 {
-  font-size: 1.8rem;
+  margin: 0;
+  font-size: 1.5rem;
   font-weight: 800;
 }
 
-.logout-btn {
-  padding: 8px 16px;
+.logout-link {
   background: rgba(231, 76, 60, 0.8);
   color: white;
-  border: none;
+  padding: 8px 16px;
   border-radius: 20px;
-  cursor: pointer;
+  text-decoration: none;
   font-weight: 600;
+  cursor: pointer;
+  border: none;
   transition: all 0.3s;
 }
 
-.logout-btn:hover {
+.logout-link:hover {
   background: rgba(231, 76, 60, 1);
   transform: translateY(-2px);
 }
@@ -55,137 +56,136 @@ main {
   padding: 0 1rem;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.tabs {
+  display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
+  border-bottom: 2px solid #ddd;
 }
 
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.stat-value {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: #1b5583;
-  margin-bottom: 8px;
-}
-
-.stat-label {
+.tab-btn {
+  padding: 1rem 1.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 600;
   color: #666;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.students-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.students-container h2 {
-  color: #1b5583;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-}
-
-.search-box {
-  margin-bottom: 1.5rem;
-  display: flex;
-  gap: 10px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
   font-size: 1rem;
 }
 
-.search-box button {
-  padding: 10px 20px;
-  background: #1b5583;
-  color: white;
-  border: none;
+.tab-btn.active {
+  color: #1b5583;
+  border-bottom-color: #1b5583;
+}
+
+.tab-btn:hover {
+  color: #1b5583;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.student-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 4px solid #1b5583;
+}
+
+.student-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1b5583;
+  margin-bottom: 0.5rem;
+}
+
+.student-email {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.student-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  background: #f0f8ff;
+  padding: 0.75rem;
   border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
+  text-align: center;
 }
 
-.search-box button:hover {
-  background: #0f3c5f;
-  transform: translateY(-2px);
+.stat-val {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #ffd700;
 }
 
-.table-wrapper {
-  overflow-x: auto;
+.stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
 }
 
-table {
+.submissions-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-th {
-  background: #f0f4f8;
-  color: #1b5583;
-  padding: 12px;
+.submissions-table th {
+  background: #1b5583;
+  color: white;
+  padding: 1rem;
   text-align: left;
   font-weight: 700;
-  border-bottom: 2px solid #1b5583;
 }
 
-td {
-  padding: 12px;
+.submissions-table td {
+  padding: 1rem;
   border-bottom: 1px solid #eee;
 }
 
-tr:hover {
+.submissions-table tr:hover {
   background: #f9f9f9;
 }
 
-.reset-btn {
-  padding: 6px 12px;
-  background: #e74c3c;
+.download-btn {
+  background: #1b5583;
   color: white;
-  border: none;
+  padding: 8px 16px;
   border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
+  text-decoration: none;
   font-weight: 600;
-  transition: all 0.3s;
-}
-
-.reset-btn:hover {
-  background: #c0392b;
-  transform: scale(1.05);
-}
-
-.export-btn {
-  padding: 10px 20px;
-  background: #27ae60;
-  color: white;
+  cursor: pointer;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
   transition: all 0.3s;
+  font-size: 0.9rem;
 }
 
-.export-btn:hover {
-  background: #229954;
+.download-btn:hover {
+  background: #0f3c5f;
   transform: translateY(-2px);
 }
 
@@ -201,20 +201,17 @@ tr:hover {
     gap: 1rem;
   }
 
-  header h1 {
-    font-size: 1.3rem;
-  }
-
-  .stats-grid {
+  .students-grid {
     grid-template-columns: 1fr;
   }
 
-  .table-wrapper {
+  .submissions-table {
     font-size: 0.9rem;
   }
 
-  th, td {
-    padding: 8px;
+  .submissions-table th,
+  .submissions-table td {
+    padding: 0.5rem;
   }
 }
 </style>
@@ -223,201 +220,184 @@ tr:hover {
 
 <header>
   <h1>👨‍💼 Admin Dashboard</h1>
-  <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
+  <button class="logout-link" onclick="logout()">🚪 Logout</button>
 </header>
 
 <main>
-  <!-- Stats Cards -->
-  <div class="stats-grid" id="statsGrid">
-    <div class="stat-card">
-      <div class="stat-value" id="totalStudents">0</div>
-      <div class="stat-label">Total Students</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="avgStars">0</div>
-      <div class="stat-label">Avg Stars</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="lessonsCompleted">0</div>
-      <div class="stat-label">Total Lessons Completed</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="topScore">0</div>
-      <div class="stat-label">Highest Score</div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('students')">👥 Students</button>
+    <button class="tab-btn" onclick="switchTab('submissions')">📁 Submissions</button>
+  </div>
+
+  <!-- STUDENTS TAB -->
+  <div id="students" class="tab-content active">
+    <div id="studentsList" class="students-grid">
+      <div class="loading">Loading students...</div>
     </div>
   </div>
 
-  <!-- Students Table -->
-  <div class="students-container">
-    <h2>📊 Student Progress</h2>
-
-    <button class="export-btn" id="exportBtn">📥 Export to CSV</button>
-
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search student by name or email...">
-      <button onclick="filterStudents()">Search</button>
-    </div>
-
-    <div class="table-wrapper">
-      <table id="studentsTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>⭐ Stars</th>
-            <th>📚 Lessons</th>
-            <th>Last Updated</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="studentsList">
-          <tr>
-            <td colspan="6" class="loading">Loading students...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <!-- SUBMISSIONS TAB -->
+  <div id="submissions" class="tab-content">
+    <table class="submissions-table">
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Email</th>
+          <th>Assignment</th>
+          <th>Submitted</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="submissionsTable">
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 2rem;">Loading submissions...</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </main>
 
 <script type="module">
-import { getCurrentUser, logoutStudent } from './firebase-config.js';
-import { resetProgress } from './progress-manager.js';
-import { db } from './firebase-config.js';
+import { getCurrentUser, logoutStudent } from '../firebase-config.js';
+import { db } from '../firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 // Check if admin
 const user = getCurrentUser();
 if (!user || user.role !== 'admin') {
-  alert('❌ Access Denied. Admin only.');
+  alert('❌ Admin access only');
   window.location.href = '../login.html';
 }
 
 console.log('✅ Admin logged in:', user.name);
 
-const logoutBtn = document.getElementById('logoutBtn');
-const studentsList = document.getElementById('studentsList');
-const exportBtn = document.getElementById('exportBtn');
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
 
-let allStudents = [];
-
-// Logout
-logoutBtn.addEventListener('click', async () => {
+async function logout() {
   if (confirm('Logout?')) {
     await logoutStudent();
     window.location.href = '../login.html';
   }
-});
+}
 
-// Load all students
+// Load students
 async function loadStudents() {
   try {
     const snapshot = await get(ref(db, 'users'));
+    const studentsList = document.getElementById('studentsList');
     studentsList.innerHTML = '';
 
-    if (!snapshot.exists()) {
-      studentsList.innerHTML = '<tr><td colspan="6" class="loading">No students found</td></tr>';
-      return;
-    }
-
-    allStudents = Object.values(snapshot.val()).filter(u => u.role === 'student');
-    allStudents.sort((a, b) => (b.stars || 0) - (a.stars || 0));
-
-    // Update stats
-    updateStats();
-
-    // Display students
-    allStudents.forEach((student) => {
-      const row = document.createElement('tr');
-      const lastUpdated = student.lastUpdated ? new Date(student.lastUpdated).toLocaleString() : '-';
-
-      row.innerHTML = `
-        <td>${student.name || '-'}</td>
-        <td>${student.email || '-'}</td>
-        <td>⭐ ${student.stars || 0}</td>
-        <td>${student.lessons || 0}/5</td>
-        <td>${lastUpdated}</td>
-        <td>
-          <button class="reset-btn" onclick="resetStudentProgress('${student.email}')">Reset</button>
-        </td>
-      `;
-      studentsList.appendChild(row);
-    });
-  } catch (error) {
-    console.error('❌ Error loading students:', error);
-    studentsList.innerHTML = '<tr><td colspan="6" class="loading">❌ Error loading data</td></tr>';
-  }
-}
-
-function updateStats() {
-  const totalStudents = allStudents.length;
-  const totalStars = allStudents.reduce((sum, s) => sum + (s.stars || 0), 0);
-  const avgStars = totalStudents > 0 ? Math.round(totalStars / totalStudents) : 0;
-  const lessonsCompleted = allStudents.reduce((sum, s) => sum + (s.lessons || 0), 0);
-  const topScore = allStudents.length > 0 ? (allStudents[0].stars || 0) : 0;
-
-  document.getElementById('totalStudents').textContent = totalStudents;
-  document.getElementById('avgStars').textContent = avgStars;
-  document.getElementById('lessonsCompleted').textContent = lessonsCompleted;
-  document.getElementById('topScore').textContent = topScore;
-}
-
-window.filterStudents = function() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  const rows = document.querySelectorAll('#studentsList tr');
-
-  rows.forEach(row => {
-    const name = row.cells[0].textContent.toLowerCase();
-    const email = row.cells[1].textContent.toLowerCase();
-
-    if (name.includes(query) || email.includes(query)) {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
-    }
-  });
-};
-
-window.resetStudentProgress = async function(email) {
-  if (confirm(`Are you sure? This will reset all progress for ${email}`)) {
-    // Find student UID and reset
-    const snapshot = await get(ref(db, 'users'));
     if (snapshot.exists()) {
-      const users = snapshot.val();
-      for (const uid in users) {
-        if (users[uid].email === email) {
-          await resetProgress(uid);
-          alert('✅ Progress reset');
-          loadStudents();
-          return;
-        }
-      }
+      const allUsers = Object.values(snapshot.val())
+        .filter(u => u.role === 'student')
+        .sort((a, b) => (b.stars || 0) - (a.stars || 0));
+
+      allUsers.forEach((student, index) => {
+        const card = document.createElement('div');
+        card.className = 'student-card';
+        card.innerHTML = `
+          <div class="student-name">#${index + 1} - ${student.name}</div>
+          <div class="student-email">${student.email}</div>
+          <div class="student-stats">
+            <div class="stat">
+              <div class="stat-val">⭐ ${student.stars || 0}</div>
+              <div class="stat-label">Total Stars</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val">${student.lessons || 0}/5</div>
+              <div class="stat-label">Lessons</div>
+            </div>
+          </div>
+        `;
+        studentsList.appendChild(card);
+      });
     }
+  } catch (error) {
+    console.error('Error loading students:', error);
+  }
+}
+
+// Load submissions
+async function loadSubmissions() {
+  try {
+    const snapshot = await get(ref(db, 'assignments'));
+    const tbody = document.getElementById('submissionsTable');
+    tbody.innerHTML = '';
+
+    if (snapshot.exists()) {
+      const assignments = snapshot.val();
+      
+      Object.entries(assignments).forEach(([uid, userAssignments]) => {
+        Object.entries(userAssignments).forEach(([assignmentType, data]) => {
+          const row = document.createElement('tr');
+          
+          // Get student name from users
+          get(ref(db, `users/${uid}`)).then(snap => {
+            if (snap.exists()) {
+              const student = snap.val();
+              row.innerHTML = `
+                <td>${student.name}</td>
+                <td>${student.email}</td>
+                <td>${assignmentType}</td>
+                <td>${new Date(data.uploadedAt).toLocaleDateString()}</td>
+                <td>
+                  <button class="download-btn" onclick="downloadFile('${uid}', '${assignmentType}', '${data.fileName}')">
+                    📥 Download
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(row);
+            }
+          });
+        });
+      });
+
+      if (tbody.children.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No submissions yet</td></tr>';
+      }
+    } else {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No submissions yet</td></tr>';
+    }
+  } catch (error) {
+    console.error('Error loading submissions:', error);
+  }
+}
+
+// Download file
+window.downloadFile = async (uid, assignmentType, fileName) => {
+  try {
+    const snapshot = await get(ref(db, `assignments/${uid}/${assignmentType}`));
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      
+      // Convert base64 to blob
+      const arr = data.fileData;
+      const blob = new Blob([new Uint8Array(Object.values(arr))], { type: data.fileType });
+      
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  } catch (error) {
+    alert('❌ Error downloading file: ' + error.message);
   }
 };
-
-// Export to CSV
-exportBtn.addEventListener('click', () => {
-  let csv = 'Name,Email,Stars,Lessons,Last Updated\n';
-
-  allStudents.forEach(s => {
-    const lastUpdated = s.lastUpdated ? new Date(s.lastUpdated).toLocaleString() : '-';
-    csv += `"${s.name || '-'}","${s.email || '-'}",${s.stars || 0},${s.lessons || 0},"${lastUpdated}"\n`;
-  });
-
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `beautiful-mind-students-${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
-});
 
 // Initialize
 loadStudents();
-
-// Refresh every 30 seconds
-setInterval(loadStudents, 30000);
+loadSubmissions();
 </script>
 
 </body>
