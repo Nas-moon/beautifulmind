@@ -337,33 +337,13 @@ h1 {
 }
 
 @media (max-width: 480px) {
-  main {
-    padding: 15px;
-  }
-
-  .congrats-card {
-    padding: 25px 20px;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-
-  .subtitle {
-    font-size: 1rem;
-  }
-
-  .trophy-icon {
-    font-size: 3.5rem;
-  }
-
-  .actions {
-    grid-template-columns: 1fr;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
+  main { padding: 15px; }
+  .congrats-card { padding: 25px 20px; }
+  h1 { font-size: 2rem; }
+  .subtitle { font-size: 1rem; }
+  .trophy-icon { font-size: 3.5rem; }
+  .actions { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -432,55 +412,73 @@ h1 {
 </main>
 
 <script type="module">
-import { getCurrentUser } from '../firebase-config.js';
-import { getProgressData } from '../progress-manager.js';
-import { db } from '../firebase-config.js';
-import { ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-// Check authentication
-const user = getCurrentUser();
-if (!user) {
-  alert('❌ Not authenticated');
-  window.location.href = '../login.html';
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
+  authDomain: "beautifulmind-19645.firebaseapp.com",
+  databaseURL: "https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "beautifulmind-19645",
+  storageBucket: "beautifulmind-19645.firebasestorage.app",
+  messagingSenderId: "799227957055",
+  appId: "1:799227957055:web:6a7397f3c43c7a9ed54d8a"
+};
 
-console.log('✅ User:', user.name, 'Email:', user.email);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
 
-// Load data
-async function loadData() {
+// Wait for auth
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    alert('❌ Not authenticated');
+    window.location.href = '/login.html';
+    return;
+  }
+
+  console.log('✅ User:', user.email);
+  loadData(user);
+});
+
+async function loadData(user) {
   try {
-    // Get progress
-    const progressData = await getProgressData(user.uid);
-    const totalStars = progressData.stars || 0;
+    // Get user progress
+    const userSnap = await get(ref(db, `users/${user.uid}`));
+    
+    if (!userSnap.exists()) {
+      throw new Error('User data not found');
+    }
 
-    // Update name and stars
-    document.getElementById('studentName').textContent = user.name;
+    const userData = userSnap.val();
+    const totalStars = userData.stars || 0;
+
+    console.log('📊 Progress:', userData);
+
+    // Update UI
+    document.getElementById('studentName').textContent = userData.name || user.email;
     document.getElementById('totalStarsDisplay').textContent = totalStars;
 
-    console.log('📊 Loaded - Stars:', totalStars);
-
-    // Fetch leaderboard
-    const snapshot = await get(ref(db, 'users'));
+    // Get leaderboard
+    const usersSnap = await get(ref(db, 'users'));
     const lbPreview = document.getElementById('lbPreview');
     lbPreview.innerHTML = '';
 
-    if (snapshot.exists()) {
-      const allUsers = snapshot.val();
+    if (usersSnap.exists()) {
+      const allUsers = usersSnap.val();
       const students = Object.values(allUsers)
         .filter(u => u.role === 'student')
         .sort((a, b) => (b.stars || 0) - (a.stars || 0));
 
-      const myIndex = students.findIndex(u => u.email === user.email);
-
-      if (myIndex >= 0) {
-        document.getElementById('rankDisplay').textContent = '#' + (myIndex + 1);
-      }
+      const myRank = students.findIndex(u => u.email === user.email) + 1;
+      document.getElementById('rankDisplay').textContent = '#' + myRank;
 
       // Show top 3 + me
       const toShow = [];
       students.slice(0, 3).forEach(u => toShow.push(u));
-      if (myIndex > 2) {
-        toShow.push(students[myIndex]);
+      if (myRank > 3) {
+        toShow.push(students[myRank - 1]);
       }
 
       toShow.forEach((u) => {
@@ -498,19 +496,19 @@ async function loadData() {
         lbPreview.appendChild(item);
       });
 
-      console.log('🏆 Leaderboard loaded - Your rank:', myIndex + 1);
+      console.log('🏆 Your rank:', myRank);
     }
 
     createConfetti();
 
   } catch (error) {
-    console.error('❌ Error loading data:', error);
-    document.getElementById('studentName').textContent = user.name;
+    console.error('❌ Error:', error);
+    document.getElementById('studentName').textContent = user.email;
   }
 }
 
 function createConfetti() {
-  const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a8e6cf'];
+  const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
 
   for (let i = 0; i < 60; i++) {
     const confetti = document.createElement('div');
@@ -529,14 +527,12 @@ function createConfetti() {
 
 // Button events
 document.getElementById('viewLeaderboard').addEventListener('click', () => {
-  window.location.href = '../lessonmap/lesson-map.html#leaderboard';
+  window.location.href = '../lessonmap/lesson-map.html';
 });
 
 document.getElementById('backHome').addEventListener('click', () => {
   window.location.href = '../lessonmap/lesson-map.html';
 });
-
-loadData();
 </script>
 
 </body>
