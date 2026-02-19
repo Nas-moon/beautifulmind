@@ -37,7 +37,7 @@ const VALID_STUDENTS = [
 ];
 
 const ADMIN_ACCOUNTS = [
-  "admin1@beautifulmind.com",
+  "nasreenbanu375@gmail.com",
   "admin2@beautifulmind.com",
   "admin3@beautifulmind.com",
 ];
