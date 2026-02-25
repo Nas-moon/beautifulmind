@@ -180,6 +180,7 @@ main {
 .lesson:nth-child(4) { animation-delay: 0.2s; }
 .lesson:nth-child(5) { animation-delay: 0.1s; }
 .lesson:nth-child(6) { animation-delay: 0s; }
+.lesson:nth-child(7) { animation-delay: 0s; }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
@@ -485,7 +486,7 @@ main {
 <div class="leaderboard-panel" id="lbPanel">
   <div class="lb-header">
     <h2>🏆 Leaderboard</h2>
-    <button class="lb-close" onclick="closeLB()">✕</button>
+    <button class="lb-close" id="lbCloseBtn">✕</button>
   </div>
   <div class="lb-content">
     <div class="lb-list" id="lbList">
@@ -494,14 +495,14 @@ main {
   </div>
 </div>
 
-<button class="lb-fab" onclick="openLB()">🏆 <span>Leaderboard</span></button>
+<button class="lb-fab" id="lbBtn">🏆 <span>Leaderboard</span></button>
 
 <main>
   <div class="header">
     <h1>🌟 Your Learning Journey</h1>
     <p>Complete each lesson to unlock the next!</p>
     <div class="header-controls">
-      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+      <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
     </div>
     <div class="progress-bar">
       <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
@@ -515,8 +516,9 @@ main {
             fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
 
+    <!-- FINISH LINE NODE -->
     <div class="lesson lesson-finish hidden" id="finishNode">
-      <div class="lesson-content finish-content" onclick="goToCongrats()">
+      <div class="lesson-content finish-content" id="finishContent">
         <div class="node finish-node">🏁</div>
         <div class="lesson-label">Finish Line</div>
       </div>
@@ -560,35 +562,66 @@ for (let i = 0; i < 30; i++) {
   starsEl.appendChild(s);
 }
 
-// Auth
+// Auth check
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = '/login.html';
     return;
   }
   currentUser = user;
-  console.log('User:', user.email);
+  console.log('✅ User:', user.email);
   loadProgress();
+  setupEventListeners();
 });
 
-// LEADERBOARD FUNCTIONS
-function openLB() {
-  console.log('Opening leaderboard...');
-  document.getElementById('lbPanel').classList.add('open');
-  document.getElementById('lbOverlay').classList.add('open');
-  loadLeaderboard();
+// SETUP EVENT LISTENERS
+function setupEventListeners() {
+  const lbBtn = document.getElementById('lbBtn');
+  const lbCloseBtn = document.getElementById('lbCloseBtn');
+  const lbOverlay = document.getElementById('lbOverlay');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const finishContent = document.getElementById('finishContent');
+
+  // Leaderboard button
+  lbBtn.addEventListener('click', () => {
+    console.log('📂 Opening leaderboard');
+    document.getElementById('lbPanel').classList.add('open');
+    document.getElementById('lbOverlay').classList.add('open');
+    loadLeaderboard();
+  });
+
+  // Close leaderboard
+  lbCloseBtn.addEventListener('click', () => {
+    console.log('📂 Closing leaderboard');
+    document.getElementById('lbPanel').classList.remove('open');
+    document.getElementById('lbOverlay').classList.remove('open');
+  });
+
+  // Close on overlay click
+  lbOverlay.addEventListener('click', () => {
+    document.getElementById('lbPanel').classList.remove('open');
+    document.getElementById('lbOverlay').classList.remove('open');
+  });
+
+  // Logout
+  logoutBtn.addEventListener('click', () => {
+    if (confirm('Logout?')) {
+      signOut(auth).then(() => {
+        window.location.href = '/login.html';
+      });
+    }
+  });
+
+  // Finish node
+  finishContent.addEventListener('click', () => {
+    console.log('🏁 Finish line clicked');
+    window.location.href = './congratulations.html';
+  });
 }
 
-function closeLB() {
-  console.log('Closing leaderboard...');
-  document.getElementById('lbPanel').classList.remove('open');
-  document.getElementById('lbOverlay').classList.remove('open');
-}
-
-document.getElementById('lbOverlay').onclick = closeLB;
-
+// LOAD LEADERBOARD
 async function loadLeaderboard() {
-  console.log('Loading leaderboard...');
+  console.log('📊 Fetching leaderboard...');
   const lbList = document.getElementById('lbList');
   lbList.innerHTML = '<div class="lb-loading">Loading...</div>';
   
@@ -620,27 +653,12 @@ async function loadLeaderboard() {
         `;
         lbList.appendChild(item);
       });
-    } else {
-      lbList.innerHTML = '<div class="lb-loading">No students yet</div>';
+      console.log('✅ Leaderboard loaded');
     }
   } catch (error) {
-    console.error('LB Error:', error);
-    lbList.innerHTML = '<div class="lb-loading">Error loading</div>';
+    console.error('❌ LB Error:', error);
+    lbList.innerHTML = '<div class="lb-loading">Error loading leaderboard</div>';
   }
-}
-
-// LOGOUT
-function logout() {
-  if (confirm('Logout?')) {
-    signOut(auth).then(() => {
-      window.location.href = '/login.html';
-    });
-  }
-}
-
-// FINISH NODE
-function goToCongrats() {
-  window.location.href = './congratulations.html';
 }
 
 // LOAD PROGRESS
@@ -656,10 +674,12 @@ async function loadProgress() {
     const data = snap.val();
     const completed = data.lessons || 0;
 
+    console.log('📊 Progress:', completed, '/ 5');
+
     document.getElementById('progressFill').style.width = (completed / 5 * 100) + '%';
     document.getElementById('completionText').textContent = `${completed} of 5 lessons completed`;
 
-    // Show lessons
+    // Render lessons
     document.querySelectorAll(".lesson:not(.lesson-finish)").forEach((lesson) => {
       const cls = Array.from(lesson.classList).find(c => c.startsWith('lesson-'));
       const num = parseInt(cls.split('-')[1]);
@@ -677,20 +697,23 @@ async function loadProgress() {
         content.classList.add("locked-content");
       }
 
-      if (!lesson.classList.contains("locked")) {
-        content.onclick = () => {
+      // Add click listener
+      content.addEventListener('click', () => {
+        if (!lesson.classList.contains("locked")) {
+          console.log('→ Going to lesson', num);
           window.location.href = `../lesson${num}/l${num}topic1.html`;
-        };
-      }
+        }
+      });
     });
 
     // Show finish node
     if (completed === 5) {
+      console.log('🏁 Showing finish node');
       document.getElementById('finishNode').classList.remove('hidden');
     }
 
   } catch (error) {
-    console.error('Progress error:', error);
+    console.error('❌ Progress error:', error);
   }
 }
 </script>
