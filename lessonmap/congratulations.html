@@ -3,94 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Congratulations – Beautiful Mind</title>
+<title>Congratulations - Beautiful Mind</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
   min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+body::before {
+  content: '';
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.1;
+  top: -100px;
+  right: -100px;
+  animation: float 20s infinite ease-in-out;
+  z-index: 0;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(30px); }
+}
+
 main {
-  position: relative; z-index: 1; padding: 20px;
-  max-width: 640px; margin: 0 auto; min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  max-width: 600px;
 }
+
 .congrats-card {
   background: linear-gradient(135deg, #1b5583 0%, #0f3c5f 100%);
-  border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,215,0,0.3); padding: 40px 30px;
-  text-align: center; animation: slideUp 0.8s ease forwards;
-  overflow-y: auto; max-height: 95vh; width: 100%;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,215,0,0.3);
+  padding: 60px 40px;
+  text-align: center;
+  animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-@keyframes slideUp { from { opacity:0; transform:translateY(50px); } to { opacity:1; transform:translateY(0); } }
 
-.trophy { font-size: 5rem; display: block; margin-bottom: 16px; animation: bounce 1.2s ease-in-out infinite; }
-@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
-
-h1 { color: #ffd700; font-size: 2.4rem; font-weight: 900; letter-spacing: 2px; text-shadow: 0 4px 12px rgba(255,215,0,0.3); margin-bottom: 10px; }
-.subtitle { color: #e6eef4; font-size: 1.1rem; margin-bottom: 24px; opacity: 0.9; }
-
-.achievement {
-  background: rgba(88,204,2,0.15); border: 2px solid rgba(88,204,2,0.4);
-  border-radius: 16px; padding: 20px; margin: 20px 0;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-.achievement-name { color: #e6eef4; font-size: 1.4rem; font-weight: 800; margin: 8px 0; }
-.achievement-sub { color: rgba(230,238,244,0.8); font-size: 0.9rem; }
 
-.stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 20px 0; }
-.stat { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 14px; }
-.stat-icon { font-size: 1.8rem; margin-bottom: 6px; }
-.stat-val { color: #ffd700; font-size: 1.5rem; font-weight: 900; }
-.stat-label { color: rgba(255,255,255,0.55); font-size: 0.72rem; text-transform: uppercase; margin-top: 4px; }
-
-.lb-box {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,215,0,0.2);
-  border-radius: 12px; padding: 14px; margin: 20px 0; max-height: 180px; overflow-y: auto;
+.trophy-icon {
+  font-size: 5rem;
+  margin-bottom: 30px;
+  display: block;
+  animation: bounce 1s ease-in-out infinite 0.3s;
 }
-.lb-box h3 { color: #ffd700; font-size: 0.9rem; margin-bottom: 10px; }
-.lb-item { display:flex; align-items:center; gap:10px; padding:7px; margin-bottom:5px; background:rgba(255,255,255,0.04); border-radius:8px; font-size:0.82rem; }
-.lb-item.me { background:rgba(88,204,2,0.2); border-left:3px solid rgba(88,204,2,0.6); }
-.lb-rank { color:#ffd700; font-weight:900; min-width:28px; }
-.lb-name { flex:1; color:#e6eef4; font-weight:600; }
-.lb-stars { color:#ffd700; font-weight:700; }
 
-.cert-box {
-  background: rgba(255,215,0,0.1); border: 2px dashed rgba(255,215,0,0.4);
-  border-radius: 12px; padding: 18px; margin: 20px 0;
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
-.cert-icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
-.cert-text { color: #e6eef4; font-size: 0.9rem; line-height: 1.5; }
-.cert-note { color: rgba(230,238,244,0.6); font-size: 0.82rem; margin-top: 6px; font-style: italic; }
 
-/* Assignment warning */
-.assignment-warning {
-  background: rgba(231,76,60,0.15); border: 2px solid rgba(231,76,60,0.4);
-  border-radius: 12px; padding: 18px; margin: 20px 0; display: none;
+h1 {
+  color: #ffd700;
+  font-size: 2.8rem;
+  font-weight: 900;
+  margin: 20px 0;
+  text-shadow: 0 4px 12px rgba(255,215,0,0.3);
+  letter-spacing: 2px;
 }
-.assignment-warning h3 { color: #ff6b6b; margin-bottom: 8px; }
-.assignment-warning p { color: rgba(230,238,244,0.85); font-size: 0.9rem; line-height: 1.5; }
 
-.message { background:rgba(88,204,2,0.1); border-left:4px solid rgba(88,204,2,0.6); border-radius:8px; padding:14px; margin:20px 0; }
-.message p { color:#e6eef4; font-size:0.88rem; line-height:1.6; }
+.achievement-section {
+  background: rgba(88,204,2,0.15);
+  border: 2px solid rgba(88,204,2,0.4);
+  border-radius: 16px;
+  padding: 30px;
+  margin: 40px 0;
+}
 
-.actions { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:24px; }
-.btn { padding:13px 18px; border:none; border-radius:10px; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
-.btn-primary { background:linear-gradient(135deg,#ffd700,#ffa500); color:#0f2f4a; box-shadow:0 6px 18px rgba(255,215,0,0.3); }
-.btn-primary:hover { transform:translateY(-3px); }
-.btn-secondary { background:rgba(255,255,255,0.1); color:#e6eef4; border:2px solid rgba(255,215,0,0.3); }
-.btn-secondary:hover { background:rgba(255,255,255,0.15); transform:translateY(-3px); }
+.achievement-badge {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
 
-.confetti { position:fixed; pointer-events:none; z-index:1000; animation:fall 2s ease-out forwards; border-radius:2px; }
-@keyframes fall { 0% { transform:translateY(-10vh) rotate(0deg); opacity:1; } 100% { transform:translateY(110vh) rotate(720deg); opacity:0; } }
+.achievement-text {
+  color: rgba(230,238,244,0.9);
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.6;
+}
 
-.loading-msg { text-align:center; color:rgba(230,238,244,0.6); padding:1.5rem; font-size:0.9rem; }
+.certificate-box {
+  background: rgba(255,215,0,0.1);
+  border: 2px dashed rgba(255,215,0,0.4);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  margin: 30px 0;
+}
+
+.certificate-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.certificate-text {
+  color: #e6eef4;
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 1000;
+  animation: confetti-fall 2s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(500px) rotate(720deg);
+    opacity: 0;
+  }
+}
 
 @media (max-width: 480px) {
-  .congrats-card { padding:24px 16px; }
-  h1 { font-size:1.8rem; }
-  .stats-grid { grid-template-columns:1fr; }
-  .actions { grid-template-columns:1fr; }
+  main { padding: 15px; }
+  .congrats-card { padding: 40px 25px; }
+  h1 { font-size: 2rem; }
+  .trophy-icon { font-size: 3.5rem; }
+  .achievement-section { padding: 20px; }
 }
 </style>
 </head>
@@ -98,151 +167,41 @@ h1 { color: #ffd700; font-size: 2.4rem; font-weight: 900; letter-spacing: 2px; t
 
 <main>
   <div class="congrats-card">
-    <span class="trophy">🏆</span>
+    <div class="trophy-icon">🏆</div>
     <h1>CONGRATULATIONS!</h1>
-    <p class="subtitle">You've Completed Your Beautiful Mind Journey!</p>
 
-    <div class="achievement">
-      <div style="font-size:2.5rem">⭐⭐⭐⭐⭐</div>
-      <div class="achievement-name" id="studentName">Loading...</div>
-      <div class="achievement-sub">Has Successfully Completed All 5 Lessons</div>
+    <div class="achievement-section">
+      <div class="achievement-badge">⭐⭐⭐⭐⭐</div>
+      <p class="achievement-text">You've Successfully Completed All 5 Lessons</p>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat">
-        <div class="stat-icon">📚</div>
-        <div class="stat-val">5/5</div>
-        <div class="stat-label">Lessons</div>
-      </div>
-      <div class="stat">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-val" id="totalStars">0</div>
-        <div class="stat-label">Stars</div>
-      </div>
-      <div class="stat">
-        <div class="stat-icon">🏅</div>
-        <div class="stat-val" id="myRank">#-</div>
-        <div class="stat-label">Rank</div>
-      </div>
-    </div>
-
-    <div class="lb-box">
-      <h3>🏅 Leaderboard Position</h3>
-      <div id="lbPreview"><div class="loading-msg">Loading...</div></div>
-    </div>
-
-    <!-- Assignment warning (shows if assignments not done) -->
-    <div class="assignment-warning" id="assignmentWarning">
-      <h3>⚠️ Assignments Pending!</h3>
-      <p>You've completed all lessons, but your <strong>assignments</strong> are still pending. Your certificate will only be issued once all assignments are submitted. Please submit them from the Lesson Map.</p>
-    </div>
-
-    <div class="cert-box" id="certBox" style="display:none">
-      <span class="cert-icon">🎓</span>
-      <div class="cert-text">An official <strong>Certificate of Achievement</strong> will be sent to your registered email address shortly!</div>
-      <div class="cert-note">Keep an eye on your inbox 📧</div>
-    </div>
-
-    <div class="message">
-      <p>🌟 <strong>Amazing Work!</strong> You've shown dedication and perseverance completing this learning journey.<br><br>Keep nurturing your Beautiful Mind!<br><em>— The Beautiful Mind Team</em></p>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-secondary" id="backMapBtn">🗺️ Back to Map</button>
+    <div class="certificate-box">
+      <div class="certificate-icon">🎓</div>
+      <p class="certificate-text">Your official Certificate of Achievement will be sent to your registered email address shortly!</p>
     </div>
   </div>
 </main>
 
-<script type="module">
-import { getCurrentUser, db } from '../firebase-config.js';
-import { checkCourseComplete } from '../progress-manager.js';
-import { ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
-const MAP = '../lessonmap/lesson-map.html';
-
-// Auth check
-const user = getCurrentUser();
-if (!user) { window.location.href = '../login.html'; }
-
-async function init() {
-  // Verify all lessons are actually done before showing this page
-  const check = await checkCourseComplete(user.uid);
-
-  if (!check.allLessonsDone) {
-    // Not eligible — redirect back to map
-    alert('⚠️ You have not completed all lessons yet!');
-    window.location.href = MAP;
-    return;
-  }
-
-  // Show appropriate UI based on assignment status
-  if (check.assignmentsDone) {
-    document.getElementById('certBox').style.display = 'block';
-  } else {
-    document.getElementById('assignmentWarning').style.display = 'block';
-  }
-
-  // Load user data
-  const userSnap = await get(ref(db, `users/${user.uid}`));
-  if (!userSnap.exists()) return;
-  const userData = userSnap.val();
-
-  document.getElementById('studentName').textContent = userData.name || user.email;
-  document.getElementById('totalStars').textContent = userData.stars || 0;
-
-  // Leaderboard
-  const usersSnap = await get(ref(db, 'users'));
-  if (usersSnap.exists()) {
-    const all = Object.values(usersSnap.val())
-      .filter(u => u.role === 'student')
-      .sort((a, b) => (b.stars || 0) - (a.stars || 0));
-
-    const myRank = all.findIndex(u => u.email === user.email) + 1;
-    document.getElementById('myRank').textContent = '#' + myRank;
-
-    const lbEl = document.getElementById('lbPreview');
-    lbEl.innerHTML = '';
-    const show = [...all.slice(0, 3)];
-    if (myRank > 3) show.push(all[myRank - 1]);
-
-    show.forEach(u => {
-      const rank = all.findIndex(x => x.email === u.email) + 1;
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '#' + rank;
-      const isMe = u.email === user.email;
-      const item = document.createElement('div');
-      item.className = 'lb-item' + (isMe ? ' me' : '');
-      item.innerHTML = `<div class="lb-rank">${medal}</div><div class="lb-name">${u.name || 'Student'}${isMe ? ' (You)' : ''}</div><div class="lb-stars">⭐ ${u.stars || 0}</div>`;
-      lbEl.appendChild(item);
-    });
-  }
-
-  createConfetti();
-}
-
+<script>
 function createConfetti() {
-  const colors = ['#ffd700','#ff6b6b','#4ecdc4','#45b7d1','#f9ca24','#6c5ce7'];
-  for (let i = 0; i < 70; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti';
-    el.style.cssText = `
-      left: ${Math.random() * 100}%;
-      top: -10px;
-      width: ${Math.random() * 10 + 5}px;
-      height: ${Math.random() * 6 + 4}px;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      animation-delay: ${Math.random() * 0.8}s;
-      animation-duration: ${1.5 + Math.random()}s;
-    `;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3000);
+  const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
+
+  for (let i = 0; i < 60; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * window.innerWidth + 'px';
+    confetti.style.top = '-10px';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = Math.random() * 10 + 5 + 'px';
+    confetti.style.height = confetti.style.width;
+    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+    document.body.appendChild(confetti);
+
+    setTimeout(() => confetti.remove(), 2500);
   }
 }
 
-document.getElementById('backMapBtn').addEventListener('click', () => {
-  window.location.href = MAP;
-});
-
-init();
+createConfetti();
 </script>
 
 </body>
