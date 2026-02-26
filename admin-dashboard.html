@@ -107,11 +107,11 @@ main {
 }
 
 .tab-content {
-  display: none;
+  display: none !important;
 }
 
 .tab-content.active {
-  display: block;
+  display: block !important;
 }
 
 .students-grid {
@@ -237,8 +237,8 @@ main {
 
 <main>
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab(event, 'students')">👥 Students</button>
-    <button class="tab-btn" onclick="switchTab(event, 'submissions')">📁 Submissions</button>
+    <button class="tab-btn active" id="studentsTabBtn" onclick="switchTab('students')">👥 Students</button>
+    <button class="tab-btn" id="submissionsTabBtn" onclick="switchTab('submissions')">📁 Submissions</button>
   </div>
 
   <div id="students" class="tab-content active">
@@ -314,26 +314,50 @@ onAuthStateChanged(auth, async (user) => {
 
 function setupButtons() {
   console.log('⚙️ Setting up buttons');
+  
   document.getElementById('uploadQuestionsBtn').onclick = () => {
-    console.log('📤 Button clicked');
+    console.log('📤 Upload button clicked');
     window.location.href = './admin-upload-questions.html';
   };
   
   document.getElementById('logoutBtn').onclick = () => {
-    if (confirm('Logout?')) {
+    console.log('🔓 Logout button clicked');
+    if (confirm('Are you sure you want to logout?')) {
       signOut(auth).then(() => {
+        console.log('✅ Logged out');
         window.location.href = './login.html';
+      }).catch((error) => {
+        console.error('❌ Logout error:', error);
       });
     }
   };
+  
+  console.log('✅ Buttons set up');
 }
 
-function switchTab(event, tabName) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+window.switchTab = function(tabName) {
+  console.log('📑 Switching to tab:', tabName);
+  
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  // Remove active from all buttons
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('active');
+  });
+  
+  // Show selected tab
   document.getElementById(tabName).classList.add('active');
-  event.target.classList.add('active');
-}
+  
+  // Add active to clicked button
+  if (tabName === 'students') {
+    document.getElementById('studentsTabBtn').classList.add('active');
+  } else if (tabName === 'submissions') {
+    document.getElementById('submissionsTabBtn').classList.add('active');
+  }
+};
 
 async function loadStudents() {
   try {
@@ -396,7 +420,10 @@ async function loadSubmissions() {
       const assignments = snapshot.val();
       
       for (const [uid, userAssignments] of Object.entries(assignments)) {
-        if (uid === 'questionFile') continue;
+        if (uid === 'questionFile') {
+          console.log('⏭️ Skipping questionFile');
+          continue;
+        }
 
         try {
           const userSnap = await get(ref(db, `users/${uid}`));
@@ -404,11 +431,13 @@ async function loadSubmissions() {
 
           for (const [assignmentType, data] of Object.entries(userAssignments)) {
             const row = document.createElement('tr');
+            const submittedDate = new Date(data.uploadedAt || 0).toLocaleDateString();
+            
             row.innerHTML = `
               <td>${student.name || 'Unknown'}</td>
               <td>${student.email || 'Unknown'}</td>
               <td>${assignmentType}</td>
-              <td>${new Date(data.uploadedAt || 0).toLocaleDateString()}</td>
+              <td>${submittedDate}</td>
             `;
             tbody.appendChild(row);
             count++;
