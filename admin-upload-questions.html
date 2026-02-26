@@ -32,6 +32,28 @@ header h1 {
   font-weight: 800;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.back-btn {
+  background: #ffd700;
+  color: #0f2f4a;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+}
+
+.back-btn:hover {
+  background: #ffc800;
+  transform: translateY(-2px);
+}
+
 .logout-link {
   background: rgba(231, 76, 60, 0.8);
   color: white;
@@ -192,6 +214,14 @@ h2 {
     gap: 1rem;
   }
 
+  .header-buttons {
+    width: 100%;
+  }
+
+  .header-buttons button {
+    flex: 1;
+  }
+
   main {
     margin: 1rem;
     padding: 1rem;
@@ -208,7 +238,10 @@ h2 {
 
 <header>
   <h1>📤 Upload Assignment Questions</h1>
-  <button class="logout-link" onclick="logout()">🚪 Logout</button>
+  <div class="header-buttons">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <button class="logout-link" onclick="logout()">🚪 Logout</button>
+  </div>
 </header>
 
 <main>
@@ -260,29 +293,41 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
+// Check if user is admin
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = '/login.html';
+    console.log('❌ Not logged in');
+    window.location.href = './login.html';
     return;
   }
 
-  const userSnap = await get(ref(db, `users/${user.uid}`));
-  if (!userSnap.exists() || userSnap.val().role !== 'admin') {
-    alert('❌ Admin access only');
-    window.location.href = '/login.html';
-    return;
+  try {
+    const userSnap = await get(ref(db, `users/${user.uid}`));
+    if (!userSnap.exists() || userSnap.val().role !== 'admin') {
+      console.log('❌ Not admin');
+      window.location.href = './login.html';
+      return;
+    }
+    
+    console.log('✅ Admin logged in:', user.email);
+    loadCurrentFile();
+  } catch (error) {
+    console.error('Error:', error);
+    window.location.href = './login.html';
   }
-
-  console.log('✅ Admin logged in:', user.email);
-  loadCurrentFile();
 });
 
 function logout() {
   if (confirm('Logout?')) {
     signOut(auth).then(() => {
-      window.location.href = '/login.html';
+      console.log('✅ Logged out');
+      window.location.href = './login.html';
     });
   }
+}
+
+function goBack() {
+  window.location.href = './admin-dashboard.html';
 }
 
 const fileInput = document.getElementById('fileInput');
