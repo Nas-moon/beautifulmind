@@ -622,7 +622,7 @@ function setupEventListeners() {
   logoutBtn.addEventListener('click', () => {
     if (confirm('Logout?')) {
       signOut(auth).then(() => {
-        window.location.href = './login.html';
+        window.location.href = '../login.html';
       });
     }
   });
