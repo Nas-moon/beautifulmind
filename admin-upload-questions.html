@@ -174,6 +174,7 @@ h2 {
   display: none;
   text-align: center;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .status-message.success {
@@ -187,6 +188,13 @@ h2 {
   background: #fee;
   color: #c33;
   border-left: 4px solid #c33;
+  display: block;
+}
+
+.status-message.loading {
+  background: #eef;
+  color: #33c;
+  border-left: 4px solid #33c;
   display: block;
 }
 
@@ -206,6 +214,20 @@ h2 {
 .current-file p {
   color: #666;
   margin: 0.5rem 0;
+}
+
+.error-banner {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c33;
+  display: none;
+}
+
+.error-banner.show {
+  display: block;
 }
 
 @media (max-width: 768px) {
@@ -245,10 +267,12 @@ h2 {
 </header>
 
 <main>
+  <div class="error-banner" id="errorBanner"></div>
+
   <h2>Upload Question File</h2>
 
   <p class="description">
-    Upload the assignment question PDF file that will be displayed to all students. Students will be able to download and view this file in the assignments section.
+    Upload the assignment question PDF file that will be displayed to all students. Students will be able to download and view this file in the assignments section, then upload their completed answers as PDF attachment.
   </p>
 
   <div class="upload-section">
@@ -269,8 +293,11 @@ h2 {
 
   <div class="current-file" id="currentFile" style="display: none;">
     <h4>📋 Current Question File:</h4>
-    <p id="currentFileName"></p>
+    <p><strong id="currentFileName"></strong></p>
     <p id="currentFileDate" style="font-size: 0.9rem; color: #999;"></p>
+    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+      ✅ This file is now visible to all students in their Assignment section
+    </p>
   </div>
 </main>
 
@@ -293,40 +320,73 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
+console.log('🔧 Upload Questions page loaded');
+
 // Check if user is admin
 onAuthStateChanged(auth, async (user) => {
+  console.log('👤 Auth state changed, user:', user?.email);
+  
   if (!user) {
-    console.log('❌ Not logged in');
-    window.location.href = './login.html';
+    console.log('❌ No user logged in, redirecting to login');
+    showError('Not logged in. Redirecting...');
+    setTimeout(() => {
+      window.location.href = './login.html';
+    }, 1000);
     return;
   }
 
   try {
+    console.log('🔍 Checking user role...');
     const userSnap = await get(ref(db, `users/${user.uid}`));
-    if (!userSnap.exists() || userSnap.val().role !== 'admin') {
-      console.log('❌ Not admin');
-      window.location.href = './login.html';
+    
+    if (!userSnap.exists()) {
+      console.log('❌ User profile not found in database');
+      showError('User profile not found. Contact admin.');
+      return;
+    }
+
+    const userData = userSnap.val();
+    console.log('📊 User data:', userData);
+
+    if (userData.role !== 'admin') {
+      console.log('❌ User is not admin. Role:', userData.role);
+      showError('Admin access only. Redirecting...');
+      setTimeout(() => {
+        window.location.href = './login.html';
+      }, 1000);
       return;
     }
     
-    console.log('✅ Admin logged in:', user.email);
+    console.log('✅ Admin verified:', user.email);
     loadCurrentFile();
   } catch (error) {
-    console.error('Error:', error);
-    window.location.href = './login.html';
+    console.error('❌ Error checking admin:', error);
+    showError('Error: ' + error.message);
   }
 });
 
+function showError(msg) {
+  const banner = document.getElementById('errorBanner');
+  banner.textContent = msg;
+  banner.classList.add('show');
+}
+
+function clearError() {
+  const banner = document.getElementById('errorBanner');
+  banner.classList.remove('show');
+}
+
 function logout() {
   if (confirm('Logout?')) {
+    console.log('🔓 Logging out...');
     signOut(auth).then(() => {
-      console.log('✅ Logged out');
       window.location.href = './login.html';
     });
   }
 }
 
 function goBack() {
+  console.log('← Going back to dashboard');
   window.location.href = './admin-dashboard.html';
 }
 
@@ -335,9 +395,16 @@ const fileName = document.getElementById('fileName');
 const uploadBtn = document.getElementById('uploadBtn');
 const statusMessage = document.getElementById('statusMessage');
 
+function showStatus(msg, type) {
+  statusMessage.textContent = msg;
+  statusMessage.className = 'status-message ' + type;
+}
+
 fileInput.addEventListener('change', (e) => {
+  console.log('📁 File selected');
   if (e.target.files.length > 0) {
     const file = e.target.files[0];
+    console.log('📄 File name:', file.name, 'Size:', file.size, 'Type:', file.type);
     
     if (file.type !== 'application/pdf') {
       fileName.textContent = '❌ Please select a PDF file only';
@@ -358,52 +425,69 @@ fileInput.addEventListener('change', (e) => {
 
 uploadBtn.addEventListener('click', async () => {
   const file = fileInput.files[0];
-  if (!file) return;
+  if (!file) {
+    console.log('❌ No file selected');
+    return;
+  }
 
+  console.log('🚀 Starting upload:', file.name);
   uploadBtn.disabled = true;
   uploadBtn.textContent = '📤 Uploading...';
-  statusMessage.className = 'status-message';
-  statusMessage.textContent = '⏳ Uploading...';
+  showStatus('⏳ Uploading...', 'loading');
+  clearError();
 
   try {
     const reader = new FileReader();
+    
+    reader.onerror = (error) => {
+      console.error('❌ File read error:', error);
+      showStatus('❌ Error reading file', 'error');
+      uploadBtn.textContent = '🚀 Upload File';
+      uploadBtn.disabled = false;
+    };
+
     reader.onload = async (e) => {
       try {
+        console.log('📖 File read successfully, uploading to Firebase...');
+        const fileData = e.target.result;
         const questionRef = ref(db, 'assignments/questionFile');
+        
         await set(questionRef, {
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
-          fileData: e.target.result,
+          fileData: fileData,
           uploadedAt: Date.now(),
           uploadedBy: 'admin'
         });
 
-        statusMessage.className = 'status-message success';
-        statusMessage.textContent = '✅ Question file uploaded successfully!';
+        console.log('✅ File uploaded to Firebase successfully!');
+        showStatus('✅ Question file uploaded successfully! Students can now see it.', 'success');
         uploadBtn.textContent = '🚀 Upload File';
         uploadBtn.disabled = true;
         fileInput.disabled = true;
-
-        console.log('✅ Question file uploaded');
         
         setTimeout(() => {
           loadCurrentFile();
           fileInput.disabled = false;
           fileName.textContent = 'No file selected';
+          fileInput.value = '';
         }, 1500);
 
       } catch (error) {
-        statusMessage.className = 'status-message error';
-        statusMessage.textContent = '❌ Error uploading: ' + error.message;
+        console.error('❌ Upload error:', error);
+        showStatus('❌ Error uploading: ' + error.message, 'error');
         uploadBtn.textContent = '🚀 Upload File';
         uploadBtn.disabled = false;
       }
     };
+
+    console.log('📖 Starting to read file...');
     reader.readAsDataURL(file);
+
   } catch (error) {
-    statusMessage.className = 'status-message error';
-    statusMessage.textContent = '❌ Error: ' + error.message;
+    console.error('❌ Unexpected error:', error);
+    showStatus('❌ Error: ' + error.message, 'error');
     uploadBtn.textContent = '🚀 Upload File';
     uploadBtn.disabled = false;
   }
@@ -411,6 +495,7 @@ uploadBtn.addEventListener('click', async () => {
 
 async function loadCurrentFile() {
   try {
+    console.log('📂 Loading current question file...');
     const snapshot = await get(ref(db, 'assignments/questionFile'));
     const currentFileDiv = document.getElementById('currentFile');
     
@@ -419,12 +504,16 @@ async function loadCurrentFile() {
       const date = new Date(data.uploadedAt).toLocaleDateString();
       const fileSize = ((data.fileSize || 0) / 1024 / 1024).toFixed(2);
 
+      console.log('✅ Current file found:', data.fileName);
       document.getElementById('currentFileName').textContent = data.fileName;
       document.getElementById('currentFileDate').textContent = `Uploaded: ${date} | Size: ${fileSize}MB`;
       currentFileDiv.style.display = 'block';
+    } else {
+      console.log('ℹ️ No question file uploaded yet');
+      currentFileDiv.style.display = 'none';
     }
   } catch (error) {
-    console.error('Error loading current file:', error);
+    console.error('❌ Error loading current file:', error);
   }
 }
 </script>
