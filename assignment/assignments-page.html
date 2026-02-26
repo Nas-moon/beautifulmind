@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assignments - Beautiful Mind</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.1;
+  top: -100px;
+  right: -100px;
+  animation: float 20s infinite ease-in-out;
+  z-index: 0;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(30px); }
+}
+
+main {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header h1 {
+  color: #e6eef4;
+  font-size: 2rem;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  font-weight: 800;
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.back-btn {
+  padding: 8px 16px;
+  background: rgba(255, 215, 0, 0.8);
+  color: #0f2f4a;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 215, 0, 1);
+  transform: translateY(-2px);
+}
+
+.tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: 2px solid rgba(255,215,0,0.3);
+  background: transparent;
+  color: #e6eef4;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  color: #0f2f4a;
+  border-color: #ffd700;
+}
+
+.tab-btn:hover:not(.active) {
+  background: rgba(255,215,0,0.2);
+  border-color: rgba(255,215,0,0.6);
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.content-box {
+  background: linear-gradient(135deg, rgba(27,85,131,0.8) 0%, rgba(15,60,95,0.8) 100%);
+  border-radius: 16px;
+  padding: 30px;
+  border: 2px solid rgba(255,215,0,0.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.content-box h2 {
+  color: #ffd700;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.content-box p {
+  color: #e6eef4;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+/* QUESTION FILE DISPLAY */
+.question-display {
+  background: rgba(255,255,255,0.08);
+  border: 2px dashed rgba(88,204,2,0.4);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.question-display.no-file {
+  color: rgba(230,238,244,0.6);
+  padding: 40px 20px;
+}
+
+.question-display.no-file p {
+  font-size: 0.95rem;
+}
+
+.question-file-info {
+  color: #ffd700;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.view-btn {
+  display: inline-block;
+  background: #ffd700;
+  color: #0f2f4a;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+}
+
+.view-btn:hover {
+  background: #ffc800;
+  transform: translateY(-2px);
+}
+
+/* STUDENT SUBMISSION */
+.upload-section {
+  background: rgba(255,255,255,0.06);
+  border: 2px dashed rgba(76,175,80,0.4);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+}
+
+.upload-section h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.file-input-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.file-input-wrapper input[type='file'] {
+  position: absolute;
+  left: -9999px;
+}
+
+.file-label {
+  display: inline-block;
+  background: linear-gradient(135deg, #58cc02, #3cb043);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.file-label:hover {
+  background: linear-gradient(135deg, #3cb043, #2d9032);
+  transform: translateY(-2px);
+}
+
+.file-name {
+  margin-top: 10px;
+  color: #e6eef4;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  color: #0f2f4a;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all 0.3s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255,215,0,0.4);
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.status-message {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  display: none;
+  text-align: center;
+  font-weight: 600;
+}
+
+.status-message.success {
+  background: rgba(60,204,60,0.3);
+  color: #5c5;
+  border-left: 4px solid #5c5;
+  display: block;
+}
+
+.status-message.error {
+  background: rgba(204,60,60,0.3);
+  color: #c55;
+  border-left: 4px solid #c55;
+  display: block;
+}
+
+.status-message.loading {
+  background: rgba(60,120,204,0.3);
+  color: #5c5;
+  border-left: 4px solid #5c5;
+  display: block;
+}
+
+/* ADMIN UPLOAD */
+.admin-upload {
+  background: rgba(255,255,255,0.06);
+  border: 2px dashed rgba(255,215,0,0.4);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+}
+
+.admin-upload h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.admin-note {
+  color: rgba(230,238,244,0.7);
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  main { padding: 15px; }
+  .content-box { padding: 20px; }
+  .header h1 { font-size: 1.5rem; }
+  .tabs { flex-direction: column; }
+  .tab-btn { width: 100%; }
+}
+</style>
+</head>
+
+<body>
+
+<main>
+  <div class="header">
+    <h1>📝 Assignments</h1>
+    <div class="header-controls">
+      <button class="back-btn" onclick="window.location.href='../lessonmap/lesson-map.html'">← Back to Map</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(event, 'questions')">❓ Questions</button>
+    <button class="tab-btn" onclick="switchTab(event, 'submit')">📤 Submit Work</button>
+  </div>
+
+  <!-- QUESTIONS TAB -->
+  <div id="questions" class="tab-content active">
+    <div class="content-box">
+      <h2>📄 Assignment Questions</h2>
+      
+      <div class="question-display" id="questionDisplay">
+        <div class="no-file">
+          <p>📋 No assignment questions uploaded yet. Check back soon!</p>
+        </div>
+      </div>
+
+      <div style="color: #e6eef4; font-size: 0.9rem; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+        <p>Questions will be displayed here once uploaded by administrators. You can download and review them before submitting your work.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT TAB -->
+  <div id="submit" class="tab-content">
+    <div class="content-box">
+      <h2>📤 Submit Your Assignment</h2>
+      
+      <div class="upload-section">
+        <h3>📎 Upload Your Answer Sheet</h3>
+        <p style="color: #e6eef4; margin-bottom: 15px;">Select your completed PDF file</p>
+        
+        <div class="file-input-wrapper">
+          <input type="file" id="studentFileInput" accept=".pdf" />
+          <label for="studentFileInput" class="file-label">📄 Choose PDF</label>
+        </div>
+        
+        <div class="file-name" id="studentFileName">No file selected</div>
+        
+        <button class="submit-btn" id="studentSubmitBtn" disabled>🚀 Submit</button>
+        
+        <div class="status-message" id="studentStatusMessage"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
+  authDomain: "beautifulmind-19645.firebaseapp.com",
+  databaseURL: "https://beautifulmind-19645-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "beautifulmind-19645",
+  storageBucket: "beautifulmind-19645.firebasestorage.app",
+  messagingSenderId: "799227957055",
+  appId: "1:799227957055:web:6a7397f3c43c7a9ed54d8a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = '/login.html';
+    return;
+  }
+  currentUser = user;
+  loadQuestionFile();
+  setupStudentSubmission();
+});
+
+function switchTab(event, tabName) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Load question file
+async function loadQuestionFile() {
+  try {
+    const snapshot = await get(ref(db, 'assignments/questionFile'));
+    const display = document.getElementById('questionDisplay');
+    
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      display.innerHTML = `
+        <div class="question-file-info">
+          📄 ${data.fileName}
+        </div>
+        <button class="view-btn" onclick="downloadQuestion('${data.fileData}', '${data.fileName}')">
+          📥 Download Questions
+        </button>
+      `;
+    } else {
+      display.innerHTML = '<div class="no-file"><p>📋 No assignment questions uploaded yet. Check back soon!</p></div>';
+    }
+  } catch (error) {
+    console.error('Error loading questions:', error);
+  }
+}
+
+window.downloadQuestion = (fileData, fileName) => {
+  const link = document.createElement('a');
+  link.href = fileData;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// Student submission
+function setupStudentSubmission() {
+  const fileInput = document.getElementById('studentFileInput');
+  const fileName = document.getElementById('studentFileName');
+  const submitBtn = document.getElementById('studentSubmitBtn');
+  const statusMsg = document.getElementById('studentStatusMessage');
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      const file = e.target.files[0];
+      
+      if (file.type !== 'application/pdf') {
+        fileName.textContent = '❌ Please select a PDF file only';
+        submitBtn.disabled = true;
+        return;
+      }
+      
+      if (file.size > 10 * 1024 * 1024) {
+        fileName.textContent = '❌ File too large (max 10MB)';
+        submitBtn.disabled = true;
+        return;
+      }
+      
+      fileName.textContent = `✅ ${file.name}`;
+      submitBtn.disabled = false;
+    }
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '📤 Uploading...';
+    statusMsg.className = 'status-message loading';
+    statusMsg.textContent = '⏳ Uploading your assignment...';
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const assignmentRef = ref(db, `assignments/${currentUser.uid}/submission`);
+          await set(assignmentRef, {
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            fileData: e.target.result,
+            uploadedAt: Date.now(),
+            studentName: currentUser.displayName || 'Student',
+            studentEmail: currentUser.email,
+            status: 'submitted'
+          });
+
+          statusMsg.className = 'status-message success';
+          statusMsg.textContent = '✅ Assignment submitted successfully!';
+          submitBtn.textContent = '🚀 Submit';
+          submitBtn.disabled = true;
+          fileInput.disabled = true;
+
+          console.log('✅ Assignment uploaded');
+        } catch (error) {
+          statusMsg.className = 'status-message error';
+          statusMsg.textContent = '❌ Error: ' + error.message;
+          submitBtn.textContent = '🚀 Submit';
+          submitBtn.disabled = false;
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      statusMsg.className = 'status-message error';
+      statusMsg.textContent = '❌ Error: ' + error.message;
+      submitBtn.textContent = '🚀 Submit';
+      submitBtn.disabled = false;
+    }
+  });
+}
+</script>
+
+</body>
+</html>
