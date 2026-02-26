@@ -290,11 +290,19 @@ main {
 
 .hidden { display: none !important; }
 
-.lb-fab {
+/* BUTTONS */
+.fab-group {
   position: fixed;
   bottom: 30px;
   right: 20px;
   z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.lb-fab, .assign-fab {
   background: linear-gradient(135deg, #ffd700, #ffa500);
   border: none;
   border-radius: 50px;
@@ -311,7 +319,12 @@ main {
   animation: fabPulse 2.5s infinite;
 }
 
-.lb-fab:hover {
+.assign-fab {
+  background: linear-gradient(135deg, #58cc02, #3cb043);
+  color: white;
+}
+
+.lb-fab:hover, .assign-fab:hover {
   transform: scale(1.08);
   box-shadow: 0 8px 24px rgba(0,0,0,0.45);
 }
@@ -471,8 +484,8 @@ main {
 @media (max-width: 480px) {
   main { padding: 15px; }
   .lesson { margin: 60px 0; }
-  .lb-fab span { display: none; }
-  .lb-fab { padding: 14px; border-radius: 50%; }
+  .lb-fab span, .assign-fab span { display: none; }
+  .lb-fab, .assign-fab { padding: 14px; border-radius: 50%; }
   .leaderboard-panel { max-width: 100%; }
 }
 </style>
@@ -495,7 +508,11 @@ main {
   </div>
 </div>
 
-<button class="lb-fab" id="lbBtn">🏆 <span>Leaderboard</span></button>
+<!-- FAB BUTTONS -->
+<div class="fab-group">
+  <button class="assign-fab" id="assignBtn">📝 <span>Assignment</span></button>
+  <button class="lb-fab" id="lbBtn">🏆 <span>Leaderboard</span></button>
+</div>
 
 <main>
   <div class="header">
@@ -516,7 +533,6 @@ main {
             fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
 
-    <!-- FINISH LINE NODE -->
     <div class="lesson lesson-finish hidden" id="finishNode">
       <div class="lesson-content finish-content" id="finishContent">
         <div class="node finish-node">🏁</div>
@@ -553,7 +569,6 @@ const auth = getAuth(app);
 
 let currentUser = null;
 
-// Create stars
 const starsEl = document.getElementById('stars');
 for (let i = 0; i < 30; i++) {
   const s = document.createElement('div');
@@ -562,7 +577,6 @@ for (let i = 0; i < 30; i++) {
   starsEl.appendChild(s);
 }
 
-// Auth check
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = '/login.html';
@@ -574,15 +588,14 @@ onAuthStateChanged(auth, (user) => {
   setupEventListeners();
 });
 
-// SETUP EVENT LISTENERS
 function setupEventListeners() {
   const lbBtn = document.getElementById('lbBtn');
+  const assignBtn = document.getElementById('assignBtn');
   const lbCloseBtn = document.getElementById('lbCloseBtn');
   const lbOverlay = document.getElementById('lbOverlay');
   const logoutBtn = document.getElementById('logoutBtn');
   const finishContent = document.getElementById('finishContent');
 
-  // Leaderboard button
   lbBtn.addEventListener('click', () => {
     console.log('📂 Opening leaderboard');
     document.getElementById('lbPanel').classList.add('open');
@@ -590,20 +603,22 @@ function setupEventListeners() {
     loadLeaderboard();
   });
 
-  // Close leaderboard
+  assignBtn.addEventListener('click', () => {
+    console.log('📝 Opening assignments');
+    window.location.href = '../assignment/assignments-page.html';
+  });
+
   lbCloseBtn.addEventListener('click', () => {
     console.log('📂 Closing leaderboard');
     document.getElementById('lbPanel').classList.remove('open');
     document.getElementById('lbOverlay').classList.remove('open');
   });
 
-  // Close on overlay click
   lbOverlay.addEventListener('click', () => {
     document.getElementById('lbPanel').classList.remove('open');
     document.getElementById('lbOverlay').classList.remove('open');
   });
 
-  // Logout
   logoutBtn.addEventListener('click', () => {
     if (confirm('Logout?')) {
       signOut(auth).then(() => {
@@ -612,14 +627,12 @@ function setupEventListeners() {
     }
   });
 
-  // Finish node
   finishContent.addEventListener('click', () => {
     console.log('🏁 Finish line clicked');
     window.location.href = './congratulations.html';
   });
 }
 
-// LOAD LEADERBOARD
 async function loadLeaderboard() {
   console.log('📊 Fetching leaderboard...');
   const lbList = document.getElementById('lbList');
@@ -661,7 +674,6 @@ async function loadLeaderboard() {
   }
 }
 
-// LOAD PROGRESS
 async function loadProgress() {
   try {
     const snap = await get(ref(db, `users/${currentUser.uid}`));
@@ -679,7 +691,6 @@ async function loadProgress() {
     document.getElementById('progressFill').style.width = (completed / 5 * 100) + '%';
     document.getElementById('completionText').textContent = `${completed} of 5 lessons completed`;
 
-    // Render lessons
     document.querySelectorAll(".lesson:not(.lesson-finish)").forEach((lesson) => {
       const cls = Array.from(lesson.classList).find(c => c.startsWith('lesson-'));
       const num = parseInt(cls.split('-')[1]);
@@ -697,7 +708,6 @@ async function loadProgress() {
         content.classList.add("locked-content");
       }
 
-      // Add click listener
       content.addEventListener('click', () => {
         if (!lesson.classList.contains("locked")) {
           console.log('→ Going to lesson', num);
@@ -706,7 +716,6 @@ async function loadProgress() {
       });
     });
 
-    // Show finish node
     if (completed === 5) {
       console.log('🏁 Showing finish node');
       document.getElementById('finishNode').classList.remove('hidden');
