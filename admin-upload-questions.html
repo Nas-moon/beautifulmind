@@ -42,11 +42,11 @@ header h1 {
   color: #0f2f4a;
   padding: 8px 16px;
   border-radius: 20px;
-  text-decoration: none;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: all 0.3s;
+  font-size: 0.9rem;
 }
 
 .back-btn:hover {
@@ -63,6 +63,7 @@ header h1 {
   cursor: pointer;
   border: none;
   transition: all 0.3s;
+  font-size: 0.9rem;
 }
 
 .logout-link:hover {
@@ -261,8 +262,8 @@ h2 {
 <header>
   <h1>📤 Upload Assignment Questions</h1>
   <div class="header-buttons">
-    <button class="back-btn" onclick="goBack()">← Back</button>
-    <button class="logout-link" onclick="logout()">🚪 Logout</button>
+    <button class="back-btn" id="backBtn">← Back</button>
+    <button class="logout-link" id="logoutBtn">🚪 Logout</button>
   </div>
 </header>
 
@@ -328,10 +329,9 @@ onAuthStateChanged(auth, async (user) => {
   
   if (!user) {
     console.log('❌ No user logged in, redirecting to login');
-    showError('Not logged in. Redirecting...');
     setTimeout(() => {
       window.location.href = './login.html';
-    }, 1000);
+    }, 500);
     return;
   }
 
@@ -353,17 +353,42 @@ onAuthStateChanged(auth, async (user) => {
       showError('Admin access only. Redirecting...');
       setTimeout(() => {
         window.location.href = './login.html';
-      }, 1000);
+      }, 500);
       return;
     }
     
     console.log('✅ Admin verified:', user.email);
     loadCurrentFile();
+    setupButtons();
   } catch (error) {
     console.error('❌ Error checking admin:', error);
     showError('Error: ' + error.message);
   }
 });
+
+function setupButtons() {
+  console.log('⚙️ Setting up buttons');
+  
+  document.getElementById('backBtn').onclick = () => {
+    console.log('← Back button clicked');
+    window.location.href = './admin-dashboard.html';
+  };
+
+  document.getElementById('logoutBtn').onclick = () => {
+    console.log('🔓 Logout button clicked');
+    if (confirm('Are you sure you want to logout?')) {
+      signOut(auth).then(() => {
+        console.log('✅ Logged out');
+        window.location.href = './login.html';
+      }).catch((error) => {
+        console.error('❌ Logout error:', error);
+        showError('Error logging out: ' + error.message);
+      });
+    }
+  };
+  
+  console.log('✅ Buttons set up');
+}
 
 function showError(msg) {
   const banner = document.getElementById('errorBanner');
@@ -374,20 +399,6 @@ function showError(msg) {
 function clearError() {
   const banner = document.getElementById('errorBanner');
   banner.classList.remove('show');
-}
-
-function logout() {
-  if (confirm('Logout?')) {
-    console.log('🔓 Logging out...');
-    signOut(auth).then(() => {
-      window.location.href = './login.html';
-    });
-  }
-}
-
-function goBack() {
-  console.log('← Going back to dashboard');
-  window.location.href = './admin-dashboard.html';
 }
 
 const fileInput = document.getElementById('fileInput');
