@@ -173,17 +173,13 @@ main {
   padding: 40px 20px;
 }
 
-.question-display.no-file p {
-  font-size: 0.95rem;
-}
-
 .question-file-info {
   color: #ffd700;
   font-weight: 700;
   margin-bottom: 15px;
 }
 
-.view-btn {
+.download-btn {
   display: inline-block;
   background: #ffd700;
   color: #0f2f4a;
@@ -197,7 +193,7 @@ main {
   font-size: 0.95rem;
 }
 
-.view-btn:hover {
+.download-btn:hover {
   background: #ffc800;
   transform: translateY(-2px);
 }
@@ -308,28 +304,6 @@ main {
   display: block;
 }
 
-/* ADMIN UPLOAD */
-.admin-upload {
-  background: rgba(255,255,255,0.06);
-  border: 2px dashed rgba(255,215,0,0.4);
-  border-radius: 12px;
-  padding: 25px;
-  text-align: center;
-}
-
-.admin-upload h3 {
-  color: #ffd700;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
-}
-
-.admin-note {
-  color: rgba(230,238,244,0.7);
-  font-size: 0.85rem;
-  margin-bottom: 15px;
-  font-style: italic;
-}
-
 @media (max-width: 768px) {
   main { padding: 15px; }
   .content-box { padding: 20px; }
@@ -352,7 +326,7 @@ main {
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab(event, 'questions')">❓ Questions</button>
-    <button class="tab-btn" onclick="switchTab(event, 'submit')">📤 Submit Work</button>
+    <button class="tab-btn" onclick="switchTab(event, 'submit')">📤 Submit Answer</button>
   </div>
 
   <!-- QUESTIONS TAB -->
@@ -375,7 +349,7 @@ main {
   <!-- SUBMIT TAB -->
   <div id="submit" class="tab-content">
     <div class="content-box">
-      <h2>📤 Submit Your Assignment</h2>
+      <h2>📤 Submit Your Answer</h2>
       
       <div class="upload-section">
         <h3>📎 Upload Your Answer Sheet</h3>
@@ -419,10 +393,11 @@ let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    window.location.href = '/login.html';
+    window.location.href = '../login.html';
     return;
   }
   currentUser = user;
+  console.log('✅ Student:', user.email);
   loadQuestionFile();
   setupStudentSubmission();
 });
@@ -435,31 +410,36 @@ function switchTab(event, tabName) {
   event.target.classList.add('active');
 }
 
-// Load question file
+// Load question file uploaded by admin
 async function loadQuestionFile() {
   try {
+    console.log('📂 Loading question file...');
     const snapshot = await get(ref(db, 'assignments/questionFile'));
     const display = document.getElementById('questionDisplay');
     
     if (snapshot.exists()) {
       const data = snapshot.val();
+      console.log('✅ Question file found:', data.fileName);
       display.innerHTML = `
         <div class="question-file-info">
           📄 ${data.fileName}
         </div>
-        <button class="view-btn" onclick="downloadQuestion('${data.fileData}', '${data.fileName}')">
+        <button class="download-btn" onclick="downloadQuestion('${data.fileData}', '${data.fileName}')">
           📥 Download Questions
         </button>
       `;
     } else {
+      console.log('ℹ️ No question file yet');
       display.innerHTML = '<div class="no-file"><p>📋 No assignment questions uploaded yet. Check back soon!</p></div>';
     }
   } catch (error) {
-    console.error('Error loading questions:', error);
+    console.error('❌ Error loading questions:', error);
+    display.innerHTML = '<div class="no-file"><p>Error loading questions</p></div>';
   }
 }
 
 window.downloadQuestion = (fileData, fileName) => {
+  console.log('📥 Downloading:', fileName);
   const link = document.createElement('a');
   link.href = fileData;
   link.download = fileName;
@@ -503,32 +483,33 @@ function setupStudentSubmission() {
     submitBtn.disabled = true;
     submitBtn.textContent = '📤 Uploading...';
     statusMsg.className = 'status-message loading';
-    statusMsg.textContent = '⏳ Uploading your assignment...';
+    statusMsg.textContent = '⏳ Uploading your answer...';
 
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
-          const assignmentRef = ref(db, `assignments/${currentUser.uid}/submission`);
+          console.log('📤 Uploading answer:', file.name);
+          const assignmentRef = ref(db, `assignments/${currentUser.uid}/answer`);
           await set(assignmentRef, {
             fileName: file.name,
             fileType: file.type,
             fileSize: file.size,
             fileData: e.target.result,
             uploadedAt: Date.now(),
-            studentName: currentUser.displayName || 'Student',
-            studentEmail: currentUser.email,
+            studentName: currentUser.email,
             status: 'submitted'
           });
 
+          console.log('✅ Answer submitted');
           statusMsg.className = 'status-message success';
-          statusMsg.textContent = '✅ Assignment submitted successfully!';
+          statusMsg.textContent = '✅ Answer submitted successfully! Admin will review it.';
           submitBtn.textContent = '🚀 Submit';
           submitBtn.disabled = true;
           fileInput.disabled = true;
-
-          console.log('✅ Assignment uploaded');
+          fileName.textContent = '';
         } catch (error) {
+          console.error('❌ Upload error:', error);
           statusMsg.className = 'status-message error';
           statusMsg.textContent = '❌ Error: ' + error.message;
           submitBtn.textContent = '🚀 Submit';
@@ -537,6 +518,7 @@ function setupStudentSubmission() {
       };
       reader.readAsDataURL(file);
     } catch (error) {
+      console.error('❌ Error:', error);
       statusMsg.className = 'status-message error';
       statusMsg.textContent = '❌ Error: ' + error.message;
       submitBtn.textContent = '🚀 Submit';
