@@ -38,37 +38,37 @@ header h1 {
   gap: 10px;
 }
 
-.logout-link {
-  background: rgba(231, 76, 60, 0.8);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s;
-}
-
-.logout-link:hover {
-  background: rgba(231, 76, 60, 1);
-  transform: translateY(-2px);
-}
-
 .upload-questions-btn {
   background: #ffd700;
   color: #0f2f4a;
   padding: 8px 16px;
   border-radius: 20px;
-  text-decoration: none;
   font-weight: 600;
   cursor: pointer;
   border: none;
   transition: all 0.3s;
+  font-size: 0.9rem;
 }
 
 .upload-questions-btn:hover {
   background: #ffc800;
+  transform: translateY(-2px);
+}
+
+.logout-link {
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.logout-link:hover {
+  background: rgba(231, 76, 60, 1);
   transform: translateY(-2px);
 }
 
@@ -145,7 +145,6 @@ main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .stat {
@@ -231,8 +230,8 @@ main {
 <header>
   <h1>👨‍💼 Admin Dashboard</h1>
   <div class="header-buttons">
-    <button class="upload-questions-btn" onclick="goToUpload()">📤 Upload Questions</button>
-    <button class="logout-link" onclick="logout()">🚪 Logout</button>
+    <button class="upload-questions-btn" id="uploadQuestionsBtn">📤 Upload Questions</button>
+    <button class="logout-link" id="logoutBtn">🚪 Logout</button>
   </div>
 </header>
 
@@ -242,14 +241,12 @@ main {
     <button class="tab-btn" onclick="switchTab(event, 'submissions')">📁 Submissions</button>
   </div>
 
-  <!-- STUDENTS TAB -->
   <div id="students" class="tab-content active">
     <div id="studentsList" class="students-grid">
       <div class="loading">Loading students...</div>
     </div>
   </div>
 
-  <!-- SUBMISSIONS TAB -->
   <div id="submissions" class="tab-content">
     <table class="submissions-table">
       <thead>
@@ -261,9 +258,7 @@ main {
         </tr>
       </thead>
       <tbody id="submissionsTable">
-        <tr>
-          <td colspan="4" style="text-align: center; padding: 2rem;">Loading submissions...</td>
-        </tr>
+        <tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading submissions...</td></tr>
       </tbody>
     </table>
   </div>
@@ -288,10 +283,13 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// Check if user is logged in and is admin
+console.log('🔧 Admin Dashboard loaded');
+
 onAuthStateChanged(auth, async (user) => {
+  console.log('👤 Auth check - User:', user?.email);
+  
   if (!user) {
-    console.log('❌ Not logged in, redirecting to login');
+    console.log('❌ No user');
     window.location.href = './login.html';
     return;
   }
@@ -299,51 +297,53 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const userSnap = await get(ref(db, `users/${user.uid}`));
     if (!userSnap.exists() || userSnap.val().role !== 'admin') {
-      console.log('❌ Not admin, redirecting to login');
+      console.log('❌ Not admin');
       window.location.href = './login.html';
       return;
     }
     
-    console.log('✅ Admin logged in:', user.email);
+    console.log('✅ Admin verified:', user.email);
     loadStudents();
     loadSubmissions();
+    setupButtons();
   } catch (error) {
-    console.error('Error checking admin:', error);
+    console.error('❌ Error:', error);
     window.location.href = './login.html';
   }
 });
 
+function setupButtons() {
+  console.log('⚙️ Setting up buttons');
+  document.getElementById('uploadQuestionsBtn').onclick = () => {
+    console.log('📤 Button clicked');
+    window.location.href = './admin-upload-questions.html';
+  };
+  
+  document.getElementById('logoutBtn').onclick = () => {
+    if (confirm('Logout?')) {
+      signOut(auth).then(() => {
+        window.location.href = './login.html';
+      });
+    }
+  };
+}
+
 function switchTab(event, tabName) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  
   document.getElementById(tabName).classList.add('active');
   event.target.classList.add('active');
 }
 
-function logout() {
-  if (confirm('Logout?')) {
-    signOut(auth).then(() => {
-      console.log('✅ Logged out');
-      window.location.href = './login.html';
-    });
-  }
-}
-
-function goToUpload() {
-  window.location.href = './admin-upload-questions.html';
-}
-
 async function loadStudents() {
   try {
-    console.log('📊 Loading students...');
+    console.log('👥 Loading students...');
     const snapshot = await get(ref(db, 'users'));
     const studentsList = document.getElementById('studentsList');
     studentsList.innerHTML = '';
 
     if (snapshot.exists()) {
-      const allData = snapshot.val();
-      const students = Object.entries(allData)
+      const students = Object.entries(snapshot.val())
         .map(([uid, data]) => ({ uid, ...data }))
         .filter(u => u.role === 'student')
         .sort((a, b) => (b.stars || 0) - (a.stars || 0));
@@ -390,36 +390,39 @@ async function loadSubmissions() {
     const tbody = document.getElementById('submissionsTable');
     tbody.innerHTML = '';
 
-    let submissionCount = 0;
+    let count = 0;
 
     if (snapshot.exists()) {
       const assignments = snapshot.val();
       
       for (const [uid, userAssignments] of Object.entries(assignments)) {
-        // Skip questionFile entry
         if (uid === 'questionFile') continue;
 
-        const userSnap = await get(ref(db, `users/${uid}`));
-        const student = userSnap.exists() ? userSnap.val() : { name: 'Unknown', email: 'Unknown' };
+        try {
+          const userSnap = await get(ref(db, `users/${uid}`));
+          const student = userSnap.exists() ? userSnap.val() : { name: 'Unknown', email: 'Unknown' };
 
-        for (const [assignmentType, data] of Object.entries(userAssignments)) {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${student.name || 'Unknown'}</td>
-            <td>${student.email || 'Unknown'}</td>
-            <td>${assignmentType}</td>
-            <td>${new Date(data.uploadedAt || 0).toLocaleDateString()}</td>
-          `;
-          tbody.appendChild(row);
-          submissionCount++;
+          for (const [assignmentType, data] of Object.entries(userAssignments)) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${student.name || 'Unknown'}</td>
+              <td>${student.email || 'Unknown'}</td>
+              <td>${assignmentType}</td>
+              <td>${new Date(data.uploadedAt || 0).toLocaleDateString()}</td>
+            `;
+            tbody.appendChild(row);
+            count++;
+          }
+        } catch (error) {
+          console.error('❌ Error with user:', uid, error);
         }
       }
 
-      if (submissionCount === 0) {
+      if (count === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="no-data">No submissions yet</td></tr>';
       }
 
-      console.log('✅ Found', submissionCount, 'submissions');
+      console.log('✅ Found', count, 'submissions');
     } else {
       tbody.innerHTML = '<tr><td colspan="4" class="no-data">No submissions yet</td></tr>';
     }
