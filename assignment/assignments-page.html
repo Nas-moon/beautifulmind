@@ -163,7 +163,7 @@ main {
   background: rgba(255,255,255,0.08);
   border: 2px dashed rgba(88,204,2,0.4);
   border-radius: 12px;
-  padding: 20px;
+  padding: 30px 20px;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -177,13 +177,14 @@ main {
   color: #ffd700;
   font-weight: 700;
   margin-bottom: 15px;
+  font-size: 1.1rem;
 }
 
 .download-btn {
   display: inline-block;
   background: #ffd700;
   color: #0f2f4a;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 700;
@@ -203,7 +204,7 @@ main {
   background: rgba(255,255,255,0.06);
   border: 2px dashed rgba(76,175,80,0.4);
   border-radius: 12px;
-  padding: 25px;
+  padding: 30px;
   text-align: center;
 }
 
@@ -211,6 +212,11 @@ main {
   color: #ffd700;
   margin-bottom: 15px;
   font-size: 1.1rem;
+}
+
+.upload-section p {
+  color: #e6eef4;
+  margin-bottom: 15px;
 }
 
 .file-input-wrapper {
@@ -229,7 +235,7 @@ main {
   display: inline-block;
   background: linear-gradient(135deg, #58cc02, #3cb043);
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
@@ -242,16 +248,16 @@ main {
 }
 
 .file-name {
-  margin-top: 10px;
+  margin-top: 15px;
   color: #e6eef4;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .submit-btn {
   display: block;
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: linear-gradient(135deg, #ffd700, #ffa500);
   color: #0f2f4a;
   border: none;
@@ -259,7 +265,7 @@ main {
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: 20px;
   transition: all 0.3s;
 }
 
@@ -325,7 +331,7 @@ main {
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab(event, 'questions')">❓ Questions</button>
+    <button class="tab-btn active" onclick="switchTab(event, 'questions')">❓ View Assignment</button>
     <button class="tab-btn" onclick="switchTab(event, 'submit')">📤 Submit Answer</button>
   </div>
 
@@ -336,12 +342,12 @@ main {
       
       <div class="question-display" id="questionDisplay">
         <div class="no-file">
-          <p>📋 No assignment questions uploaded yet. Check back soon!</p>
+          <p>📋 No assignment uploaded yet. Check back soon!</p>
         </div>
       </div>
 
       <div style="color: #e6eef4; font-size: 0.9rem; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-        <p>Questions will be displayed here once uploaded by administrators. You can download and review them before submitting your work.</p>
+        <p>✅ Download the assignment PDF and complete it. Then go to "Submit Answer" tab to upload your completed work.</p>
       </div>
     </div>
   </div>
@@ -352,17 +358,17 @@ main {
       <h2>📤 Submit Your Answer</h2>
       
       <div class="upload-section">
-        <h3>📎 Upload Your Answer Sheet</h3>
-        <p style="color: #e6eef4; margin-bottom: 15px;">Select your completed PDF file</p>
+        <h3>📎 Upload Your Answer PDF</h3>
+        <p>Select your completed assignment PDF file</p>
         
         <div class="file-input-wrapper">
           <input type="file" id="studentFileInput" accept=".pdf" />
-          <label for="studentFileInput" class="file-label">📄 Choose PDF</label>
+          <label for="studentFileInput" class="file-label">📄 Choose PDF File</label>
         </div>
         
         <div class="file-name" id="studentFileName">No file selected</div>
         
-        <button class="submit-btn" id="studentSubmitBtn" disabled>🚀 Submit</button>
+        <button class="submit-btn" id="studentSubmitBtn" disabled>🚀 Submit Answer</button>
         
         <div class="status-message" id="studentStatusMessage"></div>
       </div>
@@ -391,11 +397,17 @@ const auth = getAuth(app);
 
 let currentUser = null;
 
+console.log('📝 Assignments page loaded');
+
 onAuthStateChanged(auth, (user) => {
+  console.log('👤 Auth check - User:', user?.email);
+  
   if (!user) {
+    console.log('❌ Not logged in');
     window.location.href = '../login.html';
     return;
   }
+  
   currentUser = user;
   console.log('✅ Student:', user.email);
   loadQuestionFile();
@@ -403,6 +415,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function switchTab(event, tabName) {
+  console.log('📑 Switching tab to:', tabName);
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   
@@ -413,32 +426,35 @@ function switchTab(event, tabName) {
 // Load question file uploaded by admin
 async function loadQuestionFile() {
   try {
-    console.log('📂 Loading question file...');
+    console.log('📂 Loading assignment file...');
     const snapshot = await get(ref(db, 'assignments/questionFile'));
     const display = document.getElementById('questionDisplay');
     
     if (snapshot.exists()) {
       const data = snapshot.val();
-      console.log('✅ Question file found:', data.fileName);
+      console.log('✅ Assignment found:', data.fileName);
       display.innerHTML = `
         <div class="question-file-info">
-          📄 ${data.fileName}
+          📄 Assignment
         </div>
-        <button class="download-btn" onclick="downloadQuestion('${data.fileData}', '${data.fileName}')">
-          📥 Download Questions
+        <p style="color: #e6eef4; margin-bottom: 15px;">
+          ${data.fileName}
+        </p>
+        <button class="download-btn" onclick="downloadAssignment('${data.fileData}', '${data.fileName}')">
+          📥 Download Assignment
         </button>
       `;
     } else {
-      console.log('ℹ️ No question file yet');
-      display.innerHTML = '<div class="no-file"><p>📋 No assignment questions uploaded yet. Check back soon!</p></div>';
+      console.log('ℹ️ No assignment uploaded yet');
+      display.innerHTML = '<div class="no-file"><p>📋 No assignment uploaded yet. Check back soon!</p></div>';
     }
   } catch (error) {
-    console.error('❌ Error loading questions:', error);
-    display.innerHTML = '<div class="no-file"><p>Error loading questions</p></div>';
+    console.error('❌ Error loading assignment:', error);
+    document.getElementById('questionDisplay').innerHTML = '<div class="no-file"><p>Error loading assignment</p></div>';
   }
 }
 
-window.downloadQuestion = (fileData, fileName) => {
+window.downloadAssignment = (fileData, fileName) => {
   console.log('📥 Downloading:', fileName);
   const link = document.createElement('a');
   link.href = fileData;
@@ -450,14 +466,19 @@ window.downloadQuestion = (fileData, fileName) => {
 
 // Student submission
 function setupStudentSubmission() {
+  console.log('⚙️ Setting up student submission');
+  
   const fileInput = document.getElementById('studentFileInput');
   const fileName = document.getElementById('studentFileName');
   const submitBtn = document.getElementById('studentSubmitBtn');
   const statusMsg = document.getElementById('studentStatusMessage');
 
   fileInput.addEventListener('change', (e) => {
+    console.log('📁 File selected');
+    
     if (e.target.files.length > 0) {
       const file = e.target.files[0];
+      console.log('📄 File:', file.name, 'Size:', file.size);
       
       if (file.type !== 'application/pdf') {
         fileName.textContent = '❌ Please select a PDF file only';
@@ -471,15 +492,22 @@ function setupStudentSubmission() {
         return;
       }
       
-      fileName.textContent = `✅ ${file.name}`;
+      fileName.textContent = `✅ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
       submitBtn.disabled = false;
+    } else {
+      fileName.textContent = 'No file selected';
+      submitBtn.disabled = true;
     }
   });
 
   submitBtn.addEventListener('click', async () => {
     const file = fileInput.files[0];
-    if (!file) return;
+    if (!file) {
+      console.log('❌ No file');
+      return;
+    }
 
+    console.log('🚀 Starting upload:', file.name);
     submitBtn.disabled = true;
     submitBtn.textContent = '📤 Uploading...';
     statusMsg.className = 'status-message loading';
@@ -487,44 +515,60 @@ function setupStudentSubmission() {
 
     try {
       const reader = new FileReader();
+      
+      reader.onerror = (error) => {
+        console.error('❌ File read error:', error);
+        statusMsg.className = 'status-message error';
+        statusMsg.textContent = '❌ Error reading file';
+        submitBtn.textContent = '🚀 Submit Answer';
+        submitBtn.disabled = false;
+      };
+
       reader.onload = async (e) => {
         try {
-          console.log('📤 Uploading answer:', file.name);
+          console.log('📖 File read, uploading to Firebase...');
           const assignmentRef = ref(db, `assignments/${currentUser.uid}/answer`);
+          
           await set(assignmentRef, {
             fileName: file.name,
             fileType: file.type,
             fileSize: file.size,
             fileData: e.target.result,
             uploadedAt: Date.now(),
-            studentName: currentUser.email,
+            studentEmail: currentUser.email,
             status: 'submitted'
           });
 
           console.log('✅ Answer submitted');
           statusMsg.className = 'status-message success';
           statusMsg.textContent = '✅ Answer submitted successfully! Admin will review it.';
-          submitBtn.textContent = '🚀 Submit';
+          submitBtn.textContent = '🚀 Submit Answer';
           submitBtn.disabled = true;
           fileInput.disabled = true;
           fileName.textContent = '';
+
         } catch (error) {
           console.error('❌ Upload error:', error);
           statusMsg.className = 'status-message error';
           statusMsg.textContent = '❌ Error: ' + error.message;
-          submitBtn.textContent = '🚀 Submit';
+          submitBtn.textContent = '🚀 Submit Answer';
           submitBtn.disabled = false;
         }
       };
+
+      console.log('📖 Reading file...');
       reader.readAsDataURL(file);
+      
     } catch (error) {
       console.error('❌ Error:', error);
       statusMsg.className = 'status-message error';
       statusMsg.textContent = '❌ Error: ' + error.message;
-      submitBtn.textContent = '🚀 Submit';
+      submitBtn.textContent = '🚀 Submit Answer';
       submitBtn.disabled = false;
     }
   });
+  
+  console.log('✅ Student submission set up');
 }
 </script>
 
