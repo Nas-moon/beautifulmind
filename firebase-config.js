@@ -1,10 +1,7 @@
-// ============================================
-// FIREBASE CONFIG & AUTHENTICATION
-// ============================================
-
+// Firebase Configuration
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, get, set, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { getAuth, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAEMgcKGhZpui2eEYFA6T6SeYvWB51uRD0",
@@ -17,14 +14,19 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const auth = getAuth(app);
+const db = getDatabase(app);
 
-console.log('✅ Firebase initialized');
-
-// Valid students and admins
+// ============================================
+// WHITELIST - STUDENTS WHO CAN REGISTER
+// ============================================
 const ALLOWED_EMAILS = [
-  "student1@beautifulmind.com","student3@beautifulmind.com","anusuya.cm@bhc.edu.in",
+  "student1@beautifulmind.com",
+  "student2@beautifulmind.com",
+  "student3@beautifulmind.com",
+  "student4@beautifulmind.com",
+  "student5@beautifulmind.com",
+  "anusuya.cm@bhc.edu.in",
 "balamuralikrishnan.cm@bhc.edu.in",
 "kavitha.cm@bhc.edu.in",
 "sutha.cm@bhc.edu.in",
@@ -73,145 +75,140 @@ const ALLOWED_EMAILS = [
 "umamaheswari.cm@bhc.edu.in",
 "bhcsumathi@gmail.com",
 "lakshmir554@gmail.com"
-];
-
-const ADMIN_ACCOUNTS = [
-  "nasreenbanu375@gmail.com",
-  "admin2@beautifulmind.com",
-  "admin3@beautifulmind.com",
+  // Add more student emails here
 ];
 
 // ============================================
-// LOGIN FUNCTION - CRITICAL FIX
+// ADMIN ACCOUNTS
+// ============================================
+const ADMIN_ACCOUNTS = [
+  "admin1@beautifulmind.com",
+  "nasreenbanu375@gmail.com",
+  // Add more admin emails here
+];
+
+// ============================================
+// LOGIN FUNCTION
 // ============================================
 export async function loginStudent(email, password) {
   try {
-    console.log('🔐 Attempting login for:', email);
-    
-    // Validate email
-    const validEmails = [...VALID_STUDENTS, ...ADMIN_ACCOUNTS];
-    if (!validEmails.includes(email.toLowerCase())) {
-      throw new Error('❌ Email not authorized. Access denied.');
-    }
-
-    // Sign in with Firebase Auth
+    // Step 1: Sign in with Firebase Auth
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    const uid = user.uid;
 
-    console.log('✅ Auth login successful, UID:', uid);
+    console.log('✅ Auth login successful for:', user.email);
 
-    // Determine role
-    const role = ADMIN_ACCOUNTS.includes(email.toLowerCase()) ? 'admin' : 'student';
+    // Step 2: Get user data from Database
+    const userSnapshot = await get(ref(db, `users/${user.uid}`));
 
-    // CHECK if user exists in Firebase
-    const existingSnapshot = await get(ref(db, `users/${uid}`));
-    let userData;
-
-    if (existingSnapshot.exists()) {
-      // USER EXISTS - FETCH THEIR DATA WITH PROGRESS INTACT
-      userData = existingSnapshot.val();
-      console.log('✅ Existing user found - preserving all progress:', userData);
-    } else {
-      // NEW USER - CREATE INITIAL RECORD (ONLY ONCE)
-      userData = {
-        name: email.split('@')[0],
-        email: email.toLowerCase(),
-        phone: '',
-        standard: '',
-        role: role,
-        stars: 0,
-        lessons: 0,
-        completedTopics: {},
-        completedQuizzes: {},
-        createdAt: Date.now(),
-        lastUpdated: Date.now()
+    if (!userSnapshot.exists()) {
+      return {
+        success: false,
+        error: '❌ User profile not found. Please contact admin.',
+        role: null
       };
-      
-      console.log('📝 New user detected - creating initial record');
-      
-      // Use set() ONLY for brand new users
-      await set(ref(db, `users/${uid}`), userData);
-      console.log('✅ New user created in Firebase');
     }
 
-    // Save to localStorage for quick access
-    localStorage.setItem('uid', uid);
-    localStorage.setItem('userName', userData.name);
-    localStorage.setItem('userEmail', email.toLowerCase());
-    localStorage.setItem('userRole', role);
-    localStorage.setItem('userPhone', userData.phone || '');
-    localStorage.setItem('userStandard', userData.standard || '');
+    const userData = userSnapshot.val();
+    const userRole = userData.role || 'student';
 
-    console.log('✅ Login successful:', userData.name, '| Stars:', userData.stars, '| Lessons:', userData.lessons);
-    return { success: true, user: userData, role: role, uid: uid };
+    console.log('✅ User data retrieved. Role:', userRole);
+
+    return {
+      success: true,
+      error: null,
+      role: userRole,
+      userData: userData
+    };
 
   } catch (error) {
-    console.error('❌ Login error:', error.message);
-    return { success: false, error: error.message };
-  }
-}
+    console.error('❌ Login error:', error.code, error.message);
 
-// ============================================
-// LOGOUT FUNCTION
-// ============================================
-export async function logoutStudent() {
-  try {
-    await signOut(auth);
-    localStorage.clear();
-    console.log('✅ Logout successful');
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Logout error:', error.message);
-    return { success: false, error: error.message };
-  }
-}
+    let errorMsg = '❌ Login failed. Please try again.';
 
-// ============================================
-// GET CURRENT USER
-// ============================================
-export function getCurrentUser() {
-  const uid = localStorage.getItem('uid');
-  const email = localStorage.getItem('userEmail');
-  const role = localStorage.getItem('userRole');
-  const name = localStorage.getItem('userName');
-
-  if (!uid || !email) {
-    return null;
-  }
-
-  return {
-    uid: uid,
-    email: email,
-    role: role,
-    name: name
-  };
-}
-
-// ============================================
-// CHECK AUTHENTICATION
-// ============================================
-export function isAuthenticated() {
-  return getCurrentUser() !== null;
-}
-
-// ============================================
-// GET USER DATA FROM FIREBASE
-// ============================================
-export async function getUserData(uid) {
-  try {
-    const snapshot = await get(ref(db, `users/${uid}`));
-    if (snapshot.exists()) {
-      return snapshot.val();
+    if (error.code === 'auth/user-not-found') {
+      errorMsg = '❌ Email not found. Please register first.';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMsg = '❌ Incorrect password. Please try again.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMsg = '❌ Invalid email address.';
+    } else if (error.code === 'auth/user-disabled') {
+      errorMsg = '❌ This account has been disabled.';
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMsg = '❌ Too many failed attempts. Please try again later.';
     }
-    return null;
-  } catch (error) {
-    console.error('❌ Error getting user data:', error.message);
-    return null;
+
+    return {
+      success: false,
+      error: errorMsg,
+      role: null
+    };
   }
 }
 
 // ============================================
-// EXPORT FIREBASE INSTANCES
+// REGISTRATION FUNCTION
 // ============================================
-export { app, db, auth };
+export async function registerStudent(email, password, name, phone, standard) {
+  try {
+    // Step 1: Check if email is in whitelist
+    if (!ALLOWED_EMAILS.includes(email)) {
+      return {
+        success: false,
+        error: '❌ This email is not registered. Please ask your administrator.'
+      };
+    }
+
+    // Step 2: Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    console.log('✅ Auth user created:', user.uid);
+
+    // Step 3: Create user profile in Database
+    const userRef = ref(db, `users/${user.uid}`);
+    await set(userRef, {
+      name: name,
+      email: email,
+      phone: phone,
+      standard: standard,
+      role: "student",
+      stars: 0,
+      lessons: 0,
+      completedTopics: {},
+      completedQuizzes: {},
+      lastUpdated: Date.now(),
+      createdAt: Date.now()
+    });
+
+    console.log('✅ User profile created in database');
+
+    return {
+      success: true,
+      error: null
+    };
+
+  } catch (error) {
+    console.error('❌ Registration error:', error.code, error.message);
+
+    let errorMsg = '❌ Registration failed. Please try again.';
+
+    if (error.code === 'auth/email-already-in-use') {
+      errorMsg = '❌ This email is already registered. Please login instead.';
+    } else if (error.code === 'auth/weak-password') {
+      errorMsg = '❌ Password is too weak. Use at least 6 characters.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMsg = '❌ Invalid email address.';
+    }
+
+    return {
+      success: false,
+      error: errorMsg
+    };
+  }
+}
+
+// ============================================
+// EXPORTS
+// ============================================
+export { auth, db, app };
