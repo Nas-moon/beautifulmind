@@ -84,6 +84,8 @@ const ALLOWED_EMAILS = [
 const ADMIN_ACCOUNTS = [
   "admin1@beautifulmind.com",
   "nasreenbanu375@gmail.com",
+  "Kamalakannanpersonal2006@gmail.com",
+  "miraclinjakruthi22@gmail.com"
   // Add more admin emails here
 ];
 
