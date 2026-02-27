@@ -192,6 +192,23 @@ main {
   background: #f9f9f9;
 }
 
+.download-btn {
+  background: #1b5583;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s;
+}
+
+.download-btn:hover {
+  background: #0f3c5f;
+  transform: translateY(-2px);
+}
+
 .loading {
   text-align: center;
   padding: 2rem;
@@ -230,7 +247,7 @@ main {
 <header>
   <h1>👨‍💼 Admin Dashboard</h1>
   <div class="header-buttons">
-    <button class="upload-questions-btn" id="uploadQuestionsBtn">📤 Upload Questions</button>
+    <button class="upload-questions-btn" id="uploadQuestionsBtn">📤 Upload Assignment</button>
     <button class="logout-link" id="logoutBtn">🚪 Logout</button>
   </div>
 </header>
@@ -255,10 +272,11 @@ main {
           <th>Email</th>
           <th>Assignment</th>
           <th>Submitted</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody id="submissionsTable">
-        <tr><td colspan="4" style="text-align: center; padding: 2rem;">Loading submissions...</td></tr>
+        <tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading submissions...</td></tr>
       </tbody>
     </table>
   </div>
@@ -338,25 +356,31 @@ function setupButtons() {
 window.switchTab = function(tabName) {
   console.log('📑 Switching to tab:', tabName);
   
-  // Hide all tabs
   document.querySelectorAll('.tab-content').forEach(el => {
     el.classList.remove('active');
   });
   
-  // Remove active from all buttons
   document.querySelectorAll('.tab-btn').forEach(el => {
     el.classList.remove('active');
   });
   
-  // Show selected tab
   document.getElementById(tabName).classList.add('active');
   
-  // Add active to clicked button
   if (tabName === 'students') {
     document.getElementById('studentsTabBtn').classList.add('active');
   } else if (tabName === 'submissions') {
     document.getElementById('submissionsTabBtn').classList.add('active');
   }
+};
+
+window.downloadSubmission = function(fileData, fileName) {
+  console.log('📥 Downloading:', fileName);
+  const link = document.createElement('a');
+  link.href = fileData;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 async function loadStudents() {
@@ -420,8 +444,8 @@ async function loadSubmissions() {
       const assignments = snapshot.val();
       
       for (const [uid, userAssignments] of Object.entries(assignments)) {
-        if (uid === 'questionFile') {
-          console.log('⏭️ Skipping questionFile');
+        if (uid === 'questionFile' || uid === 'assignments') {
+          console.log('⏭️ Skipping:', uid);
           continue;
         }
 
@@ -429,15 +453,20 @@ async function loadSubmissions() {
           const userSnap = await get(ref(db, `users/${uid}`));
           const student = userSnap.exists() ? userSnap.val() : { name: 'Unknown', email: 'Unknown' };
 
-          for (const [assignmentType, data] of Object.entries(userAssignments)) {
+          for (const [assignmentName, data] of Object.entries(userAssignments)) {
             const row = document.createElement('tr');
             const submittedDate = new Date(data.uploadedAt || 0).toLocaleDateString();
             
             row.innerHTML = `
               <td>${student.name || 'Unknown'}</td>
               <td>${student.email || 'Unknown'}</td>
-              <td>${assignmentType}</td>
+              <td>${data.fileName || assignmentName}</td>
               <td>${submittedDate}</td>
+              <td>
+                <button class="download-btn" onclick="downloadSubmission('${data.fileData}', '${data.fileName || assignmentName}')">
+                  📥 Download
+                </button>
+              </td>
             `;
             tbody.appendChild(row);
             count++;
@@ -448,16 +477,16 @@ async function loadSubmissions() {
       }
 
       if (count === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="no-data">No submissions yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="no-data">No submissions yet</td></tr>';
       }
 
       console.log('✅ Found', count, 'submissions');
     } else {
-      tbody.innerHTML = '<tr><td colspan="4" class="no-data">No submissions yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="no-data">No submissions yet</td></tr>';
     }
   } catch (error) {
     console.error('❌ Error loading submissions:', error);
-    document.getElementById('submissionsTable').innerHTML = `<tr><td colspan="4" class="no-data">Error: ${error.message}</td></tr>`;
+    document.getElementById('submissionsTable').innerHTML = `<tr><td colspan="5" class="no-data">Error: ${error.message}</td></tr>`;
   }
 }
 </script>
