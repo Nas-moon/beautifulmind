@@ -27,54 +27,54 @@ const ALLOWED_EMAILS = [
   "student4@beautifulmind.com",
   "student5@beautifulmind.com",
   "anusuya.cm@bhc.edu.in",
-"balamuralikrishnan.cm@bhc.edu.in",
-"kavitha.cm@bhc.edu.in",
-"sutha.cm@bhc.edu.in",
-"vijayalakshmi.cm@bhc.edu.in",
-"mohan.cm@bhc.edu.in",
-"hemalatha.cm@bhc.edu.in",
-"nasrinhussaina.cm@bhc.edu.in",
-"selvindelish.cm@bhc.edu.in",
-"rajasekar.cm@bhc.edu.in",
-"charlesdurai.cm@bhc.edu.in",
-"padmavathy.cm@bhc.edu.in",
-"karpagam.cm@bhc.edu.in",
-"daniel.cm@bhc.edu.in",
-"palpandian.cm@bhc.edu.in",
-"deepa.cm@bhc.edu.in",
-"maheswari.cm@bhc.edu.in",
-"manikandan.cm@bhc.edu.in",
-"mercypaulin.cm@bhc.edu.in",
-"manivannan.cm@bhc.edu.in",
-"jeyalakshmi.cm@bhc.edu.in",
-"ramar.cm@bhc.edu.in",
-"davidantony.cm@bhc.edu.in",
-"asaithambi.cm@bhc.edu.in",
-"sivasankar.cm@bhc.edu.in",
-"elayaraja.cm@bhc.edu.in",
-"ravishankar.cm@bhc.edu.in",
-"palanikumar.cm@bhc.edu.in",
-"shakila.cm@bhc.edu.in",
-"samundeeshwari.cm@bhc.edu.in",
-"rajesh.cm@bhc.edu.in",
-"sujatha.cm@bhc.edu.in",
-"vinothkumar.cm@bhc.edu.in",
-"lawrenceimmanuel.cm@bhc.edu.in",
-"karthik.cm@bhc.edu.in",
-"kanagaraju.cm@bhc.edu.in",
-"varsha.cm@bhc.edu.in",
-"dhevika.cm@bhc.edu.in",
-"vani.cm@bhc.edu.in",
-"margaret.cm@bhc.edu.in",
-"muthu kumar.cm@bhc.edu.in",
-"mehraj banu.cm@bhc.edu.in",
-"chandrasekar.cm@bhc.edu.in",
-"thilagavathi.cm@bhc.edu.in",
-"gmklaxman@gmail.com",
-"proftmpremnath@gmail.com",
-"umamaheswari.cm@bhc.edu.in",
-"bhcsumathi@gmail.com",
-"lakshmir554@gmail.com"
+  "balamuralikrishnan.cm@bhc.edu.in",
+  "kavitha.cm@bhc.edu.in",
+  "sutha.cm@bhc.edu.in",
+  "vijayalakshmi.cm@bhc.edu.in",
+  "mohan.cm@bhc.edu.in",
+  "hemalatha.cm@bhc.edu.in",
+  "nasrinhussaina.cm@bhc.edu.in",
+  "selvindelish.cm@bhc.edu.in",
+  "rajasekar.cm@bhc.edu.in",
+  "charlesdurai.cm@bhc.edu.in",
+  "padmavathy.cm@bhc.edu.in",
+  "karpagam.cm@bhc.edu.in",
+  "daniel.cm@bhc.edu.in",
+  "palpandian.cm@bhc.edu.in",
+  "deepa.cm@bhc.edu.in",
+  "maheswari.cm@bhc.edu.in",
+  "manikandan.cm@bhc.edu.in",
+  "mercypaulin.cm@bhc.edu.in",
+  "manivannan.cm@bhc.edu.in",
+  "jeyalakshmi.cm@bhc.edu.in",
+  "ramar.cm@bhc.edu.in",
+  "davidantony.cm@bhc.edu.in",
+  "asaithambi.cm@bhc.edu.in",
+  "sivasankar.cm@bhc.edu.in",
+  "elayaraja.cm@bhc.edu.in",
+  "ravishankar.cm@bhc.edu.in",
+  "palanikumar.cm@bhc.edu.in",
+  "shakila.cm@bhc.edu.in",
+  "samundeeshwari.cm@bhc.edu.in",
+  "rajesh.cm@bhc.edu.in",
+  "sujatha.cm@bhc.edu.in",
+  "vinothkumar.cm@bhc.edu.in",
+  "lawrenceimmanuel.cm@bhc.edu.in",
+  "karthik.cm@bhc.edu.in",
+  "kanagaraju.cm@bhc.edu.in",
+  "varsha.cm@bhc.edu.in",
+  "dhevika.cm@bhc.edu.in",
+  "vani.cm@bhc.edu.in",
+  "margaret.cm@bhc.edu.in",
+  "muthu kumar.cm@bhc.edu.in",
+  "mehraj banu.cm@bhc.edu.in",
+  "chandrasekar.cm@bhc.edu.in",
+  "thilagavathi.cm@bhc.edu.in",
+  "gmklaxman@gmail.com",
+  "proftmpremnath@gmail.com",
+  "umamaheswari.cm@bhc.edu.in",
+  "bhcsumathi@gmail.com",
+  "lakshmir554@gmail.com"
   // Add more student emails here
 ];
 
@@ -88,6 +88,27 @@ const ADMIN_ACCOUNTS = [
   "miraclinjakruthi22@gmail.com"
   // Add more admin emails here
 ];
+
+// ============================================
+// SESSION MANAGEMENT  ← THIS WAS MISSING!
+// ============================================
+
+export function setCurrentUser(userData) {
+  sessionStorage.setItem('currentUser', JSON.stringify(userData));
+}
+
+export function getCurrentUser() {
+  try {
+    const data = sessionStorage.getItem('currentUser');
+    return data ? JSON.parse(data) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function clearCurrentUser() {
+  sessionStorage.removeItem('currentUser');
+}
 
 // ============================================
 // LOGIN FUNCTION
@@ -112,9 +133,18 @@ export async function loginStudent(email, password) {
     }
 
     const userData = userSnapshot.val();
+    userData.uid = user.uid; // ← SAVE THE UID INTO userData
     const userRole = userData.role || 'student';
 
     console.log('✅ User data retrieved. Role:', userRole);
+
+    // ← SAVE SESSION AUTOMATICALLY ON LOGIN
+    setCurrentUser({
+      uid: user.uid,
+      name: userData.name,
+      email: userData.email,
+      role: userRole
+    });
 
     return {
       success: true,
