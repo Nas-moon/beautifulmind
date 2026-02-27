@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta name="description" content="About Beautiful Mind - Learn about our department and contact us.">
+   <title>About & Contact - BEAUTIFUL MIND</title>
+   <link rel="stylesheet" href="stylesheet.css">
+   <style>
+      .about-contact-container {
+         max-width: 900px;
+         margin: 40px auto;
+         padding: 0 20px;
+      }
+
+      .back-button {
+         display: inline-block;
+         margin-bottom: 30px;
+         padding: 10px 20px;
+         background-color: #e6eef4;
+         color: #1b5583;
+         border: none;
+         border-radius: 8px;
+         font-weight: 600;
+         cursor: pointer;
+         text-decoration: none;
+         transition: all 0.3s ease;
+         font-size: 1rem;
+         box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+         font-family: verdana;
+      }
+
+      .back-button:hover {
+         transform: translateY(-2px);
+         background-color: #dbe7f0;
+         box-shadow: 0 10px 28px rgba(0,0,0,0.2);
+      }
+
+      .about-section {
+         background: #ffffff;
+         border-radius: 12px;
+         padding: 40px;
+         margin-bottom: 40px;
+         box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+         animation: slideInUp 0.6s ease-out;
+      }
+
+      .about-section h2 {
+         color: #1b5583;
+         font-size: 2.2rem;
+         margin-bottom: 20px;
+         margin-top: 0;
+         font-family: optima;
+         font-weight: bold;
+      }
+
+      .about-section p {
+         color: #222;
+         line-height: 1.8;
+         font-size: 1rem;
+         margin-bottom: 15px;
+         font-family: verdana;
+      }
+
+      .about-section p:last-child {
+         margin-bottom: 0;
+      }
+
+      .contact-section {
+         background: #ffffff;
+         border-radius: 12px;
+         padding: 40px;
+         box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+         animation: slideInUp 0.8s ease-out;
+      }
+
+      .contact-section h2 {
+         color: #1b5583;
+         font-size: 2.2rem;
+         margin-bottom: 30px;
+         margin-top: 0;
+         font-family: optima;
+         font-weight: bold;
+      }
+
+      .contact-section h3 {
+         color: #1b5583;
+         margin-top: 30px;
+         margin-bottom: 15px;
+         font-family: verdana;
+         font-weight: bold;
+      }
+
+      .contact-info {
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         gap: 30px;
+         margin-bottom: 30px;
+      }
+
+      .contact-item {
+         display: flex;
+         align-items: flex-start;
+         gap: 15px;
+      }
+
+      .contact-icon {
+         width: 40px;
+         height: 40px;
+         background: #e6eef4;
+         border-radius: 8px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 1.3rem;
+         flex-shrink: 0;
+         color: #1b5583;
+      }
+
+      .contact-details h3 {
+         color: #1b5583;
+         margin-bottom: 5px;
+         margin-top: 0;
+         font-size: 1.1rem;
+         font-family: verdana;
+         font-weight: bold;
+      }
+
+      .contact-details p {
+         color: #222;
+         margin: 0;
+         font-size: 0.95rem;
+         font-family: verdana;
+      }
+
+      .contact-details a {
+         color: #1b5583;
+         text-decoration: none;
+         transition: color 0.3s ease;
+         font-weight: bold;
+      }
+
+      .contact-details a:hover {
+         color: #0f2f4a;
+         text-decoration: underline;
+      }
+
+      .social-links {
+         display: flex;
+         gap: 15px;
+         margin-top: 20px;
+      }
+
+      .social-links a {
+         width: 40px;
+         height: 40px;
+         background: #e6eef4;
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         color: #1b5583;
+         text-decoration: none;
+         transition: all 0.3s ease;
+         font-weight: bold;
+         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      }
+
+      .social-links a:hover {
+         transform: translateY(-3px);
+         background: #dbe7f0;
+         box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      }
+
+      @media (max-width: 768px) {
+         .about-contact-container {
+            padding: 0 15px;
+            margin: 30px auto;
+         }
+
+         .about-section,
+         .contact-section {
+            padding: 25px;
+         }
+
+         .about-section h2,
+         .contact-section h2 {
+            font-size: 1.8rem;
+         }
+
+         .contact-info {
+            grid-template-columns: 1fr;
+            gap: 20px;
+         }
+
+         .back-button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+         }
+      }
+
+      @keyframes slideInUp {
+         from {
+            opacity: 0;
+            transform: translateY(20px);
+         }
+         to {
+            opacity: 1;
+            transform: translateY(0);
+         }
+      }
+   </style>
+</head>
+
+<body>
+   <header class="site-header">
+      <div class="header-bg"></div>
+      
+      <nav class="navi">
+         <div class="ice">
+            <svg id="fire" xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><title xmlns="">star-fill</title><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#ffda33" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></g></svg>
+            <div class="logoname">
+               <p>BEAUTIFUL MIND</p>
+            </div>
+         </div>
+         <div class="right">
+            <a href="index.html"><input type="button" class="instru" value="Home"></a>
+            <a href="instru.html"><input type="button" class="tracker" value="Instructions"></a>
+         </div>
+         <input type="button" value="☰" class="burger" id="burgerBtn">
+         <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html">Home</a>
+            <a href="instru.html">Instructions</a>
+         </div>
+      </nav>
+   </header>
+
+   <main class="content">
+      <div class="starfield">
+         <span></span><span></span><span></span><span></span><span></span>
+         <span></span><span></span><span></span><span></span><span></span>
+         <span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="about-contact-container">
+         <a href="index.html" class="back-button">← Back Home</a>
+
+         <!-- ABOUT SECTION -->
+         <section class="about-section">
+            <h2>About Our Department</h2>
+            <p>
+               The Department of Commerce owes its existence to the former Department of Corporate Secretaryship, affiliated to the University of Madras since 1977. The department offered B.A. Degree programme in Corporate Secretaryship and in 1984 was converted into Department of Commerce affiliating with the Bharathdiasan University, Tiruchirapalli. Since then, the Department offers B. Com degree programme.
+
+The programmes offered by the Department are very much sought after by a very large section of students of both genders, who desire in excelling in Accounting, Audit, Finance, Marketing, Human Resources, E-Commerce, Computational Accounting, and Information Technology used in Finance.
+
+The Department of Commerce has a unique place in the college as it manifests camaraderie among all its members sans discrimination of any sort. It exhibits a vibrant atmosphere as all the members of the staff are dedicated, committed, accessible and responsive to the needs of the students. The students enrolled in the department experience the best of academic ambience of the Heber campus and the professional curricular exercise with a human touch. This holistic combination provides ample scope for the students to hone their extra academic skills and develop their personality.
+
+The Department is proud of its students who have always shown excellence in curricular, cocurricular and extracurricular activities like NCC, NSS, Sports and other extension activities.
+
+The students of the Department have been securing University ranks consistently in B.Com, B. Com CA, and M.Com. Many students go on to complete CA, CMA, CS and other professional courses.
+
+The students also undertake a major socially responsible project during their stay in the Department and help those in need. This has helped them to be aware of the concerns of the society around them and inculcates in them the habit of giving and helping those in need. Recent projects include providing help to homes for HIV +ve children, destitute and orphans, and sponsoring a three-wheel scooter for an orthopedically challenged student of the college.
+
+Our students have been placed through Campus placements in Reputed Corporates like McKinsey, TCS, CTS, DELL, Royal Bank of Scotland, GoldManSachs, I Nautix, Capgemini, Atos and Karvy.
+
+The Department is proud of its distinguished alumni who occupy high positions in the corporate hierarchy both in India and abroad in institutions like the World Bank, Credit Suisse, etc., The alumni of the department are entrepreneurs owning Textile chains, Star Hotels, C&F Agencies etc. A strong network of our alumni contributes to the welfare of our students through their financial support and placement support which help the department explore new avenues.</p>
+            <!-- Edit the paragraph above with your department information -->
+         </section>
+
+         <!-- CONTACT SECTION -->
+         <section class="contact-section">
+            <h2>Get In Touch</h2>
+            
+            <div class="contact-info">
+               <div class="contact-item">
+                  <div class="contact-icon">📍</div>
+                  <div class="contact-details">
+                     <h3>Address</h3>
+                     <p>Post Box No. 615, Allithurai Road,<br>
+Tiruchirappalli - 620 017,<br> Tamilnadu, India</p>
+                  </div>
+               </div>
+
+               <div class="contact-item">
+                  <div class="contact-icon">📞</div>
+                  <div class="contact-details">
+                     <h3>Phone</h3>
+                     <p><a href="tel:+919876543210">+91 xxxxxxxxxx</a></p>
+                  </div>
+               </div>
+
+               <div class="contact-item">
+                  <div class="contact-icon">✉️</div>
+                  <div class="contact-details">
+                     <h3>Email</h3>
+                     <p><a href="mailto:contact@beautifulmind.com">contact@beautifulmind.com</a></p>
+                  </div>
+               </div>
+
+               <div class="contact-item">
+                  <div class="contact-icon">🕐</div>
+                  <div class="contact-details">
+                     <h3>Working Hours</h3>
+                     <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 4:00 PM</p>
+                  </div>
+               </div>
+            </div>
+
+            <!-- SOCIAL LINKS -->
+            <h3>Follow Us</h3>
+            <div class="social-links">
+               <a href="#" title="Facebook">f</a>
+               <a href="#" title="Instagram">📷</a>
+               <a href="#" title="Twitter">𝕏</a>
+               <a href="#" title="LinkedIn">in</a>
+            </div>
+         </section>
+      </div>
+
+      <script src="script.js"></script>
+   </main>
+
+   <footer></footer>
+</body>
+
+</html>
