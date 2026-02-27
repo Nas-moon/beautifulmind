@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructions & Lesson Plan</title>
+
+<style>
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+}
+
+/*======header======*/
+#fire {
+    display: flex;
+    margin-top: 5px;
+    margin-right: auto;
+}
+
+.ice {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-right: auto;
+}
+.logoname {
+  background-color: #e6eef4;
+  color: #1b5583;
+  font-family: verdana;
+  font-weight: bold;
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+  margin-right: auto;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 20px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+}
+
+.logoname p {
+ margin: 0;
+ line-height: 1;
+}
+
+.navi {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;   /* allows z-index */
+  z-index: 1;
+}
+
+.site-header {
+  position: relative;   /* IMPORTANT */
+  z-index: 10;
+  padding: 0.8rem 0 1rem;
+}
+
+.header-bg {
+  position: absolute;
+  inset: 0;             /* top:0 left:0 right:0 bottom:0 */
+  background-color: #1b5583;  /* different from site */
+  z-index: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+ }
+
+.navi input {
+  background-color: #e6eef4;
+  color: #1b5583;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.instru:hover,
+.tracker:hover {
+  background-color: #dbe7f0;
+}
+
+.tracker {
+  margin-left: auto;
+  margin-right: 10%;
+  padding: 5px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: verdana;
+  font-weight: bold;
+  background-color: #e6eef4;
+  color: #1b5583;  
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  font-size: 15px;
+  margin-top: 9px;
+}
+
+.back {
+  margin-left: auto;
+  margin-right: 10%;
+  padding: 5px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: verdana;
+  font-weight: bold;
+  background-color: #e6eef4;
+  color: #1b5583;  
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  font-size: 15px;
+  margin-top: 9px;
+}
+
+.start {
+  margin-left: auto;
+  margin-right: 10%;
+  padding: 8px;
+  border-radius: 15px;
+  box-sizing: border-box;
+  font-family: verdana;
+  font-weight: bold;
+  background-color: #e6eef4;
+  color: #1b5583;  
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  font-size: 20px;
+  margin-top: 5px;
+}
+
+
+.back:hover,
+.tracker:hover {
+  background-color: #dbe7f0;
+}
+
+
+.right {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2em;
+  margin-top: 5px;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+
+
+/* ===== PAGE LAYOUT ===== */
+body {
+  background: #eef4fa;
+  color: #222;
+}
+
+.instructions-page {
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ===== INSTRUCTIONS ===== */
+.instructions {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  margin-bottom: 3rem;
+}
+
+.instructions h1 {
+  color: #1b5583;
+  margin-bottom: 1rem;
+}
+
+.instructions ul {
+  padding-left: 1.2rem;
+}
+
+.instructions li {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+/* ===== LESSON PLAN ===== */
+.lesson-plan h2 {
+  color: #1b5583;
+  margin-bottom: 1.2rem;
+}
+
+/* SCROLL CONTAINER */
+.timeline-container {
+  position: relative;
+  background: #ffffff;
+  border-radius: 2rem;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  overflow-x: auto;
+}
+
+/* HORIZONTAL TIMELINE */
+.timeline {
+  display: flex;
+  gap: 2rem;
+}
+
+/* LESSON CARD */
+.lesson {
+  min-width: 240px;
+  background: #f4f8fb;
+  border-radius: 1.25rem;
+  padding: 1rem 1.2rem;
+  border-left: 6px solid #1b5583;
+}
+
+/* HEADER */
+.lesson-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.lesson-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ARROW */
+.arrow {
+  margin-right: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+/* DOT */
+.dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  background: #1b5583;
+  border-radius: 50%;
+  margin-right: 0.6rem;
+}
+
+/* TOPICS */
+.lesson-topics {
+  display: none;
+  margin-top: 0.7rem;
+  padding-left: 1.3rem;
+}
+
+.lesson-topics p {
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+/* OPEN STATE */
+.lesson.open .lesson-topics {
+  display: block;
+}
+
+.lesson.open .arrow {
+  transform: rotate(90deg);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .timeline {
+    gap: 1rem;
+  }
+
+  .lesson {
+    min-width: 200px;
+  }
+}
+</style>
+
+<script>
+function toggleLesson(header) {
+  const lesson = header.parentElement;
+  lesson.classList.toggle("open");
+}
+</script>
+
+</head>
+
+<body>
+<header class="site-header">
+       <div class="header-bg"></div>
+       
+       <nav class="navi">
+          <div class="ice">
+             <svg id="fire" xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><title xmlns="">star-fill</title><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"/><path fill="#ffda33" d="M10.92 2.868a1.25 1.25 0 0 1 2.16 0l2.795 4.798l5.428 1.176a1.25 1.25 0 0 1 .667 2.054l-3.7 4.141l.56 5.525a1.25 1.25 0 0 1-1.748 1.27L12 19.592l-5.082 2.24a1.25 1.25 0 0 1-1.748-1.27l.56-5.525l-3.7-4.14a1.25 1.25 0 0 1 .667-2.055l5.428-1.176z"/></g></svg>
+              <div class="logoname">
+         <p>BEAUTIFUL MIND</p>
+              </div>
+            </div>
+            <div class="right">
+        <a href="lessonmap/lesson-map.html"><input type="button" class="start" value="Go to lessons"></a>
+            </div>
+        </nav>
+     </header>
+
+
+<main class="instructions-page">
+
+  <!-- PART 1: INSTRUCTIONS -->
+  <section class="instructions">
+    <h1>Instructions</h1>
+    <ul>
+      <li>Students must complete topics in order.</li>
+      <li>Each lesson contains 3 topics.</li>
+      <li>A quiz unlocks after completing all topics.</li>
+      <li>Only after the quiz can the next lesson be accessed.</li>
+    </ul>
+  </section>
+
+  <!-- PART 2: LESSON PLAN -->
+  <section class="lesson-plan">
+    <h2>Lesson Plan</h2>
+
+    <div class="timeline-container">
+      <aside class="timeline">
+
+        <!-- LESSON 1 -->
+        <div class="lesson">
+          <div class="lesson-header" onclick="toggleLesson(this)">
+            <span class="arrow">▶</span>
+            <span class="dot"></span>
+            <h3>Lesson 1</h3>
+          </div>
+          <div class="lesson-topics">
+            <p>Topic 1: Introduction</p>
+            <p>Topic 2: Core Concepts</p>
+            <p>Topic 3: Practice</p>
+          </div>
+        </div>
+
+        <!-- LESSON 2 -->
+        <div class="lesson">
+          <div class="lesson-header" onclick="toggleLesson(this)">
+            <span class="arrow">▶</span>
+            <span class="dot"></span>
+            <h3>Lesson 2</h3>
+          </div>
+          <div class="lesson-topics">
+            <p>Topic 1: Theory</p>
+            <p>Topic 2: Examples</p>
+            <p>Topic 3: Quiz</p>
+          </div>
+        </div>
+
+        <!-- LESSON 3 -->
+        <div class="lesson">
+          <div class="lesson-header" onclick="toggleLesson(this)">
+            <span class="arrow">▶</span>
+            <span class="dot"></span>
+            <h3>Lesson 3</h3>
+          </div>
+          <div class="lesson-topics">
+            <p>Topic 1: Theory</p>
+            <p>Topic 2: Examples</p>
+            <p>Topic 3: Quiz</p>
+          </div>
+        </div>
+
+        <!-- LESSON 4 -->
+        <div class="lesson">
+          <div class="lesson-header" onclick="toggleLesson(this)">
+            <span class="arrow">▶</span>
+            <span class="dot"></span>
+            <h3>Lesson 4</h3>
+          </div>
+          <div class="lesson-topics">
+            <p>Topic 1: Theory</p>
+            <p>Topic 2: Examples</p>
+            <p>Topic 3: Quiz</p>
+          </div>
+        </div>
+        <!-- LESSON 5 -->
+        <div class="lesson">
+          <div class="lesson-header" onclick="toggleLesson(this)">
+            <span class="arrow">▶</span>
+            <span class="dot"></span>
+            <h3>Lesson 5</h3>
+          </div>
+          <div class="lesson-topics">
+            <p>Topic 1: Theory</p>
+            <p>Topic 2: Examples</p>
+            <p>Topic 3: Quiz</p>
+          </div>
+        </div>
+
+
+      </aside>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>
