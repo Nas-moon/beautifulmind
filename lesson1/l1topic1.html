@@ -131,16 +131,14 @@ button#nextBtn:disabled {
 }
 
 #star-bar {
-  position: fixed;
-  top: 1rem;
-  right: 1.5rem;
   background: #fff;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
   font-size: 1.2rem;
   box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-  z-index: 1000;
   border: 2px solid #ffd700;
+  display: inline-block;
+  margin-bottom: 1rem;
 }
 
 .star {
@@ -203,13 +201,6 @@ button#nextBtn:disabled {
   .video-wrapper iframe {
     height: 300px;
   }
-
-  #star-bar {
-    top: auto;
-    bottom: 80px;
-    right: 1rem;
-    left: auto;
-  }
 }
 </style>
 </head>
@@ -253,56 +244,77 @@ import { completeTopicInFirebase, getProgressData } from '../progress-manager.js
 // ============================================
 // CONFIG - CHANGE FOR EACH PAGE
 // ============================================
-const VIDEO_DURATION = 10; // 10 seconds timer
+const VIDEO_DURATION = 10; // seconds to watch before unlocking
 const TOPIC_ID = "l1topic1";
 const STARS_TO_EARN = 10;
 const NEXT_PAGE = "./l1topic2.html";
 // ============================================
 
 const nextBtn = document.getElementById("nextBtn");
-const progress = document.getElementById("progress");
+const progressEl = document.getElementById("progress");
 const starCountEl = document.getElementById("star-count");
 const timerText = document.getElementById("timerText");
 
-// Check authentication
+// ── STEP 1: Check login ──────────────────────
 const user = getCurrentUser();
+
 if (!user) {
-  alert('❌ Not authenticated');
+  alert('❌ You are not logged in. Please log in first.');
   window.location.href = '../login.html';
+} else {
+  // Only runs if user is logged in
+  console.log('✅ User:', user.name, '| UID:', user.uid, '| Topic:', TOPIC_ID);
+  init();
 }
 
-console.log('✅ User:', user.name, 'UID:', user.uid, '| Topic:', TOPIC_ID);
+// ── STEP 2: Main init ────────────────────────
+async function init() {
+  await loadCurrentStars();
+  await checkCompletion();
+}
 
-let topicCompleted = false;
-let starsEarned = false;
-
-// Load current stars
+// ── Load star count from Firebase ────────────
 async function loadCurrentStars() {
-  const progressData = await getProgressData(user.uid);
-  starCountEl.textContent = progressData.stars;
+  try {
+    const progressData = await getProgressData(user.uid);
+    starCountEl.textContent = progressData.stars;
+  } catch (e) {
+    console.error('Could not load stars:', e);
+  }
 }
 
-// Check if already completed
+// ── Check if topic already done ──────────────
 async function checkCompletion() {
-  const progressData = await getProgressData(user.uid);
-  
-  if (progressData.completedTopics[TOPIC_ID]) {
-    topicCompleted = true;
-    starsEarned = true;
-    nextBtn.disabled = false;
-    progress.textContent = "✅ Already completed! Click to proceed.";
-    console.log('✅ Topic already completed before');
-  } else {
+  try {
+    const progressData = await getProgressData(user.uid);
+
+    if (progressData.completedTopics && progressData.completedTopics[TOPIC_ID]) {
+      // Already completed — unlock immediately, no timer needed
+      nextBtn.disabled = false;
+      progressEl.textContent = "✅ Already completed! Click to proceed.";
+      console.log('✅ Topic already completed before');
+    } else {
+      // Not done yet — start the timer
+      startTimer();
+    }
+  } catch (e) {
+    console.error('Error checking completion:', e);
+    // If Firebase fails, still start timer so page isn't stuck
     startTimer();
   }
 }
 
+// ── Timer logic ───────────────────────────────
+let starsEarned = false;
+
 function startTimer() {
   let secondsWatched = 0;
+  console.log('⏱️ Timer started...');
 
   const timerInterval = setInterval(() => {
     secondsWatched++;
     timerText.textContent = `${secondsWatched}/${VIDEO_DURATION}`;
+    console.log(`⏱️ ${secondsWatched}/${VIDEO_DURATION}`);
 
     if (secondsWatched >= VIDEO_DURATION) {
       clearInterval(timerInterval);
@@ -311,42 +323,42 @@ function startTimer() {
   }, 1000);
 }
 
-// Unlock button AND earn stars when timer completes
+// ── Unlock button + save stars ────────────────
 async function unlockAndEarnStars() {
-  if (starsEarned) return; // Prevent double earning
-  
-  console.log('⏱️ Timer finished - earning stars...');
+  if (starsEarned) return; // prevent double earning
   starsEarned = true;
 
+  console.log('🎉 Timer done! Unlocking button and saving stars...');
+
   nextBtn.disabled = false;
-  progress.innerHTML = '✅ Video watched! Click to proceed.';
-  
-  // Immediately save progress to Firebase
-  const result = await completeTopicInFirebase(user.uid, TOPIC_ID, STARS_TO_EARN);
-  
-  if (result.success) {
-    starCountEl.textContent = result.totalStars;
-    console.log(`✅ Stars earned! Total: ${result.totalStars}`);
-    rewardAnimation();
-  } else {
-    console.error('❌ Error earning stars:', result.error);
+  progressEl.innerHTML = '✅ Video watched! Click to proceed.';
+
+  try {
+    const result = await completeTopicInFirebase(user.uid, TOPIC_ID, STARS_TO_EARN);
+
+    if (result.success) {
+      starCountEl.textContent = result.totalStars;
+      console.log(`✅ Stars saved! Total: ${result.totalStars}`);
+      rewardAnimation();
+    } else {
+      console.error('❌ Error saving stars:', result.error);
+    }
+  } catch (e) {
+    console.error('❌ Firebase error:', e);
   }
 }
 
-// Button click just navigates to next page (no star earning here)
-nextBtn.addEventListener('click', async () => {
+// ── Next button click ─────────────────────────
+nextBtn.addEventListener('click', () => {
   if (nextBtn.disabled) return;
-
-  console.log('→ Proceeding to next topic...');
   nextBtn.disabled = true;
   nextBtn.textContent = 'Loading...';
-
-  // Small delay for UX, then navigate
   setTimeout(() => {
     window.location.href = NEXT_PAGE;
   }, 500);
 });
 
+// ── Animations ────────────────────────────────
 function rewardAnimation() {
   flyStar();
   confettiBurst();
@@ -373,10 +385,6 @@ function confettiBurst() {
     setTimeout(() => c.remove(), 1000);
   }
 }
-
-// Initialize
-loadCurrentStars();
-checkCompletion();
 </script>
 
 </body>
