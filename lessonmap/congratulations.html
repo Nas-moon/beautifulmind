@@ -5,33 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Congratulations - Beautiful Mind</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to bottom, #0f2f4a 0%, #1b5583 60%, #164b73 100%);
   min-height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
 body::before {
   content: '';
   position: fixed;
-  width: 300px;
-  height: 300px;
+  width: 300px; height: 300px;
   background: white;
   border-radius: 50%;
   opacity: 0.1;
-  top: -100px;
-  right: -100px;
+  top: -100px; right: -100px;
   animation: float 20s infinite ease-in-out;
   z-index: 0;
 }
@@ -44,8 +39,9 @@ body::before {
 main {
   position: relative;
   z-index: 1;
-  padding: 20px;
-  max-width: 600px;
+  width: 100%;
+  max-width: 580px;
+  margin: auto;
 }
 
 .congrats-card {
@@ -53,55 +49,53 @@ main {
   border-radius: 24px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   border: 2px solid rgba(255,215,0,0.3);
-  padding: 60px 40px;
+  padding: 40px 36px;
   text-align: center;
   animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(50px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(50px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .trophy-icon {
-  font-size: 5rem;
-  margin-bottom: 30px;
+  font-size: 4rem;
+  margin-bottom: 10px;
   display: block;
   animation: bounce 1s ease-in-out infinite 0.3s;
 }
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+  50% { transform: translateY(-15px); }
 }
 
 h1 {
   color: #ffd700;
-  font-size: 2.8rem;
+  font-size: 2.4rem;
   font-weight: 900;
-  margin: 20px 0;
+  margin: 10px 0;
   text-shadow: 0 4px 12px rgba(255,215,0,0.3);
   letter-spacing: 2px;
+}
+
+.subtitle {
+  color: rgba(199,228,238,0.85);
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+  font-weight: 500;
 }
 
 .achievement-section {
   background: rgba(88,204,2,0.15);
   border: 2px solid rgba(88,204,2,0.4);
   border-radius: 16px;
-  padding: 30px;
-  margin: 40px 0;
+  padding: 20px;
+  margin: 20px 0;
 }
 
-.achievement-badge {
-  font-size: 3rem;
-  margin-bottom: 15px;
-}
+.achievement-badge { font-size: 2.2rem; margin-bottom: 10px; }
 
 .achievement-text {
   color: rgba(230,238,244,0.9);
@@ -115,20 +109,15 @@ h1 {
   background: rgba(255,215,0,0.1);
   border: 2px dashed rgba(255,215,0,0.4);
   border-radius: 12px;
-  padding: 25px;
-  text-align: center;
-  margin: 30px 0;
+  padding: 18px 20px;
+  margin: 16px 0 0;
 }
 
-.certificate-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
-  display: block;
-}
+.certificate-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
 
 .certificate-text {
   color: #e6eef4;
-  font-size: 1rem;
+  font-size: 0.95rem;
   margin: 0;
   line-height: 1.6;
   font-weight: 500;
@@ -136,30 +125,23 @@ h1 {
 
 .confetti {
   position: fixed;
-  width: 10px;
-  height: 10px;
   pointer-events: none;
   z-index: 1000;
   animation: confetti-fall 2s ease-out forwards;
 }
 
 @keyframes confetti-fall {
-  0% {
-    transform: translateY(-100%) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(500px) rotate(720deg);
-    opacity: 0;
-  }
+  0%   { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(500px) rotate(720deg); opacity: 0; }
 }
 
 @media (max-width: 480px) {
-  main { padding: 15px; }
-  .congrats-card { padding: 40px 25px; }
-  h1 { font-size: 2rem; }
-  .trophy-icon { font-size: 3.5rem; }
-  .achievement-section { padding: 20px; }
+  body { padding: 16px; }
+  .congrats-card { padding: 30px 20px; }
+  h1 { font-size: 1.8rem; }
+  .trophy-icon { font-size: 3rem; }
+  .achievement-section { padding: 16px; }
+  .achievement-badge { font-size: 1.8rem; }
 }
 </style>
 </head>
@@ -169,15 +151,16 @@ h1 {
   <div class="congrats-card">
     <div class="trophy-icon">🏆</div>
     <h1>CONGRATULATIONS!</h1>
+    <p class="subtitle">You did it! 🎉</p>
 
     <div class="achievement-section">
       <div class="achievement-badge">⭐⭐⭐⭐⭐</div>
-      <p class="achievement-text">You've Successfully Completed All 5 Lessons</p>
+      <p class="achievement-text">You've Successfully Completed All 5 Lessons of Beautiful Mind!</p>
     </div>
 
     <div class="certificate-box">
       <div class="certificate-icon">🎓</div>
-      <p class="certificate-text">Your official Certificate of Achievement will be sent to your registered email address shortly!</p>
+      <p class="certificate-text">Your official Certificate of Appreciation will be sent to you shortly!</p>
     </div>
   </div>
 </main>
@@ -185,22 +168,20 @@ h1 {
 <script>
 function createConfetti() {
   const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
-
   for (let i = 0; i < 60; i++) {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti';
-    confetti.style.left = Math.random() * window.innerWidth + 'px';
-    confetti.style.top = '-10px';
-    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    confetti.style.width = Math.random() * 10 + 5 + 'px';
-    confetti.style.height = confetti.style.width;
-    confetti.style.animationDelay = Math.random() * 0.5 + 's';
-    document.body.appendChild(confetti);
-
-    setTimeout(() => confetti.remove(), 2500);
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * window.innerWidth + 'px';
+    c.style.top = '-10px';
+    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    const size = Math.random() * 10 + 5 + 'px';
+    c.style.width = size; c.style.height = size;
+    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+    c.style.animationDelay = Math.random() * 0.5 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2500);
   }
 }
-
 createConfetti();
 </script>
 
