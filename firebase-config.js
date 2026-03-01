@@ -86,6 +86,7 @@ const ADMIN_ACCOUNTS = [
   "nasreenbanu375@gmail.com",
   "Kamalakannanpersonal2006@gmail.com",
   "miraclinjakruthi22@gmail.com"
+  "vaishnovivaishu07@gmail.com"
   // Add more admin emails here
 ];
 
